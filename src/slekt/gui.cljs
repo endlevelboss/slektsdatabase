@@ -32,7 +32,7 @@
           template (if (= nil t)
                        (f/get-nametemplate)
                        (f/get-nametemplate t))]
-        [:div 
+        [:div
          [:label (str (:label field) " : " personid)]
          (for [field template]
              ^{:key (:id field)} [name-part-component (:type field) id (:id field)])]))
@@ -86,7 +86,7 @@
                 (f/name-string (f/getPersona (:persona/by-id main))))
         eventstring (str year " - " label " : ")]
       [:div
-        [:label 
+        [:label
          {:on-click #(f/edit-event (:event event))}
          eventstring]
         [:label
@@ -111,14 +111,14 @@
         :left "20px"
         :font-size "140%"}}
       [:strong (f/name-string personinfo)]]
-     [:div 
-      {:style 
+     [:div
+      {:style
        {:background-color "cadetblue"
         :position "absolute"
         :width "400px"
         :height "35px"
         :top "20px"
-        :left "420px"}} 
+        :left "420px"}}
       "Father: "
       [person-display-component dad]]
      [:div
@@ -127,7 +127,7 @@
                :width "400px"
                :height "35px"
                :top "55px"
-               :left "420px"}} 
+               :left "420px"}}
       "Mother: "
       [person-display-component mum]]
      [:div
@@ -135,7 +135,7 @@
                :position "absolute"
                :width "400px"
                :top "90px"
-               :left "420px"}} 
+               :left "420px"}}
       "Children:"
       (for [child children]
           ^{:key child} [person-display-component child])]
@@ -144,11 +144,11 @@
                :position "absolute"
                :width "380px"
                :top "100px"
-               :left "30px"}} 
+               :left "30px"}}
       "Events:"
       (for [event events]
           ^{:key (str (get-in event [:event :id]) (:label event))} [event-display-component event])]
-     
+
      [:input {:style {:position "absolute"
                       :top "450px"
                       :left "20px"}
@@ -166,5 +166,5 @@
     (println "*")
     (if (not= nil (get-in @d/state [:gui/state :window/edit :type]))
         [event-edit-component]
-        [current-selected-component])
-  )
+        [current-selected-component]))
+

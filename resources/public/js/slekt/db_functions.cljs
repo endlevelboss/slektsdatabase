@@ -31,12 +31,12 @@
 
 (defn events-into-list
   ([nestedlist]
-    (events-into-list nestedlist ()))
+   (events-into-list nestedlist ()))
   ([nestedlist final-list]
-    (if (empty? nestedlist)
-      final-list
-      (do
-        (recur (rest nestedlist) (concat final-list (first nestedlist)))))))
+   (if (empty? nestedlist)
+     final-list
+     (do
+       (recur (rest nestedlist) (concat final-list (first nestedlist)))))))
 
 ;(println (events-into-list (list (list :a :b) (list :c :d) (list :e :f))))
 
@@ -77,28 +77,28 @@
         t (template (:facttemplates @d/state))
         fields (:fields t)
         fieldindex (getFieldTypeID :place fields)]
-        (get (:value event) (:id fieldindex))))
+       (get (:value event) (:id fieldindex))))
 
 
 (defn parse-name
     "Creates map of name according to its template"
     ([value]
      (let [template (:template value)
-          f (get-in @d/state [:fieldtemplates template])
-          name (:name value)]
+           f (get-in @d/state [:fieldtemplates template])
+           name (:name value)]
         (parse-name name f {:template template})))
     ([name fields result]
      (if (empty? fields)
          result
          (recur name (rest fields) (assoc result (:id (first fields)) (get name (:id (first fields))))))))
 
-(defn parse-event-date 
+(defn parse-event-date
     [value]
     (let [date (date/date-to-string (:date value))
           place (get-in value [:address :value])]
         {:date date :place place}))
 
-(defn name-string 
+(defn name-string
     ([props]
      (let [nameparts (:name props)]
          (name-string nameparts "")))
@@ -116,7 +116,7 @@
           value (get values id)
           pid (:persona/by-id value)
           returnvalue (fn [i vals]
-                   [i (assoc vals :persona/by-id pid)])]
+                       [i (assoc vals :persona/by-id pid)])]
         (case type
             :name (returnvalue id (parse-name value))
             :event (returnvalue id (parse-event-date value)))))
@@ -124,9 +124,9 @@
 (defn populate-event-field
     "Loops through the template of an event to make sure each field gets the correct value from the event"
     ([event]
-    (let [template (get-in @d/state [:facttemplates (:template event)])
-          fields (:fields template)]
-        (populate-event-field fields event {})))
+     (let [template (get-in @d/state [:facttemplates (:template event)])
+           fields (:fields template)]
+         (populate-event-field fields event {})))
     ([fields event result]
      (if (empty? fields)
          result

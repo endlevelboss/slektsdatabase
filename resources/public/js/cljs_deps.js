@@ -33,7 +33,7 @@ goog.addDependency("../reagent/core.js", ['reagent.core'], ['reagent.impl.util',
 goog.addDependency("../slekt/date.js", ['slekt.date'], ['cljs.core', 'clojure.string']);
 goog.addDependency("../slekt/database.js", ['slekt.database'], ['reagent.core', 'cljs.core']);
 goog.addDependency("../slekt/events.js", ['slekt.events'], ['cljs.core', 'slekt.date', 'slekt.database']);
-goog.addDependency("../slekt/relations.js", ['slekt.relations'], ['slekt.db_functions', 'cljs.core', 'slekt.database']);
+goog.addDependency("../slekt/relations.js", ['slekt.relations'], ['cljs.core', 'slekt.database']);
 goog.addDependency("../slekt/db_functions.js", ['slekt.db_functions'], ['reagent.core', 'cljs.core', 'slekt.date', 'slekt.events', 'slekt.relations', 'slekt.database']);
 goog.addDependency("../slekt/gui.js", ['slekt.gui'], ['slekt.db_functions', 'reagent.core', 'cljs.core', 'slekt.date', 'slekt.relations', 'slekt.database']);
 goog.addDependency("../slekt/core.js", ['slekt.core'], ['slekt.db_functions', 'reagent.core', 'cljs.core', 'slekt.date', 'slekt.database', 'slekt.gui']);

@@ -1,5 +1,6 @@
 (ns slekt.database
-    (:require [reagent.core :as r]))
+    (:require [reagent.core :as r]
+              [cljs-idxdb.core :as idx]))
 
 (def database {:gui/state {:current {:selected nil
                                      :father nil

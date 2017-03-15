@@ -39,7 +39,7 @@
                val (if (= nil value)
                        ""
                        value)]
-         (recur data (rest fields) (assoc result index val))))))
+          (recur data (rest fields) (assoc result index val))))))
 
 (defn parse-name
     [data]
@@ -83,7 +83,7 @@
     [data eid]
     (let [pid (:persona/by-id data)
           links (get-in @d/state [:persona/by-id pid :links])
-          newlinks (conj links eid)]        
+          newlinks (conj links eid)]
         (swap! d/state assoc-in [:persona/by-id pid :links] newlinks)))
 
 (defn recur-personas

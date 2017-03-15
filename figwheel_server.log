@@ -10213,3 +10213,67 @@ Analyzing file:/E:/kode/slektsdatabase/src/slekt/relations.cljs
 [31mCompiling "resources/public/js/main.js" failed.
 [0mANALYSIS ERROR:  on file null, line null, column null
 [32mSuccessfully compiled "resources/public/js/main.js" in 1.57 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\relations.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/debug.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/impl/util.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/impl/batching.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/ratom.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/impl/component.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/org/clojure/clojurescript/1.7.170/clojurescript-1.7.170.jar!/clojure/walk.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/impl/template.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/dom/server.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/interop.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/dom.cljs
+Reading analysis cache for jar:file:/C:/Users/tony/.m2/repository/reagent/reagent/0.6.0/reagent-0.6.0.jar!/reagent/core.cljs
+Reading analysis cache for file:/E:/kode/slektsdatabase/src/slekt/database.cljs
+WARNING: No such namespace: f, could not locate f.cljs, f.cljc, or Closure namespace "" at line 81 E:\kode\slektsdatabase\src\slekt\relations.cljs
+WARNING: Use of undeclared Var f/getPersona at line 81 E:\kode\slektsdatabase\src\slekt\relations.cljs
+Compiling src\slekt\db-functions.cljs
+Reading analysis cache for file:/E:/kode/slektsdatabase/src/slekt/date.cljs
+Reading analysis cache for file:/E:/kode/slektsdatabase/src/slekt/events.cljs
+Compiling src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  out\slekt\relations.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 1.301 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\relations.cljs
+WARNING: No such namespace: f, could not locate f.cljs, f.cljc, or Closure namespace "" at line 85 src\slekt\relations.cljs
+WARNING: Use of undeclared Var f/getPersona at line 85 src\slekt\relations.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  out\slekt\relations.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 1.3 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\db-functions.cljs
+Compiling src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\db_functions.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.651 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\relations.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\relations.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.697 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+[31mCompiling "resources/public/js/main.js" failed.
+[0mANALYSIS ERROR: No such namespace: datomic.api, could not locate datomic/api.cljs, datomic/api.cljc, or Closure namespace "datomic.api" on file null, line null, column null
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.248 seconds.[0m

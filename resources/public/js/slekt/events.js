@@ -32,23 +32,23 @@ return templatename;
 }
 });
 slekt.events.parse_name_part = (function slekt$events$parse_name_part(var_args){
-var args30303 = [];
-var len__17843__auto___30306 = arguments.length;
-var i__17844__auto___30307 = (0);
+var args18044 = [];
+var len__17843__auto___18047 = arguments.length;
+var i__17844__auto___18048 = (0);
 while(true){
-if((i__17844__auto___30307 < len__17843__auto___30306)){
-args30303.push((arguments[i__17844__auto___30307]));
+if((i__17844__auto___18048 < len__17843__auto___18047)){
+args18044.push((arguments[i__17844__auto___18048]));
 
-var G__30308 = (i__17844__auto___30307 + (1));
-i__17844__auto___30307 = G__30308;
+var G__18049 = (i__17844__auto___18048 + (1));
+i__17844__auto___18048 = G__18049;
 continue;
 } else {
 }
 break;
 }
 
-var G__30305 = args30303.length;
-switch (G__30305) {
+var G__18046 = args18044.length;
+switch (G__18046) {
 case 1:
 return slekt.events.parse_name_part.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -58,7 +58,7 @@ return slekt.events.parse_name_part.cljs$core$IFn$_invoke$arity$3((arguments[(0)
 
 break;
 default:
-throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args30303.length)].join('')));
+throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args18044.length)].join('')));
 
 }
 });
@@ -76,12 +76,12 @@ return result;
 var index = new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(cljs.core.first.call(null,fields));
 var value = cljs.core.get.call(null,data,index);
 var val = ((cljs.core._EQ_.call(null,null,value))?"":value);
-var G__30310 = data;
-var G__30311 = cljs.core.rest.call(null,fields);
-var G__30312 = cljs.core.assoc.call(null,result,index,val);
-data = G__30310;
-fields = G__30311;
-result = G__30312;
+var G__18051 = data;
+var G__18052 = cljs.core.rest.call(null,fields);
+var G__18053 = cljs.core.assoc.call(null,result,index,val);
+data = G__18051;
+fields = G__18052;
+result = G__18053;
 continue;
 }
 break;
@@ -105,8 +105,8 @@ var type = new cljs.core.Keyword(null,"type","type",1174270348).cljs$core$IFn$_i
 var id = new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(field);
 var d = cljs.core.get_in.call(null,data,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"values","values",372645556),id], null));
 if(cljs.core.not_EQ_.call(null,null,d)){
-var G__30314 = (((type instanceof cljs.core.Keyword))?type.fqn:null);
-switch (G__30314) {
+var G__18055 = (((type instanceof cljs.core.Keyword))?type.fqn:null);
+switch (G__18055) {
 case "name":
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [id,slekt.events.parse_name.call(null,d)], null);
 
@@ -124,23 +124,23 @@ return null;
 }
 });
 slekt.events.recur_data = (function slekt$events$recur_data(var_args){
-var args30316 = [];
-var len__17843__auto___30319 = arguments.length;
-var i__17844__auto___30320 = (0);
+var args18057 = [];
+var len__17843__auto___18060 = arguments.length;
+var i__17844__auto___18061 = (0);
 while(true){
-if((i__17844__auto___30320 < len__17843__auto___30319)){
-args30316.push((arguments[i__17844__auto___30320]));
+if((i__17844__auto___18061 < len__17843__auto___18060)){
+args18057.push((arguments[i__17844__auto___18061]));
 
-var G__30321 = (i__17844__auto___30320 + (1));
-i__17844__auto___30320 = G__30321;
+var G__18062 = (i__17844__auto___18061 + (1));
+i__17844__auto___18061 = G__18062;
 continue;
 } else {
 }
 break;
 }
 
-var G__30318 = args30316.length;
-switch (G__30318) {
+var G__18059 = args18057.length;
+switch (G__18059) {
 case 2:
 return slekt.events.recur_data.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -150,7 +150,7 @@ return slekt.events.recur_data.cljs$core$IFn$_invoke$arity$3((arguments[(0)]),(a
 
 break;
 default:
-throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args30316.length)].join('')));
+throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args18057.length)].join('')));
 
 }
 });
@@ -168,12 +168,12 @@ var d = slekt.events.parse_data.call(null,data,cljs.core.first.call(null,fields)
 var id = cljs.core.get.call(null,d,(0));
 var val = cljs.core.get.call(null,d,(1));
 var res = ((cljs.core.not_EQ_.call(null,null,id))?cljs.core.assoc.call(null,result,id,val):result);
-var G__30323 = data;
-var G__30324 = cljs.core.rest.call(null,fields);
-var G__30325 = res;
-data = G__30323;
-fields = G__30324;
-result = G__30325;
+var G__18064 = data;
+var G__18065 = cljs.core.rest.call(null,fields);
+var G__18066 = res;
+data = G__18064;
+fields = G__18065;
+result = G__18066;
 continue;
 }
 break;
@@ -196,8 +196,8 @@ var f = cljs.core.first.call(null,fields);
 var type = new cljs.core.Keyword(null,"type","type",1174270348).cljs$core$IFn$_invoke$arity$1(f);
 var val = cljs.core.get_in.call(null,data,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"value","value",305978217),new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(f)], null));
 var event_id = new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(data);
-var G__30327_30328 = (((type instanceof cljs.core.Keyword))?type.fqn:null);
-switch (G__30327_30328) {
+var G__18068_18069 = (((type instanceof cljs.core.Keyword))?type.fqn:null);
+switch (G__18068_18069) {
 case "name":
 slekt.events.update_persona.call(null,val,event_id);
 
@@ -210,10 +210,10 @@ throw (new Error([cljs.core.str("No matching clause: "),cljs.core.str(type)].joi
 
 }
 
-var G__30330 = data;
-var G__30331 = cljs.core.rest.call(null,fields);
-data = G__30330;
-fields = G__30331;
+var G__18071 = data;
+var G__18072 = cljs.core.rest.call(null,fields);
+data = G__18071;
+fields = G__18072;
 continue;
 }
 break;

@@ -1,6 +1,9 @@
 (ns slekt.relations
-    (:require [slekt.database :as d]
-              [slekt.db-functions :as f]))
+    (:require [slekt.database :as d]))
+
+(defn getPersona
+  [id]
+  (get (:persona/by-id @d/state) id))
 
 (defn findrelation
   [factid relation]
@@ -32,7 +35,7 @@
             (if (= pid (:persona/by-id field))
                 true
                 (recur event pid (rest indexlist))))))
-        
+
 (defn event-by-role
     [event role pid]
     (let [template (:template event)
@@ -51,7 +54,7 @@
                res (if (= nil v)
                        result
                        (conj result v))]
-         (recur event (rest index) res)))))
+          (recur event (rest index) res)))))
 
 (defn pid-of-role
     [event role]
@@ -79,18 +82,18 @@
 
 (defn findparent
   [role pid]
-    (let [eventids (:links (f/getPersona pid))
-          events (map #(event-by-role % :child pid) (get-events eventids))
-          result (into #{} (pids-of-role events role))]
-        result))  ;; TODO More advanced selection of multiple parents
+  (let [eventids (:links (getPersona pid))
+        events (map #(event-by-role % :child pid) (get-events eventids))
+        result (into #{} (pids-of-role events role))]
+      result))  ;; TODO More advanced selection of multiple parents
 
 (defn findchildren
   [eventids pid]
-    (let [dad (map #(event-by-role % :father pid) (get-events eventids))
-          mum (map #(event-by-role % :mother pid) (get-events eventids))
-          events (concat dad mum)
-          result (into #{} (pids-of-role events :child))]
-        result))
+  (let [dad (map #(event-by-role % :father pid) (get-events eventids))
+        mum (map #(event-by-role % :mother pid) (get-events eventids))
+        events (concat dad mum)
+        result (into #{} (pids-of-role events :child))]
+      result))
 
 (defn findfather [pid] (findparent :father pid))
 (defn findmother [pid] (findparent :mother pid))
