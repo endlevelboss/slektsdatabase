@@ -162,9 +162,28 @@
               :value "Add burial/death"
               :on-click #(f/set-event-edit :burial :main)}]]))
 
-(defn start-window []
-    (println "*")
-    (if (not= nil (get-in @d/state [:gui/state :window/edit :type]))
-        [event-edit-component]
-        [current-selected-component]))
+(defn init-window []
+  (println "*")
+  (if (not= nil (get-in @d/state [:gui/state :window/edit :type]))
+    [event-edit-component]
+    [current-selected-component]))
+
+(defn runonce
+  "Initializes data at the startup, to be run after indexeddb has loaded"
+  []
+  (let [run (get-in @d/state [:gui/state :runonce])]
+    (if run
+      (do
+        (d/testidx)
+        (f/setCurrent 0)
+        (swap! d/state assoc-in [:gui/state :runonce] false))
+      nil)))
+
+(defn start-window
+  []
+  (if (not= nil @d/db)
+    (do
+      (runonce)
+      [init-window])
+    [:div "Indexed database has failed to initialize... Please contact support"]))
 

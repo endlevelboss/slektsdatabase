@@ -11,5 +11,5 @@
   (r/render [gui/start-window]
             (js/document.getElementById "app")))
 
-(f/setCurrent 0)
+(d/init-database)
 (render-app)

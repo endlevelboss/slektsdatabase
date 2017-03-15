@@ -1,8 +1,11 @@
 (ns slekt.database
     (:require [reagent.core :as r]
-              [cljs-idxdb.core :as idx]))
+              [cljs-idxdb.core :as idx]
+              [datascript.core :as ds]
+              [datascript.transit :as dt]))
 
-(def database {:gui/state {:current {:selected nil
+(def database {:gui/state {:runonce true
+                           :current {:selected nil
                                      :father nil
                                      :mother nil}
                            :window/edit {:type nil
@@ -62,3 +65,22 @@
                                                    {:id 2 :type :event :label "Marriage"}]}}})
 
 (def state (r/atom database))
+
+(def db (r/atom nil))
+(def store-name "slektsdatabase")
+
+(defn init-database
+  []
+  (idx/create-db "slekt" 1
+                 #(-> (idx/delete-and-create-store % store-name {:keyPath "name"}))
+                 #(reset! db %)))
+
+(defn testwrite
+  []
+  (idx/add-item @db store-name {:name "Test" :data "new data has come to light"} #(println "added")))
+
+
+(defn testidx []
+  (idx/get-by-key @db store-name "Test" (fn [p] (println (:data p)))))
+
+
