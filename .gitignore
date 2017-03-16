@@ -1,3 +1,10 @@
+# Added by littly blittly meweee
+
+/target
+/resources
+!/resources/public/index.html
+
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
