@@ -84,3 +84,58 @@
   (idx/get-by-key @db store-name "Test" (fn [p] (println (:data p)))))
 
 
+;;-------------------- DATASCRIPT BEGINS HERE -----------------------------
+
+(def schema {:database/name {:db/unique :db.unique/identity}
+             :database/selected {:db/cardinality :db.cardinality/one}
+             :database/personas {:db/type :db.type/ref
+                                 :db/cardinality :db.cardinality/many}
+             :persona/id {:db/unique :db.unique/identity}
+             :persona/name {:db/type :db.type/ref
+                            :db/cardinality :db.cardinality/one}
+             :persona/persons {:db/type :db.type/ref
+                               :db/cardinality :db.cardinality/many}
+             :name/parts {:db/cardinality :db.cardinality/one}
+             :name/template {:db/cardinality :db.cardinality/one}})
+
+(def conn (ds/create-conn schema))
+
+(defn initdb
+  []
+  (ds/transact! conn [{:database/name "test"
+                       :database/selected 0}
+                      {:db/id -1
+                       :name/parts {0 "Ingebrigt" 1 "Johannessen"}
+                       :name/template :firstlast}
+                      {:db/id -2
+                       :name/parts {0 "Ibenhart" 1 "Ingebrigtsen"}
+                       :name/template :firstlast}
+                      {:persona/id 1
+                       :persona/name -1}
+                      {:persona/id 2
+                       :persona/name -2}]))
+
+(defn test2
+  [name]
+  (ds/q '[:find ?e
+          :in $ ?name
+          :where
+          [?e :database/name ?name]]
+        @conn name))
+
+(defn testquery
+  [id]
+  (ds/q '[:find ?name ?template
+          :in $ ?id
+          :where
+          [?e :persona/id ?id]
+          [?e :persona/name ?nid]
+          [?nid :name/parts ?name]
+          [?nid :name/template ?template]]
+        @conn id))
+
+
+
+
+
+
