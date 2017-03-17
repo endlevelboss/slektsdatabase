@@ -1,5 +1,7 @@
 (ns slekt.relations
-    (:require [slekt.database :as d]))
+    (:require [slekt.database :as d]
+              [datascript.core :as ds]
+              [datascript.transit :as dt]))
 
 (defn getPersona
   [id]
@@ -108,3 +110,5 @@
           mothers (map #(findmother %) children)]
         (println children)
         (println mothers)))
+
+;; ---------------------- DATASCRIPT FUNCTIONS -------------------

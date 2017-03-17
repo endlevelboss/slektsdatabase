@@ -9,7 +9,7 @@
 
 (defn person-display-component
    [id]
-   (let [name (f/name-string (f/getPersona id))]
+   (let [name (d/get-name id)]
     [:div
       {:on-click #(f/setCurrent id)}
       name]))
@@ -95,10 +95,10 @@
 
 (defn current-selected-component []
   (let [current (get-in @d/state [:gui/state :current])
-        personinfo (f/getPersona (:selected current))
+        personinfo (d/get-name (:selected current))
         dad (:father current)
         mum (:mother current)
-        children (rels/findchildren (:links personinfo) (:selected current))
+        children (d/find-children (:selected current))
         events (f/event-list (:links personinfo))]
     [:div {:style {:font-family "arial"}}
      [:div
@@ -110,7 +110,7 @@
         :top "20px"
         :left "20px"
         :font-size "140%"}}
-      [:strong (f/name-string personinfo)]]
+      [:strong (d/get-name (:selected current))]]
      [:div
       {:style
        {:background-color "cadetblue"
@@ -174,8 +174,8 @@
   (let [run (get-in @d/state [:gui/state :runonce])]
     (if run
       (do
-        (d/testidx)
-        (f/setCurrent 0)
+        (d/initdb)
+        (f/setCurrent 6)
         (swap! d/state assoc-in [:gui/state :runonce] false))
       nil)))
 

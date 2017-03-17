@@ -96,7 +96,22 @@
              :persona/persons {:db/type :db.type/ref
                                :db/cardinality :db.cardinality/many}
              :name/parts {:db/cardinality :db.cardinality/one}
-             :name/template {:db/cardinality :db.cardinality/one}})
+             :name/template {:db/type :db.type/ref
+                             :db/cardinality :db.cardinality/one}
+             :template/name {:db/unique :db.unique/identity}
+             :template/parts {:db/cardinality :db.cardinality/many}
+             :event/type {:db/cardinality :db.cardinality/one}
+             :event/template {:db/type :db.type/ref
+                              :db/cardinality :db.cardinality/one}
+             :event/roles {:db/type :db.type/ref
+                           :db/cardinality :db.cardinality/many}
+             :event/items {:db/type :db.type/ref
+                           :db/cardinality :db.cardinality/many}
+             :role/type {:db/cardinality :db.cardinality/one}
+             :role/name {:db/type :db.type/ref
+                         :db/cardinality :db.cardinality/one}
+             :role/persona {:db/type :db.type/ref
+                            :db/cardinality :db.cardinality/one}})
 
 (def conn (ds/create-conn schema))
 
@@ -104,36 +119,88 @@
   []
   (ds/transact! conn [{:database/name "test"
                        :database/selected 0}
+                      {:db/id -3
+                       :template/name :firstlast
+                       :template/count 2
+                       :template/labels {0 "First name" 1 "Last name"}}
                       {:db/id -1
                        :name/parts {0 "Ingebrigt" 1 "Johannessen"}
-                       :name/template :firstlast}
+                       :name/template -3}
                       {:db/id -2
                        :name/parts {0 "Ibenhart" 1 "Ingebrigtsen"}
-                       :name/template :firstlast}
-                      {:persona/id 1
+                       :name/template -3}
+                      {:db/id -4
+                       :name/parts {0 "Johannes" 1 "Ingebrigtsson Bakke"}
+                       :name/template -3}
+                      {:db/id -7
+                       :persona/id 0
                        :persona/name -1}
-                      {:persona/id 2
-                       :persona/name -2}]))
+                      {:db/id -8
+                       :persona/id 1
+                       :persona/name -2}
+                      {:db/id -9
+                       :persona/id 2
+                       :persona/name -4}
+                      {:db/id -5
+                       :role/type :child
+                       :role/persona -7}
+                      {:db/id -6
+                       :role/type :father
+                       :role/persona -9}
+                      {:event/type "birth"
+                       :event/roles [-5 -6]}]))
 
-(defn test2
-  [name]
-  (ds/q '[:find ?e
-          :in $ ?name
-          :where
-          [?e :database/name ?name]]
-        @conn name))
 
-(defn testquery
+(defn get-name-parts
   [id]
   (ds/q '[:find ?name ?template
-          :in $ ?id
+          :in $ ?e
           :where
-          [?e :persona/id ?id]
-          [?e :persona/name ?nid]
-          [?nid :name/parts ?name]
-          [?nid :name/template ?template]]
+          [?e :persona/name ?n]
+          [?n :name/parts ?name]
+          [?n :name/template ?t]
+          [?t :template/count ?template]]
         @conn id))
 
+(defn get-name
+  ([id]
+   ( let [nameparts (if (not= nil id)
+                      (get-name-parts id)
+                      nil)
+          parts (ffirst nameparts)]
+    (get-name parts "")))
+  ([parts name]
+   (if (empty? parts)
+     name
+     (recur (rest parts) (str name " " (get (first parts) 1))))))
+
+(defn get-relation
+  [role idrole id]
+  (ds/q '[:find ?parentid
+          :in $ ?role ?idrole ?e
+          :where
+          [?c :role/persona ?e]
+          [?c :role/type ?idrole]
+          [?evt :event/roles ?c]
+          [?evt :event/roles ?f]
+          [?f :role/type ?role]
+          [?f :role/persona ?parentid]]
+        @conn role idrole id))
+
+(defn get-parent
+  [role id]
+  (get-relation role :child id))
+
+(defn find-parent ;; WARINING Multiple parents can be found, must be handled
+  [role id]
+  (let [parent (ffirst (get-parent role id))]
+    parent))
+
+(defn find-children
+  [id]
+  (let [ch1 (first (get-relation :child :father id))
+        ch2 (first (get-relation :child :mother id))]
+    (into #{} (into ch1 ch2))))
 
 
 

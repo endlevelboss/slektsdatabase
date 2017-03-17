@@ -56,12 +56,11 @@
 
 (defn setCurrentSelected
   [id]
-  (let [current (getPersona id)
-        father (rels/findfather id)
-        mother (rels/findmother id)]
+  (let [father (d/find-parent :father id)
+        mother (d/find-parent :mother id)]
     {:selected id
-     :father (first father)
-     :mother (first mother)}))
+     :father father
+     :mother mother}))
 
 (defn setCurrent
   [value]
