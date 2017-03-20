@@ -2,41 +2,45 @@
     (:require [reagent.core :as r]
               [slekt.database :as d]
               [slekt.date :as date]
-              [slekt.events :as events]
-              [slekt.relations :as rels]))
+              [slekt.events :as events]))
+              ;[slekt.relations :as rels]))
 
 (enable-console-print!)
 
-(defn getPersona
-  [id]
-  (get (:persona/by-id @d/state) id))
+;(defn getPersona
+;  [id]
+;  (get (:persona/by-id @d/state) id))
 
 (defn getEvent
   [id]
   (get (:event/by-id @d/state) id))
 
-(defn add-sortable-date
-    [event dateinfo]
-    (let [e (get-in event [:value (:id dateinfo)])
-          date (:date e)
-          address (get-in e [:address :value])
-          sortable (date/sortable-date date)]
-        {:date date :sortable sortable :label (:label dateinfo) :address address :event event}))
+;(defn add-sortable-date
+;    [event dateinfo]
+;    (let [e (get-in event [:value (:id dateinfo)])
+;          date (:date e)
+;          address (get-in e [:address :value])
+;          sortable (date/sortable-date date)
+;        {:date date :sortable sortable :label (:label dateinfo) :address address :event event}))
 
-(defn parse-event
-    [event]
-    (let [type (get-in @d/state [:facttemplates (:template event)])
-          events (filter #(= :event (:type %)) (:fields type))]
-        (map #(add-sortable-date event %) events)))
+(defn parse-fact
+  [fact-id]
+  (let [type (ffirst (d/get-fact-detail fact-id :fact/type))
+        placeref (ffirst (d/get-fact-detail fact-id :fact/place))
+        place (ffirst (d/get-place placeref))
+        dateref (ffirst (d/get-fact-detail fact-id :fact/date))
+        date (d/get-date dateref) ;; TODO check for nil
+        event-id (ffirst (d/get-event-id fact-id))]
+    {:id fact-id :type type :date date :place place :sortable (date/sortable-date date) :event event-id}))
 
-(defn events-into-list
-  ([nestedlist]
-   (events-into-list nestedlist ()))
-  ([nestedlist final-list]
-   (if (empty? nestedlist)
-     final-list
-     (do
-       (recur (rest nestedlist) (concat final-list (first nestedlist)))))))
+;(defn events-into-list
+ ; ([nestedlist]
+  ; (events-into-list nestedlist ()))
+  ;([nestedlist final-list]
+  ; (if (empty? nestedlist)
+  ;   final-list
+   ;  (do
+   ;    (recur (rest nestedlist) (concat final-list (first nestedlist)))}))
 
 ;(println (events-into-list (list (list :a :b) (list :c :d) (list :e :f))))
 
@@ -49,15 +53,15 @@
         false)))
 
 (defn event-list
-    [links]
-    (let [parsed (map #(parse-event (getEvent %)) links)
-          merged (events-into-list parsed)]
-        (filter #(not= [] (:date %)) (sort (comp compare-dates) merged))))
+  [id]
+  (let [facts (flatten (into [] (d/get-facts id)))
+        parsed (map parse-fact facts)]
+    (filter #(not= [] (:date %)) (sort (comp compare-dates) parsed))))
 
 (defn setCurrentSelected
   [id]
-  (let [father (d/find-parent :father id)
-        mother (d/find-parent :mother id)
+  (let [father (d/find-parent :husband id)
+        mother (d/find-parent :wife id)
         children (d/find-children id)
         spouses (d/find-spouses id)]
     {:selected id
@@ -74,13 +78,13 @@
   [type fields]
   (first (filter #(= type (:type %)) fields)))
 
-(defn getPlaceDeprecated ; to be removed
-  [event]
-  (let [template (:template event)
-        t (template (:facttemplates @d/state))
-        fields (:fields t)
-        fieldindex (getFieldTypeID :place fields)]
-       (get (:value event) (:id fieldindex))))
+;(defn getPlaceDeprecated ; to be removed
+;  [event]
+;  (let [template (:template event)
+;        t (template (:facttemplates @d/state))
+;        fields (:fields t)
+;        fieldindex (getFieldTypeID :place fields)
+;       (get (:value event) (:id fieldindex))))
 
 
 (defn parse-name
@@ -101,14 +105,19 @@
           place (get-in value [:address :value])]
         {:date date :place place}))
 
-(defn name-string
-    ([props]
-     (let [nameparts (:name props)]
-         (name-string nameparts "")))
-    ([nameparts name]
-     (if (empty? nameparts)
-         name
-         (recur (rest nameparts) (str name " " (first nameparts))))))
+;(defn name-stringOLD
+;    ([props]
+;     (let [nameparts (:name props)]
+;         (name-stringOLD nameparts "")})
+;    ([nameparts name]
+;     (if (empty? nameparts)
+;         name
+;         (recur (rest nameparts) (str name " " (first nameparts)))}))
+
+(defn order-event-fields
+  ([field-ids])
+  ([ordered field-ids]))
+
 
 (defn parse-event-field
     "Parses the event field to get correct values and updates the gui state"
@@ -125,18 +134,19 @@
             :event (returnvalue id (parse-event-date value)))))
 
 (defn populate-event-field
-    "Loops through the template of an event to make sure each field gets the correct value from the event"
-    ([event]
-     (let [template (get-in @d/state [:facttemplates (:template event)])
-           fields (:fields template)]
-         (populate-event-field fields event {})))
-    ([fields event result]
-     (if (empty? fields)
-         result
-         (let [parsed (parse-event-field (first fields) event)
-               id (get parsed 0)
-               value (get parsed 1)]
-             (recur (rest fields) event (assoc result id value))))))
+  "Loops through the template of an event to make sure each field gets the correct value from the event"
+  ([event]
+   (println event)
+   (let [fields (flatten (into [] (d/get-template-of-event event)))]
+     (println fields)
+     (populate-event-field fields event {})))
+  ([fields event result]
+   (if (empty? fields)
+     result
+     (let [parsed (parse-event-field (first fields) event)
+           id (get parsed 0)
+           value (get parsed 1)]
+       (recur (rest fields) event (assoc result id value))))))
 
 (defn set-event-edit-field
     ([value key]
@@ -174,10 +184,10 @@
             (swap! d/state assoc-in [:gui/state :window/edit :type] key))))
 
 (defn edit-event
-    [event]
-    (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] (:id event))
-    (swap! d/state assoc-in [:gui/state :window/edit :values] (populate-event-field event))
-    (set-event-edit (:template event) nil))
+  [event]
+  (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] event)
+  (swap! d/state assoc-in [:gui/state :window/edit :values] (populate-event-field event))
+  (set-event-edit (:template event) nil))
 
 (defn get-nametemplate
     ([]

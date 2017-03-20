@@ -2,7 +2,7 @@
     (:require [reagent.core :as r]
               [slekt.database :as d]
               [slekt.db-functions :as f]
-              [slekt.relations :as rels]
+              ;[slekt.relations :as rels]
               [slekt.date :as date]))
 
 (enable-console-print!)
@@ -76,22 +76,22 @@
                   :on-click #(f/set-event-edit nil nil)}]]))
 
 (defn event-display-component
-  [event]
-  (let [label (:label event)
-        date (:date event)
+  [fact]
+  (let [label (:type fact)
+        date (:date fact)
         year (date/getyear date)
-        main (get (get-in event [:event :value]) 0)  ;; denne maa gjoeres mer robust
-        name (if (= (:persona/by-id main) (get-in @d/state [:gui/state :current :selected]))
-                (:address event)
-                (f/name-string (f/getPersona (:persona/by-id main))))
+        mainperson (ffirst (d/get-person-in-event (:event fact) :child))
+        name (if (= mainperson (get-in @d/state [:gui/state :current :selected]))
+               (:place fact)
+               (d/get-name mainperson))
         eventstring (str year " - " label " : ")]
-      [:div
-        [:label
-         {:on-click #(f/edit-event (:event event))}
-         eventstring]
-        [:label
-            {:on-click #(f/setCurrent (:persona/by-id main))}
-          name]]))
+    [:div
+     [:label
+      {:on-click #(f/edit-event (:event fact))}
+      eventstring]
+     [:label
+      {:on-click #(f/setCurrent mainperson)}
+      name]]))
 
 (defn spouse-children-component
   [info]
@@ -126,7 +126,7 @@
         children (:children current)
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
-        events (f/event-list (:links personinfo))]
+        events (f/event-list (:selected current))]
     [:div {:style {:font-family "arial"}}
      [:div
       {:style
@@ -172,7 +172,7 @@
                :left "30px"}}
       "Events:"
       (for [event events]
-          ^{:key (str (get-in event [:event :id]) (:label event))} [event-display-component event])]
+          ^{:key (:id event)} [event-display-component event])]
 
      [:input {:style {:position "absolute"
                       :top "450px"

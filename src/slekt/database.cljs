@@ -10,7 +10,8 @@
                                      :father nil
                                      :mother nil
                                      :children #{}
-                                     :spouses #{}}
+                                     :spouses #{}
+                                     :events #{}}
                            :window/edit {:type nil
                                          :event/by-id nil
                                          :values {}}}
@@ -104,17 +105,24 @@
              :template/name {:db/unique :db.unique/identity}
              :template/parts {:db/cardinality :db.cardinality/many}
              :event/type {:db/cardinality :db.cardinality/one}
-             :event/template {:db/type :db.type/ref
-                              :db/cardinality :db.cardinality/one}
+             :event/template {:db/cardinality :db.cardinality/one}
              :event/roles {:db/type :db.type/ref
                            :db/cardinality :db.cardinality/many}
-             :event/items {:db/type :db.type/ref
+             :event/facts {:db/type :db.type/ref
                            :db/cardinality :db.cardinality/many}
-             :item/date {:db/type :db.type/ref
+             :fact/date {:db/type :db.type/ref
                          :db/cardinality :db.cardinality/one}
-             :item/place {:db/type :db.type/ref
+             :fact/place {:db/type :db.type/ref
                           :db/cardinality :db.cardinality/one}
-             :item/type {:db/cardinality :db.cardinality/one}
+             :fact/type {:db/cardinality :db.cardinality/one}
+             :date/parsed {:db/cardinality :db.cardinality/one}
+             :date/year {:db/cardinality :db.cardinality/one}
+             :date/month {:db/cardinality :db.cardinality/one}
+             :date/day {:db/cardinality :db.cardinality/one}
+             :date/text {:db/cardinality :db.cardinality/one}
+             :place/value {:db/cardinality :db.cardinality/one}
+             :place/address {:db/type :db.type/ref
+                             :db/cardinality :db.cardinality/one}
              :role/type {:db/cardinality :db.cardinality/one}
              :role/name {:db/type :db.type/ref
                          :db/cardinality :db.cardinality/one}
@@ -149,6 +157,14 @@
    (if (empty? parts)
      name
      (recur (rest parts) (str name " " (get (first parts) 1))))))
+
+(defn find-sex-of-person
+  [pid]
+  (ds/q '[:find ?sex
+          :in $ ?pid
+          :where
+          [?pid :persona/sex ?sex]]
+        @conn pid))
 
 (defn get-relation
   ([role idrole id]
@@ -186,24 +202,38 @@
 
 (defn find-parent
   [role id]
-  (let [sex (if (= :father role)
-              :m
-              :f)]
-    (find-parent-sexed :spouse id sex)))
+  (into #{} (flatten (into [] (get-relation role :child id)))))
 
 (defn find-children
   [id]
-  (let [children (into #{} (flatten (into [] (get-relation :child :spouse id))))]
+  (let [mysex (ffirst (find-sex-of-person id))
+        myrole (if (= :m mysex)
+                 :husband
+                 :wife)
+        children (into #{} (flatten (into [] (get-relation :child myrole id))))]
     children))
 
 (defn find-spouses
+  "Finds all persons that are registered as married, OR has children together"
   [id]
-  (let [spouses (into #{} (flatten (into [] (get-relation :spouse :spouse id))))]
-    (disj spouses id)))
+  (let [mysex (ffirst (find-sex-of-person id))
+        myrole (if (= :m mysex)
+                 :husband
+                 :wife)
+        role (if (= :husband myrole)
+               :wife
+               :husband)
+        spouses (into #{} (flatten (into [] (get-relation role myrole id))))]
+    spouses))
+
 
 (defn find-parent-id
   [oid myid]
-  (let [parents (into #{} (flatten (into [] (get-relation :spouse :child myid))))]
+  (let [sex (ffirst (find-sex-of-person oid))
+        role (if (= :m sex)
+               :wife
+               :husband)
+         parents (into #{} (flatten (into [] (get-relation role :child myid))))]
     (disj parents oid)))
 
 (defn recur-arrange
@@ -231,6 +261,85 @@
         smap (assoc spousemap :noparent [])
         arranged (recur-arrange-children id smap children)]
     arranged))
+
+(defn get-facts
+  [pid]
+  (ds/q '[:find ?factid
+          :in $ ?pid
+          :where
+          [?rid :role/persona ?pid]
+          [?eid :event/roles ?rid]
+          [?eid :event/facts ?factid]]
+        @conn pid))
+
+(defn find-fact
+  [fid]
+  (ds/q '[:find ?type ?dateref
+          :in $ ?fid
+          :where
+          [?fid :fact/type ?type]
+          [?fid :fact/date ?dateref]]
+        @conn fid))
+
+(defn get-fact-detail
+  [fid fact]
+  (ds/q '[:find ?value
+          :in $ ?fid ?fact
+          :where
+          [?fid ?fact ?value]]
+        @conn fid fact))
+
+(defn get-place
+  [place-id]
+  (if (= nil place-id)
+    nil
+    (ds/q '[:find ?value
+            :in $ ?pid
+            :where
+            [?pid :place/value ?value]]
+          @conn place-id)))
+
+(defn get-date
+  [did]
+  (if (= nil did)
+    nil
+    (let [d (ds/q '[:find ?p ?d ?m ?y
+                    :in $ ?did
+                    :where
+                    [?did :date/parsed ?p]
+                    [?did :date/year ?y]
+                    [?did :date/month ?m]
+                    [?did :date/day ?d]]
+                  @conn did)]
+      (first d))))
+
+(defn get-event-id
+  [fact-id]
+  (ds/q '[:find ?eid
+          :in $ ?fid
+          :where
+          [?eid :event/facts ?fid]]
+        @conn fact-id))
+
+(defn get-person-in-event
+  [eid role]
+  (ds/q '[:find ?pid
+          :in $ ?eid ?role
+          :where
+          [?eid :event/roles ?rid]
+          [?rid :role/type ?role]
+          [?rid :role/persona ?pid]]
+        @conn eid role))
+
+(defn get-template-of-event
+  [eid]
+  (ds/q '[:find ?parts
+          :in $ ?eid
+          :where
+          [?eid :event/template ?t]
+          [?tid :template/name ?t]
+          [?tid :template/parts ?parts]]
+        @conn eid))
 
 
 
