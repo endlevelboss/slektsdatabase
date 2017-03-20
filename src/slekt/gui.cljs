@@ -93,22 +93,50 @@
             {:on-click #(f/setCurrent (:persona/by-id main))}
           name]]))
 
+(defn spouse-children-component
+  [info]
+  (let [spouse (get info 0)
+        sp (if (not= :noparent spouse)
+             spouse
+             nil)
+        labelspouse (if (not= :noparent spouse)
+                      "Spouse:"
+                      nil)
+        children (get info 1)
+        labelchildren (if (not= 0 (count children))
+                        "Children:"
+                        nil)]
+    ^{:key spouse}[:div
+                   labelspouse
+                   [person-display-component sp]
+                   labelchildren
+                   (for [child children]
+                     ^{:key child} [person-display-component child])
+                   [:br]]))
+
 (defn current-selected-component []
   (let [current (get-in @d/state [:gui/state :current])
         personinfo (d/get-name (:selected current))
-        dad (:father current)
-        mum (:mother current)
-        children (d/find-children (:selected current))
+        dad (if (= 1 (count (:father current)))
+              (first (:father current))
+              nil) ;; TODO: Gui handling possible multiple fathers
+        mum (if (= 1 (count (:mother current)))
+              (first (:mother current))
+              nil)
+        children (:children current)
+        spouses (:spouses current)
+        sorted (d/arrange-children-by-parent (:selected current) spouses children)
         events (f/event-list (:links personinfo))]
     [:div {:style {:font-family "arial"}}
      [:div
       {:style
-       {:background-color "powderblue"
+       {:background-color "white"
         :position "absolute"
-        :width "400px"
-        :height "70px"
+        :width "380px"
+        :height "60px"
         :top "20px"
         :left "20px"
+        :padding "5px"
         :font-size "140%"}}
       [:strong (d/get-name (:selected current))]]
      [:div
@@ -130,15 +158,12 @@
                :left "420px"}}
       "Mother: "
       [person-display-component mum]]
-     [:div
-      {:style {:background-color "wheat"
-               :position "absolute"
-               :width "400px"
-               :top "90px"
-               :left "420px"}}
-      "Children:"
-      (for [child children]
-          ^{:key child} [person-display-component child])]
+     [:div {:style {:background-color "wheat"
+                    :position "absolute"
+                    :top "100px"
+                    :left "420px"
+                    :width "400px"}}
+      (map #(spouse-children-component %) sorted)]
      [:div
       {:style {:background-color "wheat"
                :position "absolute"
@@ -175,7 +200,7 @@
     (if run
       (do
         (d/initdb)
-        (f/setCurrent 6)
+        (f/setCurrent 10)
         (swap! d/state assoc-in [:gui/state :runonce] false))
       nil)))
 

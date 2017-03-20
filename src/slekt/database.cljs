@@ -2,12 +2,15 @@
     (:require [reagent.core :as r]
               [cljs-idxdb.core :as idx]
               [datascript.core :as ds]
-              [datascript.transit :as dt]))
+              [datascript.transit :as dt]
+              [slekt.test-database :as t]))
 
 (def database {:gui/state {:runonce true
                            :current {:selected nil
                                      :father nil
-                                     :mother nil}
+                                     :mother nil
+                                     :children #{}
+                                     :spouses #{}}
                            :window/edit {:type nil
                                          :event/by-id nil
                                          :values {}}}
@@ -107,6 +110,11 @@
                            :db/cardinality :db.cardinality/many}
              :event/items {:db/type :db.type/ref
                            :db/cardinality :db.cardinality/many}
+             :item/date {:db/type :db.type/ref
+                         :db/cardinality :db.cardinality/one}
+             :item/place {:db/type :db.type/ref
+                          :db/cardinality :db.cardinality/one}
+             :item/type {:db/cardinality :db.cardinality/one}
              :role/type {:db/cardinality :db.cardinality/one}
              :role/name {:db/type :db.type/ref
                          :db/cardinality :db.cardinality/one}
@@ -117,39 +125,7 @@
 
 (defn initdb
   []
-  (ds/transact! conn [{:database/name "test"
-                       :database/selected 0}
-                      {:db/id -3
-                       :template/name :firstlast
-                       :template/count 2
-                       :template/labels {0 "First name" 1 "Last name"}}
-                      {:db/id -1
-                       :name/parts {0 "Ingebrigt" 1 "Johannessen"}
-                       :name/template -3}
-                      {:db/id -2
-                       :name/parts {0 "Ibenhart" 1 "Ingebrigtsen"}
-                       :name/template -3}
-                      {:db/id -4
-                       :name/parts {0 "Johannes" 1 "Ingebrigtsson Bakke"}
-                       :name/template -3}
-                      {:db/id -7
-                       :persona/id 0
-                       :persona/name -1}
-                      {:db/id -8
-                       :persona/id 1
-                       :persona/name -2}
-                      {:db/id -9
-                       :persona/id 2
-                       :persona/name -4}
-                      {:db/id -5
-                       :role/type :child
-                       :role/persona -7}
-                      {:db/id -6
-                       :role/type :father
-                       :role/persona -9}
-                      {:event/type "birth"
-                       :event/roles [-5 -6]}]))
-
+  (ds/transact! conn t/initdb))
 
 (defn get-name-parts
   [id]
@@ -175,32 +151,88 @@
      (recur (rest parts) (str name " " (get (first parts) 1))))))
 
 (defn get-relation
-  [role idrole id]
-  (ds/q '[:find ?parentid
-          :in $ ?role ?idrole ?e
-          :where
-          [?c :role/persona ?e]
-          [?c :role/type ?idrole]
-          [?evt :event/roles ?c]
-          [?evt :event/roles ?f]
-          [?f :role/type ?role]
-          [?f :role/persona ?parentid]]
-        @conn role idrole id))
+  ([role idrole id]
+   (ds/q '[:find ?parentid
+           :in $ ?role ?idrole ?e ?sex
+           :where
+           [?c :role/persona ?e]
+           [?c :role/type ?idrole]
+           [?evt :event/roles ?c]
+           [?evt :event/roles ?f]
+           [?f :role/type ?role]
+           [?f :role/persona ?parentid]]
+         @conn role idrole id))
+  ([role idrole id sex]
+   (ds/q '[:find ?parentid
+           :in $ ?role ?idrole ?e ?sex
+           :where
+           [?c :role/persona ?e]
+           [?c :role/type ?idrole]
+           [?evt :event/roles ?c]
+           [?evt :event/roles ?f]
+           [?f :role/type ?role]
+           [?f :role/persona ?parentid]
+           [?parentid :persona/sex ?sex]]
+         @conn role idrole id sex)))
 
 (defn get-parent
   [role id]
   (get-relation role :child id))
 
-(defn find-parent ;; WARINING Multiple parents can be found, must be handled
-  [role id]
-  (let [parent (ffirst (get-parent role id))]
+(defn find-parent-sexed
+  [role id sex]
+  (let [parent (into #{} (flatten (into [] (get-relation role :child id sex))))]
     parent))
+
+(defn find-parent
+  [role id]
+  (let [sex (if (= :father role)
+              :m
+              :f)]
+    (find-parent-sexed :spouse id sex)))
 
 (defn find-children
   [id]
-  (let [ch1 (first (get-relation :child :father id))
-        ch2 (first (get-relation :child :mother id))]
-    (into #{} (into ch1 ch2))))
+  (let [children (into #{} (flatten (into [] (get-relation :child :spouse id))))]
+    children))
+
+(defn find-spouses
+  [id]
+  (let [spouses (into #{} (flatten (into [] (get-relation :spouse :spouse id))))]
+    (disj spouses id)))
+
+(defn find-parent-id
+  [oid myid]
+  (let [parents (into #{} (flatten (into [] (get-relation :spouse :child myid))))]
+    (disj parents oid)))
+
+(defn recur-arrange
+  [spousemap myid pids]
+  (if (empty? pids)
+    spousemap
+    (let [pid (first pids)
+          newvec (conj (get spousemap pid) myid)
+          newmap (assoc spousemap pid newvec)]
+      (recur newmap myid (rest pids)))))
+
+(defn recur-arrange-children
+  [id spousemap children]
+  (if (empty? children)
+    spousemap
+    (let [p (find-parent-id id (first children))
+          pids (if (= 0 (count p))
+                 #{:noparent}
+                 p)]
+      (recur id (recur-arrange spousemap (first children) pids) (rest children)))))
+
+(defn arrange-children-by-parent
+  [id spouses children]
+  (let [spousemap (apply merge (map #(hash-map % []) spouses))
+        smap (assoc spousemap :noparent [])
+        arranged (recur-arrange-children id smap children)]
+    arranged))
+
+
 
 
 
