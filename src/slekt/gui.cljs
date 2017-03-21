@@ -14,66 +14,74 @@
       {:on-click #(f/setCurrent id)}
       name]))
 
-(defn name-part-component
-    [label id part]
-    (let [value (get-in @d/state [:gui/state :window/edit :values id part])
-          v (if (= nil value)
-                ""
-                value)]
-        [:div (str label ": ")
-         [:input {:type "text"
-                  :value value
-                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)}]]))
+;(defn name-part-component
+;    [label id part]
+;    (let [value (get-in @d/state [:gui/state :window/edit :values id part])
+;          v (if (= nil value)
+;                ""
+;                value
+;        [:div (str label ": ")
+;         [:input {:type "text"
+;                  :value value
+;                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)]))
 
-(defn name-component [field]
-    (let [id (:id field)
-          t (get-in @d/state [:gui/state :window/edit :values id :template])
-          personid (get-in @d/state [:gui/state :window/edit :values id :persona/by-id])
-          template (if (= nil t)
-                       (f/get-nametemplate)
-                       (f/get-nametemplate t))]
-        [:div
-         [:label (str (:label field) " : " personid)]
-         (for [field template]
-             ^{:key (:id field)} [name-part-component (:type field) id (:id field)])]))
+(defn name-component
+  [field]
+  (let [id (get field 0)
+        label (get (get field 1) 2)
+        val (get-in @d/state [:gui/state :window/edit :values id])
+        value (:value val)]
+    [:div
+     [:label (str label " : " (:persona/by-id val))]
+     [:input {:type "text"
+              :value value
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]]))
 
-(defn date-component [field]
-    (let [id (:id field)
-          date (get-in @d/state [:gui/state :window/edit :values id :date])
-          place (get-in @d/state [:gui/state :window/edit :values id :place])]
-        [:div {:key (:id field)}
-         [:div (:label field)]
-         [:input {:type "text"
-                  :value date
-                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id :date)}]
-         [:div "Place"]
-         [:input {:type "text"
-                  :value place
-                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id :place)}]]))
+(defn date-component
+  [field]
+  (let [id (get field 0)
+        label (get (get field 1) 2)
+        date (get-in @d/state [:gui/state :window/edit :values id :date])
+        place (get-in @d/state [:gui/state :window/edit :values id :place])]
+    [:div
+     [:div label]
+     [:input {:type "text"
+              :value date
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :date)}]
+     [:div "Place"]
+     [:input {:type "text"
+              :value place
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :place)}]]))
 
 (defn field-generator
-    [fields]
-    (for [field fields]
-        (let [type (:type field)]
-            (case type
-                :name ^{:key (:id field)}[name-component field]
-                :event ^{:key (:id field)}[date-component field]))))
+  [fields]
+  (for [field fields]
+    (let [type (get (get field 1) 1)
+          id (get field 0)]
+      (case type
+        :role ^{:key id}[name-component field]
+        :fact ^{:key id}[date-component field]))))
 
 (defn event-edit-component
-    []
-    (let [current (get-in @d/state [:gui/state :current :selected])
-          eventtype (get-in @d/state [:gui/state :window/edit :type])
-          event (get-in @d/state [:event/by-id (get-in @d/state [:gui/state :window/edit :event/by-id])])
-          template (get-in @d/state [:facttemplates eventtype])]
-        [:div {:style {:font-family "arial"}}
-         [:h1 (:label template)]
-         (field-generator (:fields template))
-         [:input {:type "button"
-                  :value "Ok"
-                  :on-click #(f/save-event)}]
-         [:input {:type "button"
-                  :value "Cancel"
-                  :on-click #(f/set-event-edit nil nil)}]]))
+  []
+  (let [current (get-in @d/state [:gui/state :current :selected])
+        eventtype (get-in @d/state [:gui/state :window/edit :type])
+        event (get-in @d/state [:gui/state :window/edit :event/by-id])
+        template-type (get-in @d/state [:gui/state :window/edit :type])
+        template (ffirst (d/get-id-of template-type :template/name))
+        fields (d/get-template template)]
+    [:div {:style {:font-family "arial"
+                   :position "absolute"
+                   :top "20px"
+                   :left "30px"}}
+     [:h1 (:label template)]
+     (field-generator fields)
+     [:input {:type "button"
+              :value "Ok"
+              :on-click #(f/save-event)}]
+     [:input {:type "button"
+              :value "Cancel"
+              :on-click #(f/set-event-edit nil nil)}]]))
 
 (defn event-display-component
   [fact]
@@ -127,7 +135,10 @@
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
         events (f/event-list (:selected current))]
-    [:div {:style {:font-family "arial"}}
+    [:div {:style {:font-family "arial"
+                   :position "absolute"
+                   :top "20px"
+                   :left "20px"}}
      [:div
       {:style
        {:background-color "white"
@@ -193,6 +204,16 @@
     [event-edit-component]
     [current-selected-component]))
 
+(defn menu-bars []
+  [:div {:style {:position "absolute" :top "0px" :left "0px"}}
+   [:div {:style {:position "absolute" :top "0px" :left "0px"
+                  :width "20px" :height "550px"
+                  :background-color "grey"}}]
+   [:div {:style {:position "absolute" :top "0px" :left "20px"
+                  :width "900px" :height "20px"
+                  :background-color "#555555"}}]
+   [init-window]])
+
 (defn runonce
   "Initializes data at the startup, to be run after indexeddb has loaded"
   []
@@ -209,6 +230,6 @@
   (if (not= nil @d/db)
     (do
       (runonce)
-      [init-window])
+      [menu-bars])
     [:div "Indexed database has failed to initialize... Please contact support"]))
 

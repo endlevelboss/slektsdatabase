@@ -1,5 +1,6 @@
 (ns slekt.events
     (:require [slekt.database :as d]
+              [datascript.core :as ds]
               [slekt.date :as date]))
 
 (defn create-new-eventid
@@ -99,25 +100,85 @@
                 :event nil)
             (recur data (rest fields)))))
 
+(defn create-event-old
+  [data]
+  (println data)
+  (let [event-id (create-new-eventid)
+        d (assoc data :event/by-id event-id)
+        template (get-in @d/state [:facttemplates (:type d)])
+        fields (:fields template)
+        parsed (recur-data d fields)
+        value {:id event-id :template (:type d) :value parsed}]
+    (recur-personas value fields)
+    (swap! d/state assoc-in [:event/by-id event-id] value)))
+
+
+
+(defn newid
+  [transact]
+  (let [tx (:db/current-tx (:tempids transact))]
+    (ffirst (ds/q '[:find ?id
+                    :in $ ?tx
+                    :where
+                    [?id _ _ ?tx]]
+                  @d/conn tx))))
+
+(defn transact-role
+  [val field]
+  (let [type (get (get field 1) 2)
+        field (get field 0)
+        value (if (= nil (:value val))
+                ""
+                (:value val))
+        pid (:persona/by-id val) ;; TODO  Must handle new personas
+        t (ds/transact! d/conn [{:role/field field
+                                  :role/type type
+                                  :role/value value
+                                  :role/persona pid}])]
+    (newid t)))
+
+(defn transact-fact
+  [val field])
+
+(defn parse-field
+  [field data]
+  (let [fieldid (get field 0)
+        fieldtype (get (get field 1) 1)
+        value (get-in data [:values fieldid])]
+    (if (= nil value)
+      nil
+      (case fieldtype
+        :role (transact-role value field)
+        :fact (transact-fact value field)
+        nil))))
+
+(defn recur-fields
+  ([fields data]
+   (recur-fields fields data []))
+  ([fields data result]
+   (if (empty? fields)
+     result
+     (let [parsed (parse-field (first fields) data)
+           newres (if (= nil parsed)
+                    result
+                    (conj result parsed))]
+       (recur (rest fields) data newres)))))
+
 (defn create-event
-    [data]
-    (let [event-id (create-new-eventid)
-          d (assoc data :event/by-id event-id)
-          template (get-in @d/state [:facttemplates (:type d)])
-          fields (:fields template)
-          parsed (recur-data d fields)
-          value {:id event-id :template (:type d) :value parsed}]
-        (recur-personas value fields)
-        (swap! d/state assoc-in [:event/by-id event-id] value)))
+  [data]
+  (println data)
+  (let [t-id (ffirst (d/get-id-of (:type data) :template/name))
+        fields (d/get-template t-id)]
+    (println (recur-fields fields data))))
 
 (defn update-event
     [data]
     (println "updating event"))
 
 (defn save-event
-    []
-    (let [data (get-in @d/state [:gui/state :window/edit])
-          eventid (:event/by-id data)]
-        (if (= nil eventid)
-            (create-event data)
-            (update-event data))))
+  []
+  (let [data (get-in @d/state [:gui/state :window/edit])
+        eventid (:event/by-id data)]
+    (if (= nil eventid)
+      (create-event data)
+      (update-event data))))

@@ -87,23 +87,35 @@
 ;       (get (:value event) (:id fieldindex))))
 
 
-(defn parse-name
-    "Creates map of name according to its template"
-    ([value]
-     (let [template (:template value)
-           f (get-in @d/state [:fieldtemplates template])
-           name (:name value)]
-        (parse-name name f {:template template})))
-    ([name fields result]
-     (if (empty? fields)
-         result
-         (recur name (rest fields) (assoc result (:id (first fields)) (get name (:id (first fields))))))))
+;(defn parse-name
+;    "Creates map of name according to its template"
+;    ([value]
+;     (let [template (:template value)
+;           f (get-in @d/state [:fieldtemplates template])
+;           name (:name value))
+;        (parse-name name f {:template template})
+;    ([name fields result]
+;     (if (empty? fields)
+;         result
+;         (recur name (rest fields) (assoc result (:id (first fields)) (get name (:id (first fields)))))))
 
-(defn parse-event-date
-    [value]
-    (let [date (date/date-to-string (:date value))
-          place (get-in value [:address :value])]
-        {:date date :place place}))
+(defn parse-name
+  [eventid fieldid]
+  (let [value (ffirst (d/get-field-id-of-event eventid fieldid :role/value))
+        id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))]
+    {:persona/by-id id :value value}))
+
+(defn parse-fact-field
+  [eventid fieldid]
+  (let [dateid (ffirst (d/get-field-id-of-event-facts eventid fieldid :fact/date))
+        date (if (not= nil dateid)
+               (date/date-to-string (d/get-date dateid))
+               nil)
+        placeid (ffirst (d/get-field-id-of-event-facts eventid fieldid :fact/place))
+        place (if (not= nil placeid)
+                (ffirst (d/get-value-of placeid :place/value))
+                nil)]
+    {:date date :place place}))
 
 ;(defn name-stringOLD
 ;    ([props]
@@ -114,39 +126,32 @@
 ;         name
 ;         (recur (rest nameparts) (str name " " (first nameparts)))}))
 
-(defn order-event-fields
-  ([field-ids])
-  ([ordered field-ids]))
 
 
 (defn parse-event-field
-    "Parses the event field to get correct values and updates the gui state"
-    [field event]
-    (let [type (:type field)
-          id (:id field)
-          values (:value event)
-          value (get values id)
-          pid (:persona/by-id value)
-          returnvalue (fn [i vals]
-                       [i (assoc vals :persona/by-id pid)])]
-        (case type
-            :name (returnvalue id (parse-name value))
-            :event (returnvalue id (parse-event-date value)))))
+  "Parses the event field to get correct values and updates the gui state"
+  [field event]
+  (let [vals (get field 1)
+        type (get vals 1)
+        fieldid (get vals 0)]
+    (case type
+      :role (parse-name event fieldid)
+      :fact (parse-fact-field event fieldid))))
+
+
 
 (defn populate-event-field
   "Loops through the template of an event to make sure each field gets the correct value from the event"
   ([event]
-   (println event)
-   (let [fields (flatten (into [] (d/get-template-of-event event)))]
-     (println fields)
-     (populate-event-field fields event {})))
+   (let [fields (flatten (into [] (d/get-template-of-event event)))
+         ordered-fields (d/order-event-fields fields)]
+     (populate-event-field ordered-fields event {})))
   ([fields event result]
    (if (empty? fields)
      result
-     (let [parsed (parse-event-field (first fields) event)
-           id (get parsed 0)
-           value (get parsed 1)]
-       (recur (rest fields) event (assoc result id value))))))
+     (let [id (first fields)
+           parsed (parse-event-field id event)]
+       (recur (rest fields) event (assoc result (get id 0) parsed))))))
 
 (defn set-event-edit-field
     ([value key]
@@ -154,21 +159,20 @@
     ([value key subid]
      (swap! d/state assoc-in [:gui/state :window/edit :values key subid] value)))
 
-(defn find-role-id
-    [role fields]
-    (if (= role (:role (first fields)))
-        (:id (first fields))
-        (if (empty? fields)
-            nil
-            (recur role (rest fields)))))
+;(defn find-role-id
+;    [role fields]
+;    (if (= role (:role (first fields)))
+;        (:id (first fields))
+;        (if (empty? fields)
+;            nil
+;            (recur role (rest fields)))))
 
 (defn set-current-role
-    [role template]
-    (let [id (find-role-id role (:fields template))
-          pid (get-in @d/state [:gui/state :current :selected])
-          persona (get-in @d/state [:persona/by-id pid])
-          value (assoc (parse-name persona) :persona/by-id pid)]
-        (swap! d/state assoc-in [:gui/state :window/edit :values id] value)))
+  [role template]
+  (let [id (ffirst (d/get-template-field-for-role template role))
+        pid (get-in @d/state [:gui/state :current :selected])
+        value {:persona/by-id pid}]
+    (swap! d/state assoc-in [:gui/state :window/edit :values id] value)))
 
 (defn set-event-edit
     [key role]
@@ -177,17 +181,17 @@
             (swap! d/state assoc-in [:gui/state :window/edit :type] nil)
             (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] nil)
             (swap! d/state assoc-in [:gui/state :window/edit :values] {}))
-        (let [template (get-in @d/state [:facttemplates key])]
-            (if (not= nil role)
-                (set-current-role role template)
-                nil)
-            (swap! d/state assoc-in [:gui/state :window/edit :type] key))))
+        (let [template (ffirst (d/get-id-of key :template/name))]
+          (if (not= nil role)
+            (set-current-role role template)
+            nil)
+          (swap! d/state assoc-in [:gui/state :window/edit :type] key))))
 
 (defn edit-event
   [event]
   (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] event)
   (swap! d/state assoc-in [:gui/state :window/edit :values] (populate-event-field event))
-  (set-event-edit (:template event) nil))
+  (set-event-edit (ffirst (d/get-template-name event)) nil))
 
 (defn get-nametemplate
     ([]
@@ -196,16 +200,18 @@
     ([templatename]
      (get-in @d/state [:fieldtemplates templatename])))
 
-
-
 (defn save-event
     []
     (let [edit (get-in @d/state [:gui/state :window/edit :values])
-          originalevent (getEvent (get-in @d/state [:gui/state :window/edit :event/by-id]))
-          originaldata (populate-event-field originalevent)
+          originalevent (get-in @d/state [:gui/state :window/edit :event/by-id])
+          originaldata (if (= nil originalevent)
+                         nil
+                         (populate-event-field originalevent))
           currentuser (get-in @d/state [:gui/state :current :selected])]
         (if (= originaldata edit)
-            (set-event-edit nil nil)
+            (do
+              (println "No changes, exiting")
+              (set-event-edit nil nil))
             (do
                 (events/save-event)
                 (set-event-edit nil nil)))

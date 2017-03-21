@@ -103,7 +103,8 @@
              :name/template {:db/type :db.type/ref
                              :db/cardinality :db.cardinality/one}
              :template/name {:db/unique :db.unique/identity}
-             :template/parts {:db/cardinality :db.cardinality/many}
+             :template/parts {:db/type :db.type/ref
+                              :db/cardinality :db.cardinality/many}
              :event/type {:db/cardinality :db.cardinality/one}
              :event/template {:db/cardinality :db.cardinality/one}
              :event/roles {:db/type :db.type/ref
@@ -155,7 +156,7 @@
     (get-name parts "")))
   ([parts name]
    (if (empty? parts)
-     name
+     (clojure.string/trim name)
      (recur (rest parts) (str name " " (get (first parts) 1))))))
 
 (defn find-sex-of-person
@@ -341,9 +342,82 @@
           [?tid :template/parts ?parts]]
         @conn eid))
 
+(defn get-value-of
+  [id field]
+  (ds/q '[:find ?val
+          :in $ ?id ?field
+          :where
+          [?id ?field ?val]]
+        @conn id field))
 
+(defn get-id-of
+  [val field]
+  (ds/q '[:find ?id
+          :in $ ?field ?val
+          :where
+          [?id ?field ?val]]
+        @conn field val))
 
+(defn get-template-name
+  [event]
+  (ds/q '[:find ?name
+          :in $ ?eid
+          :where
+          [?eid :event/template ?name]]
+        @conn event))
 
+(defn get-field
+  [fieldid]
+  (ds/q '[:find ?id ?type ?role
+          :in $ ?fid
+          :where
+          [?fid :field/id ?id]
+          [?fid :field/type ?type]
+          [?fid :field/role ?role]]
+        @conn fieldid))
 
+(defn get-field-id-of-event
+  [eventid field type]
+  (ds/q '[:find ?val
+          :in $ ?eid ?f ?type
+          :where
+          [?eid :event/roles ?fid]
+          [?fid :role/field ?f]
+          [?fid ?type ?val]]
+        @conn eventid field type))
 
+(defn get-field-id-of-event-facts
+  [eventid field type]
+  (ds/q '[:find ?val
+          :in $ ?eid ?f ?type
+          :where
+          [?eid :event/facts ?fid]
+          [?fid :fact/field ?f]
+          [?fid ?type ?val]]
+        @conn eventid field type))
 
+(defn get-template-field-for-role
+  [tid role]
+  (ds/q '[:find ?fid
+          :in $ ?tid ?role
+          :where
+          [?tid :template/parts ?pid]
+          [?pid :field/role ?role]
+          [?pid :field/id ?fid]]
+        @conn tid role))
+
+(defn order-event-fields
+  ([field-ids]
+   (order-event-fields {} field-ids))
+  ([ordered field-ids]
+   (if (empty? field-ids)
+     ordered
+     (let [id (first field-ids)
+           field (first (get-field id))]
+       (recur (assoc ordered (get field 0) field) (rest field-ids))))))
+
+(defn get-template
+  [id]
+  (let [fields (flatten (into [] (get-value-of id :template/parts)))
+        ordered-fields (order-event-fields fields)]
+    ordered-fields))

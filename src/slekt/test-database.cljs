@@ -52,6 +52,7 @@
    {:db/id -5
     :role/field 0
     :role/type :child
+    :role/value "Ingebrigt"
     :role/persona -7}
    {:db/id -6
     :role/field 1
