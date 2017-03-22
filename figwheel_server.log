@@ -15354,3 +15354,337 @@ Compiling src\slekt\core.cljs
 Compiling target\figwheel_temp\dev\figwheel\connect.cljs
 notifying browser that file changed:  out\slekt\events.js
 [32mSuccessfully compiled "resources/public/js/main.js" in 0.626 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/transact-date at line 144 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/transact-place at line 145 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/value at line 148 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/pid at line 149 src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 1.373 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/transact-place at line 149 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/value at line 152 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/pid at line 153 src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.962 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\date.cljs
+Compiling src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/transact-place at line 149 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/value at line 152 src\slekt\events.cljs
+WARNING: Use of undeclared Var slekt.events/pid at line 153 src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\date.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 1.054 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.767 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\date.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\date.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.814 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\date.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\date.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.757 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\date.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\date.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.761 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.703 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.709 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.699 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.976 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.965 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.853 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.841 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.9 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.841 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\test-database.cljs
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\test_database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.837 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.859 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.823 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.879 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.815 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.809 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.853 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.823 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.858 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\gui.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.482 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\gui.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.493 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\db_functions.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.567 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\db_functions.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.569 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\db_functions.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.582 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\database.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+Compiling src\slekt\relations.cljs
+notifying browser that file changed:  out\slekt\database.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.866 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\gui.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.465 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\db_functions.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.503 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.655 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\events.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.658 seconds.[0m
+[0mCompiling "resources/public/js/main.js" from ["src"]...
+Compiling E:\kode\slektsdatabase\src\slekt\date.cljs
+Compiling src\slekt\events.cljs
+Compiling src\slekt\db-functions.cljs
+Compiling E:\kode\slektsdatabase\src\slekt\gui.cljs
+Compiling src\slekt\core.cljs
+Compiling target\figwheel_temp\dev\figwheel\connect.cljs
+notifying browser that file changed:  out\slekt\date.js
+[32mSuccessfully compiled "resources/public/js/main.js" in 0.717 seconds.[0m

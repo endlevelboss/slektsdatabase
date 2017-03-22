@@ -132,13 +132,47 @@
                 (:value val))
         pid (:persona/by-id val) ;; TODO  Must handle new personas
         t (ds/transact! d/conn [{:role/field field
-                                  :role/type type
-                                  :role/value value
-                                  :role/persona pid}])]
+                                 :role/type type
+                                 :role/value value
+                                 :role/persona pid}])]
     (newid t)))
 
+(defn transact-date
+  [s]
+  (if (= nil s)
+    nil
+    (let [date (date/string-to-date s)
+          t (ds/transact! d/conn [{:date/parsed (:parsing date)
+                                   :date/day (:day date)
+                                   :date/month (:month date)
+                                   :date/year (:year date)
+                                   :date/value (:value date)}])]
+      (newid t))))
+
+(defn transact-place
+  [value]
+  (if (= nil value)
+    nil
+    (let [t (ds/transact! d/conn [{:place/value value}])]
+      (newid t))))
+
+
 (defn transact-fact
-  [val field])
+  [val field]
+  (let [type (get (get field 1) 2)
+        field (get field 0)
+        date (transact-date (:date val))
+        place (transact-place (:place val))
+        reg1 {:fact/type type
+              :fact/field field}
+        reg2 (if (= nil date)
+               reg1
+               (assoc reg1 :fact/date date))
+        reg3 (if (= nil place)
+               reg2
+               (assoc reg2 :fact/place place))
+        t (ds/transact! d/conn [reg3])]
+    (newid t)))
 
 (defn parse-field
   [field data]
@@ -168,8 +202,12 @@
   [data]
   (println data)
   (let [t-id (ffirst (d/get-id-of (:type data) :template/name))
-        fields (d/get-template t-id)]
-    (println (recur-fields fields data))))
+        fields (d/get-template t-id)
+        values (recur-fields fields data)]
+    (ds/transact! d/conn [{:event/type (:type data)
+                           :event/template (:type data) ;; TODO Fix for custom templates
+                           :event/fields values}])))
+
 
 (defn update-event
     [data]

@@ -84,8 +84,7 @@
     :fact/type :baptism
     :fact/date -42}
    {:event/type :baptism
-    :event/roles [-5 -6 -18]
-    :event/facts [-41 -43]
+    :event/fields [-5 -6 -18 -41 -43]
     :event/template :baptism}
    {:db/id -19
     :role/type :child
@@ -97,7 +96,7 @@
     :role/type :wife
     :role/persona -15}
    {:event/type :baptism
-    :event/roles [-19 -20 -21]
+    :event/fields [-19 -20 -21]
     :event/template :baptism}
    {:db/id -22
     :role/type :child
@@ -109,7 +108,7 @@
     :role/type :wife
     :role/persona -17}
    {:event/type :baptism
-    :event/roles [-22 -23 -24]
+    :event/fields [-22 -23 -24]
     :event/template :baptism}
    {:db/id -25
     :role/type :husband
@@ -118,7 +117,7 @@
     :role/type :wife
     :role/persona -17}
    {:event/type :marriage
-    :event/roles [-25 -26]}
+    :event/fields [-25 -26]}
    {:db/id -27
     :name/parts {0 "Margrethe" 1 "Madsen"}
     :name/template -3}
@@ -132,7 +131,7 @@
     :role/type :wifre
     :role/persona -28}
    {:event/type :marriage
-    :event/roles [-29 -30]}
+    :event/fields [-29 -30]}
    {:db/id -31
     :name/parts {0 "Ingebrigt Martin" 1 "Johannessen"}
     :name/template -3}
@@ -149,7 +148,7 @@
     :role/type :wife
     :role/persona -28}
    {:event/type :birth
-    :event/roles [-33 -34 -35]}
+    :event/fields [-33 -34 -35]}
    {:db/id -36
     :name/parts {0 "Example" 1 "Motherless"}
     :name/template -3}
@@ -163,7 +162,7 @@
     :role/type :husband
     :role/persona -7}
    {:event/type :birth
-    :event/roles [-38 -39]}
+    :event/fields [-38 -39]}
    {:db/id -43
     :field/id 0
     :field/type :role

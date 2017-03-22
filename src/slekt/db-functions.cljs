@@ -31,7 +31,9 @@
         dateref (ffirst (d/get-fact-detail fact-id :fact/date))
         date (d/get-date dateref) ;; TODO check for nil
         event-id (ffirst (d/get-event-id fact-id))]
-    {:id fact-id :type type :date date :place place :sortable (date/sortable-date date) :event event-id}))
+    (if (= nil type)
+      nil
+      {:id fact-id :type type :date date :place place :sortable (date/sortable-date date) :event event-id})))
 
 ;(defn events-into-list
  ; ([nestedlist]
@@ -55,7 +57,7 @@
 (defn event-list
   [id]
   (let [facts (flatten (into [] (d/get-facts id)))
-        parsed (map parse-fact facts)]
+        parsed (remove nil? (map parse-fact facts))]
     (filter #(not= [] (:date %)) (sort (comp compare-dates) parsed))))
 
 (defn setCurrentSelected

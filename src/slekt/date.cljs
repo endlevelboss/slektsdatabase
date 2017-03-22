@@ -40,11 +40,13 @@
             nil)))
 
 (defn date-to-string
-    [value]
-    (let [state (first value)]
-        (case state
-            :parsed (str (get value 1) "." (parsemonth (get value 2)) " " (get value 3))
-            nil)))
+  [value]
+  (let [state (first value)]
+    (case state
+      :parsed (str (get value 1) "." (parsemonth (get value 2)) " " (get value 3))
+      :onlyyear (str (get value 3))
+      :onlyddmm (str (get value 1) "." (parsemonth (get value 2)))
+      nil)))
 
 (defn sortable-date
     [date]
@@ -72,10 +74,15 @@
 
 (defn recur-datearray
     ([array]
-     (recur-datearray array []))
-    ([array result]
+     (let [count (count array)]
+       (case count
+         1 (recur-datearray array {:parsing :onlyyear :day 0 :month 0} [:year])
+         2 (recur-datearray array {:parsing :onlyddmm :year 0} [:day :month])
+         3 (recur-datearray array {:parsing :parsed} [:day :month :year])
+         nil)))
+    ([array result kwds]
      (if (empty? array)
-         result(recur (rest array) (conj result (parse-element (first array)))))))
+         result(recur (rest array) (assoc result (first kwds) (parse-element (first array))) (rest kwds)))))
 
 (defn containsnil?
     [arr]
@@ -94,13 +101,13 @@
               clean-parts (remove-empty parts)
               result (recur-datearray clean-parts)]
             (if (containsnil? result)
-                [:unparsed string]
-                (into [] (concat [:parsed] result))))))
+              {:parsing :unparsed :value string :day 0 :month 0 :year 0}
+              (assoc result :value "")))))
 
 (defn getyear
     [date]
     (let [state (get date 0)]
         (case state
-            :parsed (get date 3)
-            :unparsed nil
-            nil)))
+          :parsed (get date 3)
+          :onlyyear (get date 3)
+          nil)))

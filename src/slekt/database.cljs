@@ -107,10 +107,8 @@
                               :db/cardinality :db.cardinality/many}
              :event/type {:db/cardinality :db.cardinality/one}
              :event/template {:db/cardinality :db.cardinality/one}
-             :event/roles {:db/type :db.type/ref
-                           :db/cardinality :db.cardinality/many}
-             :event/facts {:db/type :db.type/ref
-                           :db/cardinality :db.cardinality/many}
+             :event/fields {:db/type :db.type/ref
+                            :db/cardinality :db.cardinality/many}
              :fact/date {:db/type :db.type/ref
                          :db/cardinality :db.cardinality/one}
              :fact/place {:db/type :db.type/ref
@@ -174,8 +172,8 @@
            :where
            [?c :role/persona ?e]
            [?c :role/type ?idrole]
-           [?evt :event/roles ?c]
-           [?evt :event/roles ?f]
+           [?evt :event/fields ?c]
+           [?evt :event/fields ?f]
            [?f :role/type ?role]
            [?f :role/persona ?parentid]]
          @conn role idrole id))
@@ -185,8 +183,8 @@
            :where
            [?c :role/persona ?e]
            [?c :role/type ?idrole]
-           [?evt :event/roles ?c]
-           [?evt :event/roles ?f]
+           [?evt :event/fields ?c]
+           [?evt :event/fields ?f]
            [?f :role/type ?role]
            [?f :role/persona ?parentid]
            [?parentid :persona/sex ?sex]]
@@ -269,8 +267,8 @@
           :in $ ?pid
           :where
           [?rid :role/persona ?pid]
-          [?eid :event/roles ?rid]
-          [?eid :event/facts ?factid]]
+          [?eid :event/fields ?rid]
+          [?eid :event/fields ?factid]]
         @conn pid))
 
 (defn find-fact
@@ -319,7 +317,7 @@
   (ds/q '[:find ?eid
           :in $ ?fid
           :where
-          [?eid :event/facts ?fid]]
+          [?eid :event/fields ?fid]]
         @conn fact-id))
 
 (defn get-person-in-event
@@ -327,7 +325,7 @@
   (ds/q '[:find ?pid
           :in $ ?eid ?role
           :where
-          [?eid :event/roles ?rid]
+          [?eid :event/fields ?rid]
           [?rid :role/type ?role]
           [?rid :role/persona ?pid]]
         @conn eid role))
@@ -381,7 +379,7 @@
   (ds/q '[:find ?val
           :in $ ?eid ?f ?type
           :where
-          [?eid :event/roles ?fid]
+          [?eid :event/fields ?fid]
           [?fid :role/field ?f]
           [?fid ?type ?val]]
         @conn eventid field type))
@@ -391,7 +389,7 @@
   (ds/q '[:find ?val
           :in $ ?eid ?f ?type
           :where
-          [?eid :event/facts ?fid]
+          [?eid :event/fields ?fid]
           [?fid :fact/field ?f]
           [?fid ?type ?val]]
         @conn eventid field type))
