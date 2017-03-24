@@ -3,9 +3,11 @@
               [cljs-idxdb.core :as idx]
               [datascript.core :as ds]
               [datascript.transit :as dt]
-              [slekt.test-database :as t]))
+              [slekt.test-database :as t]
+              [slekt.language :as lang]))
 
-(def database {:gui/state {:runonce true
+(def database {:labels (lang/english)
+               :gui/state {:runonce true
                            :current {:selected nil
                                      :father nil
                                      :mother nil
@@ -88,6 +90,8 @@
   (idx/get-by-key @db store-name "Test" (fn [p] (println (:data p)))))
 
 
+
+
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------
 
 (def schema {:database/name {:db/unique :db.unique/identity}
@@ -132,6 +136,7 @@
 
 (defn initdb
   []
+  (ds/transact! conn t/templates)
   (ds/transact! conn t/initdb))
 
 (defn get-name-parts

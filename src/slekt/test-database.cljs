@@ -1,5 +1,29 @@
 (ns slekt.test-database)
 
+(def templates
+  [{:db/id -1
+    :field/id 0
+    :field/type :role
+    :field/role :child}
+   {:db/id -2
+    :field/id 1
+    :field/type :role
+    :field/role :husband}
+   {:db/id -3
+    :field/id 2
+    :field/type :role
+    :field/role :wife}
+   {:db/id -4
+    :field/id 3
+    :field/type :fact
+    :field/role :birth}
+   {:db/id -5
+    :field/id 4
+    :field/type :fact
+    :field/role :baptism}
+   {:template/name :baptism
+    :template/parts [-1 -2 -3 -4 -5]}])
+
 (def initdb
   [{:database/name "test"
     :database/selected 0}
@@ -162,27 +186,6 @@
     :role/type :husband
     :role/persona -7}
    {:event/type :birth
-    :event/fields [-38 -39]}
-   {:db/id -43
-    :field/id 0
-    :field/type :role
-    :field/role :child}
-   {:db/id -44
-    :field/id 1
-    :field/type :role
-    :field/role :husband}
-   {:db/id -45
-    :field/id 2
-    :field/type :role
-    :field/role :wife}
-   {:db/id -46
-    :field/id 3
-    :field/type :fact
-    :field/role :birth}
-   {:db/id -47
-    :field/id 4
-    :field/type :fact
-    :field/role :baptism}
-   {:template/name :baptism
-    :template/parts [-43 -44 -45 -46 -47]}])
+    :event/fields [-38 -39]} ])
+
 

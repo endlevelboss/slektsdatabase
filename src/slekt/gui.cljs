@@ -1,9 +1,10 @@
 (ns slekt.gui
-    (:require [reagent.core :as r]
-              [slekt.database :as d]
-              [slekt.db-functions :as f]
-              ;[slekt.relations :as rels]
-              [slekt.date :as date]))
+  (:require [reagent.core :as r]
+            [slekt.database :as d]
+            [slekt.db-functions :as f]
+            [slekt.language :as lang]
+    ;[slekt.relations :as rels]
+            [slekt.date :as date]))
 
 (enable-console-print!)
 
@@ -32,7 +33,7 @@
         val (get-in @d/state [:gui/state :window/edit :values id])
         value (:value val)]
     [:div
-     [:label (str label " : " (:persona/by-id val))]
+     [:label (str label " : " (d/get-name (:persona/by-id val)))]
      [:input {:type "text"
               :value value
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]]))
@@ -92,7 +93,7 @@
         name (if (= mainperson (get-in @d/state [:gui/state :current :selected]))
                (:place fact)
                (d/get-name mainperson))
-        eventstring (str year " - " label " : ")]
+        eventstring (str year " - " "label" " : ")]
     [:div
      [:label
       {:on-click #(f/edit-event (:event fact))}
@@ -108,11 +109,11 @@
              spouse
              nil)
         labelspouse (if (not= :noparent spouse)
-                      "Spouse:"
+                      "Spouse"
                       nil)
         children (get info 1)
         labelchildren (if (not= 0 (count children))
-                        "Children:"
+                        "Children"
                         nil)]
     ^{:key spouse}[:div
                    labelspouse
@@ -149,7 +150,9 @@
         :left "20px"
         :padding "5px"
         :font-size "140%"}}
-      [:strong (d/get-name (:selected current))]]
+      [:strong (d/get-name (:selected current))]
+      [:br]
+      [:small (str "("  " - "  ")" ) ]]
      [:div
       {:style
        {:background-color "cadetblue"
@@ -158,7 +161,6 @@
         :height "35px"
         :top "20px"
         :left "420px"}}
-      "Father: "
       [person-display-component dad]]
      [:div
       {:style {:background-color "lightcoral"
@@ -167,7 +169,6 @@
                :height "35px"
                :top "55px"
                :left "420px"}}
-      "Mother: "
       [person-display-component mum]]
      [:div {:style {:background-color "wheat"
                     :position "absolute"
@@ -181,7 +182,6 @@
                :width "380px"
                :top "100px"
                :left "30px"}}
-      "Events:"
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
 
@@ -221,7 +221,7 @@
     (if run
       (do
         (d/initdb)
-        (f/setCurrent 10)
+        (f/setCurrent 16)
         (swap! d/state assoc-in [:gui/state :runonce] false))
       nil)))
 
