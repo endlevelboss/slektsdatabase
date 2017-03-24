@@ -127,43 +127,70 @@
   [val field]
   (let [type (get (get field 1) 2)
         field (get field 0)
+        id (if (= nil (:db/id val))
+             -1
+             (:db/id val))
         value (if (= nil (:value val))
                 ""
                 (:value val))
         pid (:persona/by-id val) ;; TODO  Must handle new personas
-        t (ds/transact! d/conn [{:role/field field
+        t (ds/transact! d/conn [{:db/id id
+                                 :role/field field
                                  :role/type type
                                  :role/value value
                                  :role/persona pid}])]
     (newid t)))
 
 (defn transact-date
-  [s]
-  (if (= nil s)
-    nil
-    (let [date (date/string-to-date s)
-          t (ds/transact! d/conn [{:date/parsed (:parsing date)
-                                   :date/day (:day date)
-                                   :date/month (:month date)
-                                   :date/year (:year date)
-                                   :date/value (:value date)}])]
-      (newid t))))
+  [val]
+  (let [f-id (:db/id val)
+        d-id (if (= nil f-id)
+               -1
+               (ffirst (d/get-value-of f-id :fact/date)))
+        dateid (if (= nil d-id)
+                 -1
+                 d-id)
+        s (:date val)]
+    (if (= nil s)
+      nil
+      (let [date (date/string-to-date s)
+            t (ds/transact! d/conn [{:db/id dateid
+                                     :date/parsed (:parsing date)
+                                     :date/day    (:day date)
+                                     :date/month  (:month date)
+                                     :date/year   (:year date)
+                                     :date/value  (:value date)}])]
+        (newid t)))))
 
 (defn transact-place
-  [value]
-  (if (= nil value)
-    nil
-    (let [t (ds/transact! d/conn [{:place/value value}])]
-      (newid t))))
+  [val]
+  (let [f-id (:db/id val)
+        p-id (if (= nil f-id)
+               -1
+               (ffirst (d/get-value-of f-id :fact/place)))
+        placeid (if (= nil p-id)
+                 -1
+                 p-id)
+        place (:place val)]
+    (if (= nil place)
+      nil
+      (let [t (ds/transact! d/conn [{:db/id       placeid
+                                     :place/value place}])]
+        (newid t)))))
+
 
 
 (defn transact-fact
   [val field]
-  (let [type (get (get field 1) 2)
+  (let [id (if (= nil (:db/id val))
+             -1
+             (:db/id val))
+        type (get (get field 1) 2)
         field (get field 0)
-        date (transact-date (:date val))
+        date (transact-date val)
         place (transact-place (:place val))
-        reg1 {:fact/type type
+        reg1 {:db/id id
+              :fact/type type
               :fact/field field}
         reg2 (if (= nil date)
                reg1
@@ -198,25 +225,31 @@
                     (conj result parsed))]
        (recur (rest fields) data newres)))))
 
-(defn create-event
-  [data]
-  (println data)
-  (let [t-id (ffirst (d/get-id-of (:type data) :template/name))
+(defn save-event
+  []
+  (let [data (get-in @d/state [:gui/state :window/edit])
+        eventid (:event/by-id data)
+        id (if (= nil eventid)                              ;; update old event or create new?
+             -1
+             eventid)
+        t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
         values (recur-fields fields data)]
-    (ds/transact! d/conn [{:event/type (:type data)
+    (println values)
+    (ds/transact! d/conn [{:db/id id
+                           :event/type (:type data)
                            :event/template (:type data) ;; TODO Fix for custom templates
                            :event/fields values}])))
 
-
 (defn update-event
-    [data]
-    (println "updating event"))
+  [data]
+  (println "updating event")
+  (println data))
 
-(defn save-event
+(defn save-event-old
   []
   (let [data (get-in @d/state [:gui/state :window/edit])
         eventid (:event/by-id data)]
     (if (= nil eventid)
-      (create-event data)
+      ;(create-event data)
       (update-event data))))

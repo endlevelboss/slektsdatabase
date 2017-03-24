@@ -3,6 +3,10 @@
 /target
 /resources
 !/resources/public/index.html
+/.idea
+./slekt.iml
+figwheel_server.log
+slekt.iml
 
 
 # Windows image file caches

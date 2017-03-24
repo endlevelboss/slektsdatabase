@@ -104,8 +104,9 @@
 (defn parse-name
   [eventid fieldid]
   (let [value (ffirst (d/get-field-id-of-event eventid fieldid :role/value))
-        id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))]
-    {:persona/by-id id :value value}))
+        id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))
+        f-id (ffirst (d/get-field-id eventid fieldid :role/field))]
+    {:persona/by-id id :value value :db/id f-id}))
 
 (defn parse-fact-field
   [eventid fieldid]
@@ -116,8 +117,12 @@
         placeid (ffirst (d/get-field-id-of-event-facts eventid fieldid :fact/place))
         place (if (not= nil placeid)
                 (ffirst (d/get-value-of placeid :place/value))
-                nil)]
-    {:date date :place place}))
+                nil)
+        f-id (ffirst (d/get-field-id eventid fieldid :fact/field))]
+    (println eventid)
+    (println fieldid)
+    (println f-id)
+    {:date date :place place :db/id f-id}))
 
 ;(defn name-stringOLD
 ;    ([props]

@@ -374,6 +374,15 @@
           [?fid :field/role ?role]]
         @conn fieldid))
 
+(defn get-field-id
+  [eventid field fieldtype]
+  (ds/q '[:find ?id
+          :in $ ?eid ?f ?ftype
+          :where
+          [?eid :event/fields ?id]
+          [?id ?ftype ?f]]
+        @conn eventid field fieldtype))
+
 (defn get-field-id-of-event
   [eventid field type]
   (ds/q '[:find ?val

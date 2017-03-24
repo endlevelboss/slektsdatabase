@@ -231,5 +231,5 @@
     (do
       (runonce)
       [menu-bars])
-    [:div "Indexed database has failed to initialize... Please contact support"]))
+    [:div "Loading indexeddb..."]))
 
