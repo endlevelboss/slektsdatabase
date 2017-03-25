@@ -5,8 +5,9 @@
 !/resources/public/index.html
 /.idea
 ./slekt.iml
-figwheel_server.log
+./figwheel_server.log
 slekt.iml
+figwheel_server.log
 
 
 # Windows image file caches

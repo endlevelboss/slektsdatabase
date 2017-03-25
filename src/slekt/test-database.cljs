@@ -186,6 +186,6 @@
     :role/type :husband
     :role/persona -7}
    {:event/type :birth
-    :event/fields [-38 -39]} ])
-
+    :event/fields [-38 -39]}
+   ])
 

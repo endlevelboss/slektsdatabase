@@ -60,28 +60,22 @@
         parsed (remove nil? (map parse-fact facts))]
     (filter #(not= [] (:date %)) (sort (comp compare-dates) parsed))))
 
-(defn find-year-alts
-  [id firsttype secondtype]
-  (let [first (filter #(= firsttype (:type %)) (event-list id))
-        second (filter #(= secondtype (:type %)) (event-list id))]
-    (println first)
-    ;(date/getyear (:date final))
-    ))
+(defn event-year-multifact
+  "For finding years possibly given by multiple different facts, like birth/baptism or death/burial"
+  [id type1 type2]
+  (let [births (filter #(= type1 (:type %)) (event-list id))
+        bapms (filter #(= type2 (:type %)) (event-list id))
+        total (sort (comp compare-dates) (into births bapms))
+        firstevent (first total)]
+    (date/getyear (:date firstevent))))
 
-(defn find-year-with-alternatives
-  [id first second]
-  (let [y (find-year-alts id first second)]
-    (if (= nil y)
-      nil
-      (date/getyear (:date y)))))
-
-(defn birth
+(defn birthyear
   [id]
-  (find-year-alts id :birth :baptism))
+  (event-year-multifact id :birth :baptism))
 
-(defn death
+(defn deathyear
   [id]
-  (find-year-with-alternatives id :death :burial))
+  (event-year-multifact id :death :burial))
 
 (defn setCurrentSelected
   [id]
@@ -164,7 +158,6 @@
   (let [vals (get field 1)
         type (get vals 1)
         fieldid (get vals 0)]
-    (println field)
     (case type
       :role (parse-name event fieldid)
       :fact (parse-fact-field event fieldid))))
@@ -176,7 +169,6 @@
   ([event]
    (let [fields (flatten (into [] (d/get-template-of-event event)))
          ordered-fields (d/order-event-fields fields)]
-     (println ordered-fields)
      (populate-event-field ordered-fields event {})))
   ([fields event result]
    (if (empty? fields)
