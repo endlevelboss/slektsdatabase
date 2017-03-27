@@ -124,11 +124,14 @@
                   @d/conn tx))))
 
 (defn transact-persona
-  [val]
-  (println val)
+  [val role]
   (let [first (:newfirst val)
         last (:newlast val)
-        t (ds/transact! d/conn [{:persona/name -1}
+        sex (if (= role :husband)
+              :m
+              :f)
+        t (ds/transact! d/conn [{:persona/name -1
+                                 :persona/sex sex}
                                 {:db/id -1
                                  :name/parts {0 first 1 last}}
                                 ])]
@@ -145,7 +148,7 @@
                 ""
                 (:value val))
         pid (if (nil? (:persona/by-id val))
-              (transact-persona val)
+              (transact-persona val type)
               (:persona/by-id val))                         ;; TODO  Must handle new personas
         t (ds/transact! d/conn [{:db/id id
                                  :fact/type :role
@@ -254,16 +257,3 @@
                            :event/type (:type data)
                            :event/template (:type data) ;; TODO Fix for custom templates
                            :event/fields values}])))
-
-(defn update-event
-  [data]
-  (println "updating event")
-  (println data))
-
-(defn save-event-old
-  []
-  (let [data (get-in @d/state [:gui/state :window/edit])
-        eventid (:event/by-id data)]
-    (if (= nil eventid)
-      ;(create-event data)
-      (update-event data))))

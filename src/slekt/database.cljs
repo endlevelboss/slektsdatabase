@@ -3,9 +3,11 @@
               [cljs-idxdb.core :as idx]
               [datascript.core :as ds]
               [datascript.transit :as dt]
-              [slekt.test-database :as t]))
+              [slekt.test-database :as t]
+              [slekt.language :as lang]))
 
 (def database {:gui/state {:runonce true
+                           :language lang/norsk
                            :current {:selected nil
                                      :father nil
                                      :mother nil
@@ -34,6 +36,10 @@
 
 (defn testidx []
   (idx/get-by-key @db store-name "Test" (fn [p] (println (:data p)))))
+
+(defn l
+  [label]
+  (get-in @state [:gui/state :language label]))
 
 
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------

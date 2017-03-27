@@ -12,15 +12,17 @@
   (str "(" birthyear " - " deathyear ")"))
 
 (defn person-display-component
-   [id]
-   (let [name (d/get-name id)
-         birth (f/birthyear id)
-         death (f/deathyear id)]
-    [:div
-      {:on-click #(f/setCurrent id)}
-      name
-     " "
-     [:small (birth-death-string birth death)]]))
+  [id]
+  (if (nil? id)
+    nil
+    (let [name (d/get-name id)
+          birth (f/birthyear id)
+          death (f/deathyear id)]
+      [:div
+       {:on-click #(f/setCurrent id)}
+       name
+       " "
+       [:small (birth-death-string birth death)]])))
 
 ;(defn name-part-component
 ;    [label id part]
@@ -108,7 +110,7 @@
 
 (defn event-display-component
   [fact]
-  (let [label (:type fact)
+  (let [label (d/l (:type fact))
         date (:date fact)
         year (date/getyear date)
         mainperson (ffirst (d/get-main-person (:event fact)))
@@ -125,17 +127,17 @@
       name]]))
 
 (defn spouse-children-component
-  [info]
+  [info spouselabel childlabel]
   (let [spouse (get info 0)
         sp (if (not= :noparent spouse)
              spouse
              nil)
         labelspouse (if (not= :noparent spouse)
-                      "Spouse:"
+                      (str spouselabel ":")
                       nil)
         children (get info 1)
         labelchildren (if (not= 0 (count children))
-                        "Children:"
+                        (str childlabel ":")
                         nil)]
     ^{:key spouse}[:div
                    labelspouse
@@ -157,8 +159,9 @@
         children (:children current)
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
-        events (f/event-list (:selected current))]
-    (println dad)
+        events (f/event-list (:selected current))
+        spouselabel (d/l :spouse)
+        childrenlabel (d/l :children)]
     [:div {:style {:font-family "arial"
                    :position "absolute"
                    :top "20px"
@@ -184,7 +187,7 @@
         :height "35px"
         :top "20px"
         :left "420px"}}
-      "Father: "
+      (str (d/l :father) ":")
       [person-display-component dad]]
      [:div
       {:style {:background-color "lightcoral"
@@ -193,21 +196,21 @@
                :height "35px"
                :top "55px"
                :left "420px"}}
-      "Mother: "
+      (str (d/l :mother) ":")
       [person-display-component mum]]
      [:div {:style {:background-color "wheat"
                     :position "absolute"
                     :top "100px"
                     :left "420px"
                     :width "400px"}}
-      (map #(spouse-children-component %) sorted)]
+      (map #(spouse-children-component % spouselabel childrenlabel) sorted)]
      [:div
       {:style {:background-color "wheat"
                :position "absolute"
                :width "380px"
                :top "100px"
                :left "30px"}}
-      "Events:"
+      (str (d/l :events) ":")
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
 
@@ -215,13 +218,13 @@
                       :top "450px"
                       :left "20px"}
               :type "button"
-              :value "Add birth/baptism"
+              :value (d/l :bapm-event)
               :on-click #(f/set-event-edit :baptism :child)}]
      [:input {:style {:position "absolute"
                       :top "450px"
                       :left "140px"}
               :type "button"
-              :value "Add burial/death"
+              :value (d/l :buri-event)
               :on-click #(f/set-event-edit :burial :main)}]]))
 
 (defn init-window []
