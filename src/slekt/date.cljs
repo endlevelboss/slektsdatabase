@@ -88,7 +88,7 @@
     [arr]
     (if (empty? arr)
         false
-        (if (= nil (first arr))
+        (if (nil? (get (first arr) 1))
             true
             (recur (rest arr)))))
 
