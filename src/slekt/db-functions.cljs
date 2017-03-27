@@ -178,12 +178,31 @@
 ;            nil
 ;            (recur role (rest fields)))))
 
+(defn set-roles-recur
+  [template]
+  (if (empty? template)
+    nil
+    (let [id (get (first template) 0)
+          type (get (first template) 1)
+          curr (get-in @d/state [:gui/state :current])]
+      (case type
+        :main (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (:selected curr)})
+        :father (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:father curr))})
+        :mother (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:mother curr))}))
+      (recur (rest template)))))
+
+(defn set-roles
+  [templateid]
+  (let [expected-roles (ffirst (d/get-value-of templateid :template/expected))]
+    (set-roles-recur expected-roles)))
+
 (defn set-current-role
   [role template]
   (let [id (ffirst (d/get-template-field-for-role template role))
+        expected-roles (ffirst (d/get-value-of template :template/expected))
         pid (get-in @d/state [:gui/state :current :selected])
         value {:persona/by-id pid}]
-    (swap! d/state assoc-in [:gui/state :window/edit :values id] value)))
+    (set-roles template)))
 
 (defn set-event-edit
   [key role]

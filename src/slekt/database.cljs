@@ -103,6 +103,7 @@
              :name/template {:db/type :db.type/ref
                              :db/cardinality :db.cardinality/one}
              :template/name {:db/unique :db.unique/identity}
+             :template/expected {:db/cardinality :db.cardinality/one}
              :template/parts {:db/type :db.type/ref
                               :db/cardinality :db.cardinality/many}
              :event/type {:db/cardinality :db.cardinality/one}
@@ -147,13 +148,11 @@
 
 (defn get-name-parts
   [id]
-  (ds/q '[:find ?name ?template
+  (ds/q '[:find ?name
           :in $ ?e
           :where
           [?e :persona/name ?n]
-          [?n :name/parts ?name]
-          [?n :name/template ?t]
-          [?t :template/count ?template]]
+          [?n :name/parts ?name]]
         @conn id))
 
 (defn get-name

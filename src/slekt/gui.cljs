@@ -39,9 +39,22 @@
         label (get (get field 1) 2)
         val (get-in @d/state [:gui/state :window/edit :values id])
         value (:value val)
-        name (d/get-name (:persona/by-id val))]
+        pid (:persona/by-id val)
+        firstname (:newfirst val)
+        lastname (:newlast val)
+        name (if (= nil pid)
+               [:div label
+                [:label "First name"]
+                [:input {:type "text"
+                         :value firstname
+                         :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newfirst)}]
+                [:label "Last name"]
+                [:input {:type "text"
+                         :value lastname
+                         :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newlast)}]]
+               [:label (str label " : " (d/get-name pid))])]
     [:div
-     [:label (str label " : " name)]
+     name
      [:input {:type "text"
               :value value
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]]))
@@ -83,7 +96,7 @@
                    :position "absolute"
                    :top "20px"
                    :left "30px"
-                   :width "500px"}}
+                   :width "700px"}}
      [:h1 (:label template)]
      (field-generator fields)
      [:input {:type "button"
@@ -145,6 +158,7 @@
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
         events (f/event-list (:selected current))]
+    (println dad)
     [:div {:style {:font-family "arial"
                    :position "absolute"
                    :top "20px"

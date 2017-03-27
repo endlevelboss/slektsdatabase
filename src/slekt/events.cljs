@@ -123,17 +123,30 @@
                     [?id _ _ ?tx]]
                   @d/conn tx))))
 
+(defn transact-persona
+  [val]
+  (println val)
+  (let [first (:newfirst val)
+        last (:newlast val)
+        t (ds/transact! d/conn [{:persona/name -1}
+                                {:db/id -1
+                                 :name/parts {0 first 1 last}}
+                                ])]
+    (newid t)))
+
 (defn transact-role
-  [val field]
-  (let [type (get (get field 1) 2)
-        field (get field 0)
+  [val f]
+  (let [type (get (get f 1) 2)
+        field (get f 0)
         id (if (= nil (:db/id val))
              -1
              (:db/id val))
         value (if (= nil (:value val))
                 ""
                 (:value val))
-        pid (:persona/by-id val) ;; TODO  Must handle new personas
+        pid (if (nil? (:persona/by-id val))
+              (transact-persona val)
+              (:persona/by-id val))                         ;; TODO  Must handle new personas
         t (ds/transact! d/conn [{:db/id id
                                  :fact/type :role
                                  :fact/field field
@@ -237,7 +250,6 @@
         t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
         values (recur-fields fields data)]
-    (println values)
     (ds/transact! d/conn [{:db/id id
                            :event/type (:type data)
                            :event/template (:type data) ;; TODO Fix for custom templates

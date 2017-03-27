@@ -23,6 +23,7 @@
     :field/role :baptism}
    {:template/name :baptism
     :template/main 0
+    :template/expected {0 :main 1 :father 2 :mother}
     :template/parts [-1 -2 -3 -4 -5]}
    {:db/id -6
     :field/id 0
@@ -38,6 +39,7 @@
     :field/role :burial}
    {:template/name :burial
     :template/main 0
+    :template/expected {0 :main}
     :template/parts [-6 -7 -8]}])
 
 (def initdb
