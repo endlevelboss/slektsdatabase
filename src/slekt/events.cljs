@@ -135,10 +135,11 @@
                 (:value val))
         pid (:persona/by-id val) ;; TODO  Must handle new personas
         t (ds/transact! d/conn [{:db/id id
-                                 :role/field field
-                                 :role/type type
-                                 :role/value value
-                                 :role/persona pid}])]
+                                 :fact/type :role
+                                 :fact/field field
+                                 :fact/role type
+                                 :fact/value value
+                                 :fact/persona pid}])]
     (newid t)))
 
 (defn transact-date
@@ -190,7 +191,8 @@
         date (transact-date val)
         place (transact-place (:place val))
         reg1 {:db/id id
-              :fact/type type
+              :fact/type :event
+              :fact/role type
               :fact/field field}
         reg2 (if (= nil date)
                reg1
@@ -210,7 +212,7 @@
       nil
       (case fieldtype
         :role (transact-role value field)
-        :fact (transact-fact value field)
+        :event (transact-fact value field)
         nil))))
 
 (defn recur-fields

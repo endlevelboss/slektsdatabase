@@ -15,14 +15,30 @@
     :field/role :wife}
    {:db/id -4
     :field/id 3
-    :field/type :fact
+    :field/type :event
     :field/role :birth}
    {:db/id -5
     :field/id 4
-    :field/type :fact
+    :field/type :event
     :field/role :baptism}
    {:template/name :baptism
-    :template/parts [-1 -2 -3 -4 -5]}])
+    :template/main 0
+    :template/parts [-1 -2 -3 -4 -5]}
+   {:db/id -6
+    :field/id 0
+    :field/type :role
+    :field/role :main}
+   {:db/id -7
+    :field/id 1
+    :field/type :event
+    :field/role :death}
+   {:db/id -8
+    :field/id 2
+    :field/type :event
+    :field/role :burial}
+   {:template/name :burial
+    :template/main 0
+    :template/parts [-6 -7 -8]}])
 
 (def initdb
   [{:database/name "test"
@@ -74,18 +90,21 @@
     :persona/name -13
     :persona/sex :f}
    {:db/id -5
-    :role/field 0
-    :role/type :child
-    :role/value "Ingebrigt"
-    :role/persona -7}
+    :fact/field 0
+    :fact/type :role
+    :fact/role :child
+    :fact/value "Ingebrigt"
+    :fact/persona -7}
    {:db/id -6
-    :role/field 1
-    :role/type :husband
-    :role/persona -9}
+    :fact/field 1
+    :fact/type :role
+    :fact/role :husband
+    :fact/persona -9}
    {:db/id -18
-    :role/field 2
-    :role/type :wife
-    :role/persona -14}
+    :fact/field 2
+    :fact/type :role
+    :fact/role :wife
+    :fact/persona -14}
    {:db/id -40
     :date/parsed :parsed
     :date/year 1834
@@ -95,7 +114,8 @@
     :place/value "Tysnes, Hordaland"}
    {:db/id -41
     :fact/field 3
-    :fact/type :birth
+    :fact/type :event
+    :fact/role :birth
     :fact/date -40
     :fact/place -44}
    {:db/id -42
@@ -105,41 +125,50 @@
     :date/day 26}
    {:db/id -43
     :fact/field 4
-    :fact/type :baptism
+    :fact/type :event
+    :fact/role :baptism
     :fact/date -42}
    {:event/type :baptism
     :event/fields [-5 -6 -18 -41 -43]
     :event/template :baptism}
    {:db/id -19
-    :role/type :child
-    :role/persona -8}
+    :fact/role :child
+    :fact/type :role
+    :fact/persona -8}
    {:db/id -20
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:db/id -21
-    :role/type :wife
-    :role/persona -15}
+    :fact/role :wife
+    :fact/type :role
+    :fact/persona -15}
    {:event/type :baptism
     :event/fields [-19 -20 -21]
     :event/template :baptism}
    {:db/id -22
-    :role/type :child
-    :role/persona -16}
+    :fact/role :child
+    :fact/type :role
+    :fact/persona -16}
    {:db/id -23
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:db/id -24
-    :role/type :wife
-    :role/persona -17}
+    :fact/role :wife
+    :fact/type :role
+    :fact/persona -17}
    {:event/type :baptism
     :event/fields [-22 -23 -24]
     :event/template :baptism}
    {:db/id -25
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:db/id -26
-    :role/type :wife
-    :role/persona -17}
+    :fact/role :wife
+    :fact/type :role
+    :fact/persona -17}
    {:event/type :marriage
     :event/fields [-25 -26]}
    {:db/id -27
@@ -149,11 +178,13 @@
     :persona/name -27
     :persona/sex :f}
    {:db/id -29
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:db/id -30
-    :role/type :wifre
-    :role/persona -28}
+    :fact/role :wife
+    :fact/type :role
+    :fact/persona -28}
    {:event/type :marriage
     :event/fields [-29 -30]}
    {:db/id -31
@@ -163,14 +194,17 @@
     :persona/name -31
     :persona/sex :m}
    {:db/id -33
-    :role/type :child
-    :role/persona -32}
+    :fact/role :child
+    :fact/type :role
+    :fact/persona -32}
    {:db/id -34
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:db/id -35
-    :role/type :wife
-    :role/persona -28}
+    :fact/role :wife
+    :fact/type :role
+    :fact/persona -28}
    {:event/type :birth
     :event/fields [-33 -34 -35]}
    {:db/id -36
@@ -180,11 +214,13 @@
     :persona/name -36
     :persona/sex :m}
    {:db/id -38
-    :role/type :child
-    :role/persona -37}
+    :fact/role :child
+    :fact/type :role
+    :fact/persona -37}
    {:db/id -39
-    :role/type :husband
-    :role/persona -7}
+    :fact/role :husband
+    :fact/type :role
+    :fact/persona -7}
    {:event/type :birth
     :event/fields [-38 -39]}
    ])

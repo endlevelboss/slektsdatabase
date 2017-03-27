@@ -109,11 +109,6 @@
              :event/template {:db/cardinality :db.cardinality/one}
              :event/fields {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/many}
-             :fact/date {:db/type :db.type/ref
-                         :db/cardinality :db.cardinality/one}
-             :fact/place {:db/type :db.type/ref
-                          :db/cardinality :db.cardinality/one}
-             :fact/type {:db/cardinality :db.cardinality/one}
              :date/parsed {:db/cardinality :db.cardinality/one}
              :date/year {:db/cardinality :db.cardinality/one}
              :date/month {:db/cardinality :db.cardinality/one}
@@ -122,10 +117,15 @@
              :place/value {:db/cardinality :db.cardinality/one}
              :place/address {:db/type :db.type/ref
                              :db/cardinality :db.cardinality/one}
-             :role/type {:db/cardinality :db.cardinality/one}
-             :role/name {:db/type :db.type/ref
+             :fact/role {:db/cardinality :db.cardinality/one}
+             :fact/date {:db/type :db.type/ref
                          :db/cardinality :db.cardinality/one}
-             :role/persona {:db/type :db.type/ref
+             :fact/place {:db/type :db.type/ref
+                          :db/cardinality :db.cardinality/one}
+             :fact/type {:db/cardinality :db.cardinality/one}
+             :fact/name {:db/type :db.type/ref
+                         :db/cardinality :db.cardinality/one}
+             :fact/persona {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/one}})
 
 (def conn (ds/create-conn schema))
@@ -134,6 +134,16 @@
   []
   (ds/transact! conn t/initdb)
   (ds/transact! conn t/templates))
+
+(defn personas
+  []
+  (ds/q '[:find ?pid
+          :where
+          [?pid :persona/name _]] @conn))
+
+(defn persona-list
+  []
+  (flatten (into [] (personas))))
 
 (defn get-name-parts
   [id]
@@ -167,38 +177,21 @@
         @conn pid))
 
 (defn get-relation
-  ([role idrole id]
-   (ds/q '[:find ?parentid
-           :in $ ?role ?idrole ?e ?sex
-           :where
-           [?c :role/persona ?e]
-           [?c :role/type ?idrole]
-           [?evt :event/fields ?c]
-           [?evt :event/fields ?f]
-           [?f :role/type ?role]
-           [?f :role/persona ?parentid]]
-         @conn role idrole id))
-  ([role idrole id sex]
-   (ds/q '[:find ?parentid
-           :in $ ?role ?idrole ?e ?sex
-           :where
-           [?c :role/persona ?e]
-           [?c :role/type ?idrole]
-           [?evt :event/fields ?c]
-           [?evt :event/fields ?f]
-           [?f :role/type ?role]
-           [?f :role/persona ?parentid]
-           [?parentid :persona/sex ?sex]]
-         @conn role idrole id sex)))
+  [role idrole id]
+  (ds/q '[:find ?parentid
+          :in $ ?role ?idrole ?e ?sex
+          :where
+          [?c :fact/persona ?e]
+          [?c :fact/role ?idrole]
+          [?evt :event/fields ?c]
+          [?evt :event/fields ?f]
+          [?f :fact/role ?role]
+          [?f :fact/persona ?parentid]]
+        @conn role idrole id))
 
 (defn get-parent
   [role id]
   (get-relation role :child id))
-
-(defn find-parent-sexed
-  [role id sex]
-  (let [parent (into #{} (flatten (into [] (get-relation role :child id sex))))]
-    parent))
 
 (defn find-parent
   [role id]
@@ -262,14 +255,44 @@
         arranged (recur-arrange-children id smap children)]
     arranged))
 
-(defn get-facts
+(defn get-fact-from-role
+  [rid]
+  (ds/q '[:find ?fact
+          :in $ ?rid
+          :where
+          [?eid :event/fields ?rid]
+          [?eid :event/fields ?fact]
+          [?fact :fact/type :event]]
+        @conn rid))
+
+(defn test-fact
+  [rid]
+  (ds/q '[:find ?eid
+          :in $ ?rid
+          :where
+          [?eid :event/fields ?rid]]
+        @conn rid))
+
+(defn get-role
+  [pid]
+  (ds/q '[:find ?rid
+          :in $ ?pid
+          :where
+          [?rid :fact/persona ?pid]
+          [?eid :event/fields ?rid]]
+        @conn pid))
+
+(defn get-role-main
   [pid]
   (ds/q '[:find ?factid
           :in $ ?pid
           :where
-          [?rid :role/persona ?pid]
-          [?eid :event/fields ?rid]
-          [?eid :event/fields ?factid]]
+          [?eid :event/template ?template]
+          [?tid :template/name ?template]
+          [?tid :template/main ?field]
+          [?eid :event/fields ?factid]
+          [?factid :fact/field ?field]
+          [?factid :fact/persona ?pid]]
         @conn pid))
 
 (defn find-fact
@@ -327,9 +350,22 @@
           :in $ ?eid ?role
           :where
           [?eid :event/fields ?rid]
-          [?rid :role/type ?role]
-          [?rid :role/persona ?pid]]
+          [?rid :fact/role ?role]
+          [?rid :fact/persona ?pid]]
         @conn eid role))
+
+(defn get-main-person
+  [eid]
+  (ds/q '[:find ?pid
+          :in $ ?eid
+          :where
+          [?eid :event/template ?template]
+          [?tid :template/name ?template]
+          [?tid :template/main ?field]
+          [?eid :event/fields ?fid]
+          [?fid :fact/field ?field]
+          [?fid :fact/persona ?pid]]
+        @conn eid))
 
 (defn get-template-of-event
   [eid]
@@ -390,7 +426,7 @@
           :in $ ?eid ?f ?type
           :where
           [?eid :event/fields ?fid]
-          [?fid :role/field ?f]
+          [?fid :fact/field ?f]
           [?fid ?type ?val]]
         @conn eventid field type))
 

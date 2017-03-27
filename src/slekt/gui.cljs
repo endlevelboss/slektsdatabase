@@ -7,12 +7,20 @@
 
 (enable-console-print!)
 
+(defn birth-death-string
+  [birthyear deathyear]
+  (str "(" birthyear " - " deathyear ")"))
+
 (defn person-display-component
    [id]
-   (let [name (d/get-name id)]
+   (let [name (d/get-name id)
+         birth (f/birthyear id)
+         death (f/deathyear id)]
     [:div
       {:on-click #(f/setCurrent id)}
-      name]))
+      name
+     " "
+     [:small (birth-death-string birth death)]]))
 
 ;(defn name-part-component
 ;    [label id part]
@@ -30,9 +38,10 @@
   (let [id (get field 0)
         label (get (get field 1) 2)
         val (get-in @d/state [:gui/state :window/edit :values id])
-        value (:value val)]
+        value (:value val)
+        name (d/get-name (:persona/by-id val))]
     [:div
-     [:label (str label " : " (:persona/by-id val))]
+     [:label (str label " : " name)]
      [:input {:type "text"
               :value value
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]]))
@@ -60,7 +69,7 @@
           id (get field 0)]
       (case type
         :role ^{:key id}[name-component field]
-        :fact ^{:key id}[date-component field]))))
+        :event ^{:key id}[date-component field]))))
 
 (defn event-edit-component
   []
@@ -73,7 +82,8 @@
     [:div {:style {:font-family "arial"
                    :position "absolute"
                    :top "20px"
-                   :left "30px"}}
+                   :left "30px"
+                   :width "500px"}}
      [:h1 (:label template)]
      (field-generator fields)
      [:input {:type "button"
@@ -88,7 +98,7 @@
   (let [label (:type fact)
         date (:date fact)
         year (date/getyear date)
-        mainperson (ffirst (d/get-person-in-event (:event fact) :child))
+        mainperson (ffirst (d/get-main-person (:event fact)))
         name (if (= mainperson (get-in @d/state [:gui/state :current :selected]))
                (:place fact)
                (d/get-name mainperson))
@@ -151,7 +161,7 @@
         :font-size "140%"}}
       [:strong (d/get-name (:selected current))]
       [:br]
-      [:small (str "(" (f/birthyear (:selected current)) " - " (f/deathyear (:selected current)) ")")]]
+      [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
      [:div
       {:style
        {:background-color "cadetblue"
