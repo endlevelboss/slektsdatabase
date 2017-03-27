@@ -154,33 +154,25 @@
   [id]
   (let [mysex (ffirst (find-sex-of-person id))
         myrole (if (= :m mysex)
-                 :husband
-                 :wife)
+                 :father
+                 :mother)
         children (into #{} (flatten (into [] (get-relation :child myrole id))))]
     children))
 
 (defn find-spouses
   "Finds all persons that are registered as married, OR has children together"
   [id]
-  (let [mysex (ffirst (find-sex-of-person id))
-        myrole (if (= :m mysex)
-                 :husband
-                 :wife)
-        role (if (= :husband myrole)
-               :wife
-               :husband)
-        spouses (into #{} (flatten (into [] (get-relation role myrole id))))]
-    spouses))
-
+  (let [sp1 (into #{} (flatten (into [] (get-relation :husband :wife id))))
+        sp2 (into sp1 (flatten (into [] (get-relation :wife :husband id))))
+        sp3 (into sp2 (flatten (into [] (get-relation :father :mother id))))
+        sp4 (into sp3 (flatten (into [] (get-relation :mother :father id))))]
+    sp4))
 
 (defn find-parent-id
   [oid myid]
-  (let [sex (ffirst (find-sex-of-person oid))
-        role (if (= :m sex)
-               :wife
-               :husband)
-         parents (into #{} (flatten (into [] (get-relation role :child myid))))]
-    (disj parents oid)))
+  (let [par1 (into #{} (flatten (into [] (get-relation :father :child myid))))
+        par2 (into par1 (flatten (into [] (get-relation :mother :child myid))))]
+    (disj par2 oid)))
 
 (defn recur-arrange
   [spousemap myid pids]

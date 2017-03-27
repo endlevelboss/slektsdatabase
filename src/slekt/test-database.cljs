@@ -8,11 +8,11 @@
    {:db/id -2
     :field/id 1
     :field/type :role
-    :field/role :husband}
+    :field/role :father}
    {:db/id -3
     :field/id 2
     :field/type :role
-    :field/role :wife}
+    :field/role :mother}
    {:db/id -4
     :field/id 3
     :field/type :event
@@ -100,12 +100,12 @@
    {:db/id -6
     :fact/field 1
     :fact/type :role
-    :fact/role :husband
+    :fact/role :father
     :fact/persona -9}
    {:db/id -18
     :fact/field 2
     :fact/type :role
-    :fact/role :wife
+    :fact/role :mother
     :fact/persona -14}
    {:db/id -40
     :date/parsed :parsed
@@ -138,11 +138,11 @@
     :fact/type :role
     :fact/persona -8}
    {:db/id -20
-    :fact/role :husband
+    :fact/role :father
     :fact/type :role
     :fact/persona -7}
    {:db/id -21
-    :fact/role :wife
+    :fact/role :mother
     :fact/type :role
     :fact/persona -15}
    {:event/type :baptism
@@ -153,11 +153,11 @@
     :fact/type :role
     :fact/persona -16}
    {:db/id -23
-    :fact/role :husband
+    :fact/role :father
     :fact/type :role
     :fact/persona -7}
    {:db/id -24
-    :fact/role :wife
+    :fact/role :mother
     :fact/type :role
     :fact/persona -17}
    {:event/type :baptism
@@ -200,11 +200,11 @@
     :fact/type :role
     :fact/persona -32}
    {:db/id -34
-    :fact/role :husband
+    :fact/role :father
     :fact/type :role
     :fact/persona -7}
    {:db/id -35
-    :fact/role :wife
+    :fact/role :mother
     :fact/type :role
     :fact/persona -28}
    {:event/type :birth
@@ -220,7 +220,7 @@
     :fact/type :role
     :fact/persona -37}
    {:db/id -39
-    :fact/role :husband
+    :fact/role :father
     :fact/type :role
     :fact/persona -7}
    {:event/type :birth
