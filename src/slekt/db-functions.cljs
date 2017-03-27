@@ -110,9 +110,9 @@
 
 (defn parse-name
   [eventid fieldid]
-  (let [value (ffirst (d/get-field-id-of-event eventid fieldid :role/value))
-        id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))
-        f-id (ffirst (d/get-field-id eventid fieldid :role/field))]
+  (let [value (ffirst (d/get-field-id-of-event eventid fieldid :fact/value))
+        id (ffirst (d/get-field-id-of-event eventid fieldid :fact/persona))
+        f-id (ffirst (d/get-field-id eventid fieldid :fact/field))]
     {:persona/by-id id :value value :db/id f-id}))
 
 (defn parse-fact-field

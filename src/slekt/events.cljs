@@ -152,7 +152,7 @@
                  -1
                  d-id)
         s (:date val)]
-    (if (= nil s)
+    (if (empty? s)
       nil
       (let [date (date/string-to-date s)
             t (ds/transact! d/conn [{:db/id dateid
@@ -173,7 +173,7 @@
                  -1
                  p-id)
         place (:place val)]
-    (if (= nil place)
+    (if (empty? place)
       nil
       (let [t (ds/transact! d/conn [{:db/id       placeid
                                      :place/value place}])]
@@ -189,7 +189,7 @@
         type (get (get field 1) 2)
         field (get field 0)
         date (transact-date val)
-        place (transact-place (:place val))
+        place (transact-place val)
         reg1 {:db/id id
               :fact/type :event
               :fact/role type
