@@ -92,9 +92,10 @@
             true
             (recur (rest arr)))))
 
+
 (defn string-to-date  ;; TODO: Add checks for ca, before, after, between dates
   [string]
-  (if (empty? string)
+  (if (s/blank? string)
     {:parsing :empty :value "" :day 0 :month 0 :year 0}
     (let [s (s/lower-case (s/trim string))
           parts (s/split s #"[\\\/\-\.\s+]")

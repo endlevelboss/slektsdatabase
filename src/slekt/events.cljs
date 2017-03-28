@@ -1,7 +1,8 @@
 (ns slekt.events
     (:require [slekt.database :as d]
               [datascript.core :as ds]
-              [slekt.date :as date]))
+              [slekt.date :as date]
+              [clojure.string :as s]))
 
 (defn create-new-eventid
     []
@@ -149,7 +150,7 @@
                 (:value val))
         pid (if (nil? (:persona/by-id val))
               (transact-persona val type)
-              (:persona/by-id val))                         ;; TODO  Must handle new personas
+              (:persona/by-id val))
         t (ds/transact! d/conn [{:db/id id
                                  :fact/type :role
                                  :fact/field field
@@ -168,7 +169,7 @@
                  -1
                  d-id)
         s (:date val)]
-    (if (empty? s)
+    (if (and (nil? f-id) (s/blank? s))
       nil
       (let [date (date/string-to-date s)
             t (ds/transact! d/conn [{:db/id dateid
@@ -188,8 +189,10 @@
         placeid (if (= nil p-id)
                  -1
                  p-id)
-        place (:place val)]
-    (if (empty? place)
+        place (if (nil? (:place val))
+                ""
+                (:place val))]
+    (if (and (nil? f-id) (s/blank? place))
       nil
       (let [t (ds/transact! d/conn [{:db/id       placeid
                                      :place/value place}])]
@@ -199,25 +202,30 @@
 
 (defn transact-fact
   [val field]
-  (let [id (if (= nil (:db/id val))
-             -1
-             (:db/id val))
-        type (get (get field 1) 2)
-        field (get field 0)
-        date (transact-date val)
-        place (transact-place val)
-        reg1 {:db/id id
-              :fact/type :event
-              :fact/role type
-              :fact/field field}
-        reg2 (if (= nil date)
-               reg1
-               (assoc reg1 :fact/date date))
-        reg3 (if (= nil place)
-               reg2
-               (assoc reg2 :fact/place place))
-        t (ds/transact! d/conn [reg3])]
-    (newid t)))
+  (let [date (:date val)
+        place (:place val)
+        id (:db/id val)]
+    (if (and (nil? id) (s/blank? date) (s/blank? place))
+      nil
+      (let [id (if (= nil (:db/id val))
+                 -1
+                 (:db/id val))
+            type (get (get field 1) 2)
+            field (get field 0)
+            date (transact-date val)
+            place (transact-place val)
+            reg1 {:db/id      id
+                  :fact/type  :event
+                  :fact/role  type
+                  :fact/field field}
+            reg2 (if (= nil date)
+                   reg1
+                   (assoc reg1 :fact/date date))
+            reg3 (if (= nil place)
+                   reg2
+                   (assoc reg2 :fact/place place))
+            t (ds/transact! d/conn [reg3])]
+        (newid t)))))
 
 (defn parse-field
   [field data]
@@ -253,7 +261,9 @@
         t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
         values (recur-fields fields data)]
-    (ds/transact! d/conn [{:db/id id
-                           :event/type (:type data)
-                           :event/template (:type data) ;; TODO Fix for custom templates
-                           :event/fields values}])))
+    (if (empty? fields)
+      nil
+      (ds/transact! d/conn [{:db/id          id
+                             :event/type     (:type data)
+                             :event/template (:type data)   ;; TODO Fix for custom templates
+                             :event/fields   values}]))))

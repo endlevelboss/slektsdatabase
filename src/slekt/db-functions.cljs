@@ -2,7 +2,8 @@
   (:require [reagent.core :as r]
             [slekt.database :as d]
             [slekt.date :as date]
-            [slekt.events :as events]))
+            [slekt.events :as events]
+            [clojure.string :as s]))
 
 (enable-console-print!)
 
