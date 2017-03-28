@@ -16,7 +16,8 @@
                                      :events #{}}
                            :window/edit {:type nil
                                          :event/by-id nil
-                                         :values {}}}})
+                                         :values {}}
+                           :comp/personaselector {:show false}}})
 
 (def state (r/atom database))
 

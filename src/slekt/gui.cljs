@@ -35,6 +35,43 @@
 ;                  :value value
 ;                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)]))
 
+(defn person-select
+  [id]
+  (if (nil? id)
+    nil
+    (let [name (d/get-name id)
+          birth (f/birthyear id)
+          death (f/deathyear id)]
+      [:div
+       {:on-click #()}
+       name
+       " "
+       [:small (birth-death-string birth death)]])))
+
+(defn persona-selector
+  []
+  (let [personas-id (d/persona-list)]
+    (println personas-id)
+    [:div
+     {:style {:font-family      "arial"
+              :position         "absolute"
+              :background-color "grey"
+              :top              "20px"
+              :left             "580px"
+              :width            "300px"
+              :height           "700px"}}
+     (for [pid personas-id]
+       ^{:key pid}[person-select pid])
+     [:input {:type "button"
+              :value "New person"
+              }]
+     [:input {:type "button"
+              :value "Cancel"}]]))
+
+(defn button-show-persona-selector
+  []
+  (swap! d/state assoc-in [:gui/state :comp/personaselector :show] true))
+
 (defn name-component
   [field]
   (let [id (get field 0)
@@ -44,6 +81,9 @@
         pid (:persona/by-id val)
         firstname (:newfirst val)
         lastname (:newlast val)
+        personaselector (if (get-in @d/state [:gui/state :comp/personaselector :show])
+                          [persona-selector]
+                          nil)
         name (if (= nil pid)
                [:div label
                 [:label "First name"]
@@ -57,9 +97,13 @@
                [:label (str label " : " (d/get-name pid))])]
     [:div
      name
+     [:input {:type "button"
+              :value "Change person"
+              :on-click #(button-show-persona-selector)}]
      [:input {:type "text"
               :value value
-              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]]))
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]
+     personaselector]))
 
 (defn date-component
   [field]
