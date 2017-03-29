@@ -35,6 +35,18 @@
 ;                  :value value
 ;                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)]))
 
+(defn change-person
+  [id]
+  (let [field (get-in @d/state [:gui/state :comp/personaselector :field])]
+    (swap! d/state assoc-in [:gui/state :comp/personaselector :show] false)
+    (swap! d/state assoc-in [:gui/state :window/edit :values field :persona/by-id] id)
+    (swap! d/state assoc-in [:gui/state :window/edit :values field :value] nil))
+  )
+
+(defn change-person-cancel
+  []
+  (swap! d/state assoc-in [:gui/state :comp/personaselector :show] false))
+
 (defn person-select
   [id]
   (if (nil? id)
@@ -43,7 +55,7 @@
           birth (f/birthyear id)
           death (f/deathyear id)]
       [:div
-       {:on-click #()}
+       {:on-click #(change-person id)}
        name
        " "
        [:small (birth-death-string birth death)]])))
@@ -51,7 +63,6 @@
 (defn persona-selector
   []
   (let [personas-id (d/persona-list)]
-    (println personas-id)
     [:div
      {:style {:font-family      "arial"
               :position         "absolute"
@@ -64,12 +75,15 @@
        ^{:key pid}[person-select pid])
      [:input {:type "button"
               :value "New person"
+              :on-click #(change-person nil)
               }]
      [:input {:type "button"
-              :value "Cancel"}]]))
+              :value "Cancel"
+              :on-click #(change-person-cancel)}]]))
 
 (defn button-show-persona-selector
-  []
+  [field]
+  (swap! d/state assoc-in [:gui/state :comp/personaselector :field] field)
   (swap! d/state assoc-in [:gui/state :comp/personaselector :show] true))
 
 (defn name-component
@@ -99,7 +113,7 @@
      name
      [:input {:type "button"
               :value "Change person"
-              :on-click #(button-show-persona-selector)}]
+              :on-click #(button-show-persona-selector id)}]
      [:input {:type "text"
               :value value
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]

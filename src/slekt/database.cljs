@@ -17,7 +17,8 @@
                            :window/edit {:type nil
                                          :event/by-id nil
                                          :values {}}
-                           :comp/personaselector {:show false}}})
+                           :comp/personaselector {:show false
+                                                  :field nil}}})
 
 (def state (r/atom database))
 
