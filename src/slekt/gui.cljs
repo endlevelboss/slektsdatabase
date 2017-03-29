@@ -36,10 +36,14 @@
 ;                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)]))
 
 (defn change-person
-  [id]
-  (let [field (get-in @d/state [:gui/state :comp/personaselector :field])]
+  [id sex]
+  (let [field (get-in @d/state [:gui/state :comp/personaselector :field])
+        s (if (nil? id)
+            sex
+            (ffirst (d/find-sex-of-person id)))]
     (swap! d/state assoc-in [:gui/state :comp/personaselector :show] false)
     (swap! d/state assoc-in [:gui/state :window/edit :values field :persona/by-id] id)
+    (swap! d/state assoc-in [:gui/state :window/edit :values field :sex] s)
     (swap! d/state assoc-in [:gui/state :window/edit :values field :value] nil))
   )
 
@@ -55,7 +59,7 @@
           birth (f/birthyear id)
           death (f/deathyear id)]
       [:div
-       {:on-click #(change-person id)}
+       {:on-click #(change-person id nil)}
        name
        " "
        [:small (birth-death-string birth death)]])))
@@ -74,9 +78,11 @@
      (for [pid personas-id]
        ^{:key pid}[person-select pid])
      [:input {:type "button"
-              :value "New person"
-              :on-click #(change-person nil)
-              }]
+              :value "New male"
+              :on-click #(change-person nil :m)}]
+     [:input {:type "button"
+              :value "New female"
+              :on-click #(change-person nil :f)}]
      [:input {:type "button"
               :value "Cancel"
               :on-click #(change-person-cancel)}]]))
@@ -272,7 +278,6 @@
       (str (d/l :events) ":")
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
-
      [:input {:style {:position "absolute"
                       :top "450px"
                       :left "20px"}
