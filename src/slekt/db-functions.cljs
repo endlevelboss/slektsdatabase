@@ -185,11 +185,23 @@
     nil
     (let [id (get (first template) 0)
           type (get (first template) 1)
-          curr (get-in @d/state [:gui/state :current])]
+          curr (get-in @d/state [:gui/state :current])
+          curr-sex (ffirst (d/find-sex-of-person (:selected curr)))
+          spouse (first (get-in @d/state [:gui/state :current :spouses]))
+          husband (if (= :m curr-sex)
+                    {:persona/by-id (:selected curr) :sex :m}
+                    {:persona/by-id spouse :sex :m})
+          wife (if (= :f curr-sex)
+                 {:persona/by-id (:selected curr) :sex :f}
+                 {:persona/by-id spouse :sex :f})]
       (case type
         :main (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (:selected curr)})
-        :father (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:father curr))})
-        :mother (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:mother curr))}))
+        :father (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:father curr))
+                                                                              :sex :m})
+        :mother (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:mother curr))
+                                                                              :sex :f})
+        :husband (swap! d/state assoc-in [:gui/state :window/edit :values id] husband)
+        :wife (swap! d/state assoc-in [:gui/state :window/edit :values id] wife))
       (recur (rest template)))))
 
 (defn set-roles

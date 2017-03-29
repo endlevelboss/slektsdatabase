@@ -128,15 +128,14 @@
   [val role]
   (let [first (:newfirst val)
         last (:newlast val)
-        sex (if (= role :husband)
-              :m
-              :f)
-        t (ds/transact! d/conn [{:persona/name -1
-                                 :persona/sex sex}
-                                {:db/id -1
-                                 :name/parts {0 first 1 last}}
-                                ])]
-    (newid t)))
+        sex (:sex val)]
+    (if (and (s/blank? first) (s/blank? last))
+      nil
+      (newid (ds/transact! d/conn [{:persona/name -1
+                                    :persona/sex  sex}
+                                   {:db/id      -1
+                                    :name/parts {0 first 1 last}}
+                                   ])))))
 
 (defn transact-role
   [val f]
@@ -150,14 +149,15 @@
                 (:value val))
         pid (if (nil? (:persona/by-id val))
               (transact-persona val type)
-              (:persona/by-id val))
-        t (ds/transact! d/conn [{:db/id id
-                                 :fact/type :role
-                                 :fact/field field
-                                 :fact/role type
-                                 :fact/value value
-                                 :fact/persona pid}])]
-    (newid t)))
+              (:persona/by-id val))]
+    (if (nil? pid)
+      nil
+      (newid (ds/transact! d/conn [{:db/id        id
+                                    :fact/type    :role
+                                    :fact/field   field
+                                    :fact/role    type
+                                    :fact/value   value
+                                    :fact/persona pid}])))))
 
 (defn transact-date
   [val]

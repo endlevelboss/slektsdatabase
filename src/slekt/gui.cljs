@@ -89,6 +89,7 @@
 (defn name-component
   [field]
   (let [id (get field 0)
+        role (get (get field 1) 2)
         label (get (get field 1) 2)
         val (get-in @d/state [:gui/state :window/edit :values id])
         value (:value val)
@@ -101,12 +102,12 @@
         name (if (= nil pid)
                [:div label
                 [:label "First name"]
-                [:input {:type "text"
-                         :value firstname
+                [:input {:type      "text"
+                         :value     firstname
                          :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newfirst)}]
                 [:label "Last name"]
-                [:input {:type "text"
-                         :value lastname
+                [:input {:type      "text"
+                         :value     lastname
                          :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newlast)}]]
                [:label (str label " : " (d/get-name pid))])]
     [:div
@@ -283,7 +284,13 @@
                       :left "140px"}
               :type "button"
               :value (d/l :buri-event)
-              :on-click #(f/set-event-edit :burial :main)}]]))
+              :on-click #(f/set-event-edit :burial :main)}]
+     [:input {:style {:position "absolute"
+                      :top "450px"
+                      :left "287px"}
+              :type "button"
+              :value (d/l :marr-event)
+              :on-click #(f/set-event-edit :marriage :main)}]]))
 
 (defn init-window []
   (println "*")

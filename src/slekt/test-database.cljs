@@ -40,7 +40,22 @@
    {:template/name :burial
     :template/main 0
     :template/expected {0 :main}
-    :template/parts [-6 -7 -8]}])
+    :template/parts [-6 -7 -8]}
+   {:db/id -9
+    :field/id 0
+    :field/type :role
+    :field/role :husband}
+   {:db/id -10
+    :field/id 1
+    :field/type :role
+    :field/role :wife}
+   {:db/id -11
+    :field/id 2
+    :field/type :event
+    :field/role :marriage}
+   {:template/name :marriage
+    :template/expected {0 :husband 1 :wife}
+    :template/parts [-9 -10 -11]}])
 
 (def initdb
   [{:database/name "test"
