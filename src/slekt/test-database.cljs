@@ -55,7 +55,18 @@
     :field/role :marriage}
    {:template/name :marriage
     :template/expected {0 :husband 1 :wife}
-    :template/parts [-9 -10 -11]}])
+    :template/parts [-9 -10 -11]}
+   {:db/id -12
+    :field/id 0
+    :field/type :event
+    :field/role :census}
+   {:db/id -13
+    :field/id 1
+    :field/type :multirole
+    :field/role :multirole}
+   {:template/name :census
+    :template/expected {1 :first}
+    :template/parts [-12 -13]}])
 
 (def initdb
   [{:database/name "test"

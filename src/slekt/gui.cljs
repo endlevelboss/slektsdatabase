@@ -38,14 +38,14 @@
 (defn change-person
   [id sex]
   (let [field (get-in @d/state [:gui/state :comp/personaselector :field])
+        path (into [:gui/state :window/edit :values] field)
         s (if (nil? id)
             sex
             (ffirst (d/find-sex-of-person id)))]
     (swap! d/state assoc-in [:gui/state :comp/personaselector :show] false)
-    (swap! d/state assoc-in [:gui/state :window/edit :values field :persona/by-id] id)
-    (swap! d/state assoc-in [:gui/state :window/edit :values field :sex] s)
-    (swap! d/state assoc-in [:gui/state :window/edit :values field :value] nil))
-  )
+    (swap! d/state assoc-in path {:persona/by-id id
+                                  :sex s
+                                  :value nil})))
 
 (defn change-person-cancel
   []
@@ -92,7 +92,7 @@
   (swap! d/state assoc-in [:gui/state :comp/personaselector :field] field)
   (swap! d/state assoc-in [:gui/state :comp/personaselector :show] true))
 
-(defn name-component
+(defn person-component
   [field]
   (let [id (get field 0)
         role (get (get field 1) 2)
@@ -118,9 +118,9 @@
                [:label (str label " : " (d/get-name pid))])]
     [:div
      name
-     [:input {:type "button"
-              :value "Change person"
-              :on-click #(button-show-persona-selector id)}]
+     [:input {:type     "button"
+              :value    "Change person"
+              :on-click #(button-show-persona-selector [id])}]
      [:input {:type "text"
               :value value
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]
@@ -142,14 +142,75 @@
               :value place
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :place)}]]))
 
+(defn set-list-value
+  [value field-id index key]
+  (swap! d/state assoc-in [:gui/state :window/edit :values field-id index key] value))
+
+(defn person-list-component
+  [listelement field-id]
+  (let [index (get listelement 0)
+        p-id (:persona/by-id (get listelement 1))
+        val (get-in @d/state [:gui/state :window/edit :values field-id index])
+        firstname (:newfirst val)
+        lastname (:newlast val)
+        personaselector (if (get-in @d/state [:gui/state :comp/personaselector :show])
+                          [persona-selector]
+                          nil)
+        name (if (= nil p-id)
+               [:div
+                [:label "First name"]
+                [:input {:type      "text"
+                         :value     firstname
+                         :on-change #(set-list-value (-> % .-target .-value) field-id index :newfirst)}]
+                [:label "Last name"]
+                [:input {:type      "text"
+                         :value     lastname
+                         :on-change #(set-list-value (-> % .-target .-value) field-id index :newlast)}]]
+               (d/get-name p-id ))
+        r (get-in @d/state [:gui/state :window/edit :values field-id index :grouprole])
+        role (if (nil? r)
+               "nil"
+               r)]
+    [:div
+     (+ 1 index)
+     name
+     [:input {:type     "button"
+              :value    "Change person"
+              :on-click #(button-show-persona-selector [field-id index])}]
+     [:select {:name "test" :value role :on-change #(set-list-value (-> % .-target .-value) field-id index :grouprole)}
+      [:option {:value "nil" :disabled "true"} "Select"]
+      [:option {:value "husband"} "Husband"]
+      [:option {:value "wife"} "Wife"]
+      [:option {:value "son"} "Son"]
+      [:option {:value "daughter"} "Daughter"]
+      [:option {:value "unknown"} "Unknown"]]
+     personaselector]))
+
+(defn button-add-person-list-component
+  [field-id index]
+  (swap! d/state assoc-in [:gui/state :window/edit :values field-id index] {:persona/by-id nil}))
+
+(defn multi-component
+  [field]
+  (let [field-id (get field 0)
+        list (get-in @d/state [:gui/state :window/edit :values field-id])
+        count (count list)]
+    [:div "List of persons in household"
+     (for [l list]
+       ^{:key (get l 0)} [person-list-component l field-id])
+     [:input {:type "button"
+              :value "+"
+              :on-click #(button-add-person-list-component field-id count)}]]))
+
 (defn field-generator
   [fields]
   (for [field fields]
     (let [type (get (get field 1) 1)
           id (get field 0)]
       (case type
-        :role ^{:key id}[name-component field]
-        :event ^{:key id}[date-component field]))))
+        :role ^{:key id}[person-component field]
+        :event ^{:key id}[date-component field]
+        :multirole ^{:key id} [multi-component field]))))
 
 (defn event-edit-component
   []
@@ -295,7 +356,13 @@
                       :left "287px"}
               :type "button"
               :value (d/l :marr-event)
-              :on-click #(f/set-event-edit :marriage :main)}]]))
+              :on-click #(f/set-event-edit :marriage :main)}]
+     [:input {:style {:position "absolute"
+                      :top "450px"
+                      :left "391px"}
+              :type "button"
+              :value (d/l :cens-event)
+              :on-click #(f/set-event-edit :census :first)}]]))
 
 (defn init-window []
   (println "*")

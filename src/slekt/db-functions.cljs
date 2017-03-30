@@ -137,8 +137,27 @@
 ;     (if (empty? nameparts)
 ;         name
 ;         (recur (rest nameparts) (str name " " (first nameparts)))}))
+(defn recur-multi
+  ([ids field-id]
+    (recur-multi ids field-id {}))
+  ([ids field-id result]
+   (if (empty? ids)
+     result
+     (let [v (first ids)
+           pid (get v 0)
+           grole (get v 1)
+           gindex (get v 2)
+           val (get v 3)
+           db-id (get v 4)]
+       (recur (rest ids) field-id (assoc result gindex {:persona/by-id pid
+                                                        :grouprole grole
+                                                        :value val
+                                                        :db/id db-id}))))))
 
-
+(defn parse-multi
+  [event field-id]
+  (let [ids (d/get-field-multigroup event field-id)]
+    (recur-multi ids field-id)))
 
 (defn parse-event-field
   "Parses the event field to get correct values and updates the gui state"
@@ -148,7 +167,8 @@
         fieldid (get vals 0)]
     (case type
       :role (parse-name event fieldid)
-      :event (parse-fact-field event fieldid))))
+      :event (parse-fact-field event fieldid)
+      :multirole (parse-multi event fieldid))))
 
 
 
@@ -201,7 +221,8 @@
         :mother (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:mother curr))
                                                                               :sex :f})
         :husband (swap! d/state assoc-in [:gui/state :window/edit :values id] husband)
-        :wife (swap! d/state assoc-in [:gui/state :window/edit :values id] wife))
+        :wife (swap! d/state assoc-in [:gui/state :window/edit :values id] wife)
+        :first (swap! d/state assoc-in [:gui/state :window/edit :values id] {0 {:persona/by-id (:selected curr)}}))
       (recur (rest template)))))
 
 (defn set-roles
@@ -209,13 +230,18 @@
   (let [expected-roles (ffirst (d/get-value-of templateid :template/expected))]
     (set-roles-recur expected-roles)))
 
-(defn set-current-role
+(defn set-current-role-old
   [role template]
   (let [id (ffirst (d/get-template-field-for-role template role))
         expected-roles (ffirst (d/get-value-of template :template/expected))
         pid (get-in @d/state [:gui/state :current :selected])
         value {:persona/by-id pid}]
     (set-roles template)))
+
+(defn set-current-role
+  [_ template-id]
+  (let [expected-roles (ffirst (d/get-value-of template-id :template/expected))]
+    (set-roles-recur expected-roles)))
 
 (defn set-event-edit
   [key role]

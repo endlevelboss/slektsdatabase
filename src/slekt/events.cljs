@@ -128,7 +128,9 @@
   [val role]
   (let [first (:newfirst val)
         last (:newlast val)
-        sex (:sex val)]
+        sex (if (nil? (:sex val))
+              :u
+              (:sex val))]
     (if (and (s/blank? first) (s/blank? last))
       nil
       (newid (ds/transact! d/conn [{:persona/name -1
@@ -147,17 +149,58 @@
         value (if (= nil (:value val))
                 ""
                 (:value val))
+        group (get (get f 1) 0)
+        g-role (if (nil? (:grouprole val))
+                 ""
+                 (:grouprole val))
         pid (if (nil? (:persona/by-id val))
               (transact-persona val type)
               (:persona/by-id val))]
-    (if (nil? pid)
-      nil
-      (newid (ds/transact! d/conn [{:db/id        id
-                                    :fact/type    :role
-                                    :fact/field   field
-                                    :fact/role    type
-                                    :fact/value   value
-                                    :fact/persona pid}])))))
+    (newid (ds/transact! d/conn [{:db/id           id
+                                  :fact/type       :role
+                                  :fact/field      field
+                                  :fact/role       type
+                                  :fact/value      value
+                                  :fact/groupindex group
+                                  :fact/grouprole  g-role
+                                  :fact/persona    pid}]))))
+
+(defn parse-group-role
+  [group-role]
+  (case group-role
+    "husband" :father
+    "wife" :mother
+    "son" :child
+    "daughter" :child
+    "unknown" :unknown
+    :unknown))
+
+(defn parse-group-role-sex
+  [group-role]
+  (case group-role
+    "husband" :m
+    "wife" :f
+    "son" :m
+    "daughter" :f
+    "unknown" :u
+    :u))
+
+(defn transact-multi
+  ([val f]
+   (println val)
+   (transact-multi val f []))
+  ([val f result]
+   (if (empty? val)
+      result
+      (let [v (first val)
+            values (get v 1)
+            field [(get f 0) [(get v 0) :multirole (parse-group-role (:grouprole values))]]
+            pval (assoc values :sex (parse-group-role-sex (:grouprole values)))
+            role (transact-role pval field)
+            res (if (nil? role)
+                  result
+                  (conj result role))]
+        (recur (rest val) f res)))))
 
 (defn transact-date
   [val]
@@ -237,6 +280,7 @@
       (case fieldtype
         :role (transact-role value field)
         :event (transact-fact value field)
+        :multirole (transact-multi value field)
         nil))))
 
 (defn recur-fields
@@ -246,21 +290,24 @@
    (if (empty? fields)
      result
      (let [parsed (parse-field (first fields) data)
-           newres (if (= nil parsed)
+           newres (if (nil? parsed)
                     result
-                    (conj result parsed))]
+                    (if (vector? parsed)
+                      (into result parsed)
+                      (conj result parsed)))]
        (recur (rest fields) data newres)))))
 
 (defn save-event
   []
   (let [data (get-in @d/state [:gui/state :window/edit])
         eventid (:event/by-id data)
-        id (if (= nil eventid)                              ;; update old event or create new?
+        id (if (nil? eventid)                              ;; update old event or create new?
              -1
              eventid)
         t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
         values (recur-fields fields data)]
+    (println values)
     (if (empty? fields)
       nil
       (ds/transact! d/conn [{:db/id          id

@@ -377,6 +377,19 @@
           [?fid ?type ?val]]
         @conn eventid field type))
 
+(defn get-field-multigroup
+  [eventid fieldid]
+  (ds/q '[:find ?pid ?grole ?gindex ?val ?fid
+          :in $ ?eid ?field
+          :where
+          [?eid :event/fields ?fid]
+          [?fid :fact/field ?field]
+          [?fid :fact/persona ?pid]
+          [?fid :fact/grouprole ?grole]
+          [?fid :fact/groupindex ?gindex]
+          [?fid :fact/value ?val]]
+        @conn eventid fieldid))
+
 (defn get-field-id-of-event-facts
   [eventid field type]
   (ds/q '[:find ?val
