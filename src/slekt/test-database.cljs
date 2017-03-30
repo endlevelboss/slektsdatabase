@@ -68,7 +68,10 @@
     :template/expected {1 :first}
     :template/parts [-12 -13]}])
 
-(def initdb
+(def initdb-empty
+  [])
+
+(def initdb-full
   [{:database/name "test"
     :database/selected 0}
    {:db/id -3

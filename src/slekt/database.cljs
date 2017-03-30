@@ -17,6 +17,8 @@
                            :window/edit {:type nil
                                          :event/by-id nil
                                          :values {}}
+                           :window/add {:show false
+                                        :sex "m"}
                            :comp/personaselector {:show false
                                                   :field nil}}})
 
@@ -89,7 +91,7 @@
 
 (defn initdb
   []
-  (ds/transact! conn t/initdb)
+  (ds/transact! conn t/initdb-empty)
   (ds/transact! conn t/templates))
 
 (defn personas

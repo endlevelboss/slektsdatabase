@@ -3,7 +3,8 @@
               [slekt.database :as d]
               [slekt.db-functions :as f]
               ;[slekt.relations :as rels]
-              [slekt.date :as date]))
+              [slekt.date :as date]
+              [slekt.events :as events]))
 
 (enable-console-print!)
 
@@ -370,15 +371,55 @@
     [event-edit-component]
     [current-selected-component]))
 
+(defn update-add
+  [value key]
+  (swap! d/state assoc-in [:gui/state :window/add key] value))
+
+(defn button-add-person
+  []
+  (let [persona (get-in @d/state [:gui/state :window/add])
+        p2 (assoc persona :sex (keyword (:sex persona)))
+        p-id (events/transact-persona p2 nil)]
+    (f/setCurrent p-id)
+    (swap! d/state assoc-in [:gui/state :window/add :show] false)))
+
+(defn add-window
+  []
+  (let [firstname (get-in @d/state [:gui/state :window/add :newfirst])
+        lastname (get-in @d/state [:gui/state :window/add :newlast])
+        sex (get-in @d/state [:gui/state :window/add :sex])]
+    [:div {:style {:position "absolute"
+                   :top      "40px"
+                   :left     "40px"
+                   :width    "800px"}}
+     "Add first person to your genealogy database"
+     [:br]
+     [:input {:type      "text"
+              :value     firstname
+              :on-change #(update-add (-> % .-target .-value) :newfirst)}]
+     [:input {:type      "text"
+              :value     lastname
+              :on-change #(update-add (-> % .-target .-value) :newlast)}]
+     [:select {:name "sex" :value sex :on-change #(update-add (-> % .-target .-value) :sex)}
+      [:option {:value "m"} "Male"]
+      [:option {:value "f"} "Female"]]
+     [:br]
+     [:input {:type "button"
+              :value "OK"
+              :on-click #(button-add-person)}]]))
+
 (defn menu-bars []
-  [:div {:style {:position "absolute" :top "0px" :left "0px"}}
-   [:div {:style {:position "absolute" :top "0px" :left "0px"
-                  :width "20px" :height "550px"
-                  :background-color "grey"}}]
-   [:div {:style {:position "absolute" :top "0px" :left "20px"
-                  :width "900px" :height "20px"
-                  :background-color "#555555"}}]
-   [init-window]])
+  (let [show-add-window (get-in @d/state [:gui/state :window/add :show])]
+    [:div {:style {:position "absolute" :top "0px" :left "0px"}}
+     [:div {:style {:position         "absolute" :top "0px" :left "0px"
+                    :width            "20px" :height "550px"
+                    :background-color "grey"}}]
+     [:div {:style {:position         "absolute" :top "0px" :left "20px"
+                    :width            "900px" :height "20px"
+                    :background-color "#555555"}}]
+     (if show-add-window
+       [add-window]
+       [init-window])]))
 
 (defn runonce
   "Initializes data at the startup, to be run after indexeddb has loaded"
@@ -387,7 +428,10 @@
     (if run
       (do
         (d/initdb)
-        (f/setCurrent 10)
+        (let [personas (d/persona-list)]
+          (if (empty? personas)
+            (swap! d/state assoc-in [:gui/state :window/add :show] true)
+            (f/setCurrent (first personas))))
         (swap! d/state assoc-in [:gui/state :runonce] false))
       nil)))
 
