@@ -7,6 +7,7 @@
               [slekt.language :as lang]))
 
 (def database {:gui/state {:runonce true
+                           :loaded false
                            :language lang/norsk
                            :current {:selected nil
                                      :father nil
@@ -17,7 +18,7 @@
                            :window/edit {:type nil
                                          :event/by-id nil
                                          :values {}}
-                           :window/add {:show false
+                           :window/add {:show true
                                         :sex "m"}
                            :comp/personaselector {:show false
                                                   :field nil}}})
@@ -34,12 +35,12 @@
                  #(reset! db %)))
 
 (defn testwrite
-  []
-  (idx/add-item @db store-name {:name "Test" :data "new data has come to light"} #(println "added")))
+  [e]
+  (idx/add-item @db store-name {:name "Test" :data "absolutely updated data"} #(println "added")))
 
 
 (defn testidx []
-  (idx/get-by-key @db store-name "Test" (fn [p] (println (:data p)))))
+  (idx/get-by-key @db store-name "slekt" (fn [p] (println (:data p)))))
 
 (defn l
   [label]
@@ -87,13 +88,22 @@
              :fact/persona {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/one}})
 
+
+
 (def conn (ds/create-conn schema))
 
-(defn initdb
+
+
+
+
+
+
+(defn testing
   []
-  (ds/transact! conn t/initdb-full)                         ;; for db with entries
-  ;(ds/transact! conn t/initdb-empty)                        ;; for empty database
-  (ds/transact! conn t/templates))
+  (-> @conn
+      (dt/write-transit-str)
+      ;(dt/read-transit-str)
+      (println)))
 
 (defn personas
   []
@@ -116,6 +126,7 @@
 
 (defn get-name
   ([id]
+   (println (str "get name " id))
    ( let [nameparts (if (not= nil id)
                       (get-name-parts id)
                       nil)
@@ -428,3 +439,50 @@
   (let [fields (flatten (into [] (get-value-of id :template/parts)))
         ordered-fields (order-event-fields fields)]
     ordered-fields))
+
+
+(defn set-current-selected
+  [id]
+  (let [father (find-parent :father id)
+        mother (find-parent :mother id)
+        children (find-children id)
+        spouses (find-spouses id)]
+    {:selected id
+     :father   father
+     :mother   mother
+     :children children
+     :spouses  spouses}))
+
+(defn set-current
+  [value]
+  (swap! state assoc-in [:gui/state :current] (set-current-selected value)))
+
+
+(defn read-from-iddb
+  [s]
+  (let [db (dt/read-transit-str (:data s))]
+    (reset! conn db)
+    (let [personas (persona-list)]
+      (println personas)
+      (if (empty? personas)
+        (swap! state assoc-in [:gui/state :window/add :show] true)
+        (do
+          (set-current (first personas))
+          (println (get-in @state [:gui/state :current]))
+          (swap! state assoc-in [:gui/state :window/add :show] false))))))
+
+(defn write-to-iddb
+  []
+  (let [st (dt/write-transit-str @conn)]
+    (idx/add-item @db store-name {:name "slekt" :data st} #(println "Database saved"))))
+
+(defn initdb
+  []
+  (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
+  ;(ds/transact! conn t/initdb-full)                         ;; for db with entries
+  ;(ds/transact! conn t/initdb-empty)                        ;; for empty database
+  (ds/transact! conn t/templates)
+
+  (swap! state assoc-in [:gui/state :runonce] false)
+  (.addEventListener js/window "beforeunload" #(write-to-iddb) false)
+  )

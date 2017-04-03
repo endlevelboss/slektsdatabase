@@ -270,6 +270,7 @@
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
+    (println current)
     [:div#display
      [:div#nameplate
       [:strong (d/get-name (:selected current))]
@@ -319,6 +320,15 @@
     (f/setCurrent p-id)
     (swap! d/state assoc-in [:gui/state :window/add :show] false)))
 
+(defn check-loaded
+  []
+  (let [personas (d/persona-list)]
+    (if (empty? personas)
+      nil
+      (do
+        (swap! d/state assoc-in [:gui/state :window/add :show] false)
+        (d/set-current (first personas))))))
+
 (defn add-window
   []
   (let [firstname (get-in @d/state [:gui/state :window/add :newfirst])
@@ -342,13 +352,16 @@
      [:br]
      [:input {:type "button"
               :value "OK"
-              :on-click #(button-add-person)}]]))
+              :on-click #(button-add-person)}]
+     [:input {:type "button"
+              :value "Refresh"
+              :on-click #(check-loaded)}]]))
 
 (defn menu-bars []
   (let [show-add-window (get-in @d/state [:gui/state :window/add :show])]
     [:div {:style {:position "absolute" :top "0px" :left "0px"}}
      [:div {:style {:position         "absolute" :top "0px" :left "0px"
-                    :width            "20px" :height "550px"
+                    :width            "20px" :height "850px"
                     :background-color "grey"}}]
      [:div {:style {:position         "absolute" :top "0px" :left "20px"
                     :width            "900px" :height "20px"
@@ -362,13 +375,7 @@
   []
   (let [run (get-in @d/state [:gui/state :runonce])]
     (if run
-      (do
-        (d/initdb)
-        (let [personas (d/persona-list)]
-          (if (empty? personas)
-            (swap! d/state assoc-in [:gui/state :window/add :show] true)
-            (f/setCurrent (first personas))))
-        (swap! d/state assoc-in [:gui/state :runonce] false))
+      (d/initdb)
       nil)))
 
 (defn start-window
