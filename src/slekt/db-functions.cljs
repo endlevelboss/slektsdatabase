@@ -60,9 +60,28 @@
           firstevent (first total)]
       (date/getyear (:date firstevent)))))
 
+(defn age-calc
+  [fact-id]
+  (let [age (ffirst (d/get-fact-detail fact-id :fact/age))
+        facts (flatten (into [] (d/get-fact-from-role fact-id)))
+        parsed (sort (comp compare-dates) (remove nil? (map parse-fact facts)))]
+    (if (nil? age)
+      nil
+      (let [year (date/getyear (:date (first parsed)))]
+        {:sortable (:sortable (first parsed)) :date (- year age)}))))
+
+(defn find-age
+  [id]
+  (first (sort (comp compare-dates) (remove nil? (map #(age-calc (first %)) (d/get-role id)))))
+  )
+
 (defn birthyear
   [id]
-  (event-year-multifact id :birth :baptism))
+  (let [birthrecord (event-year-multifact id :birth :baptism)
+        age (:date (find-age id))]
+    (if (nil? birthrecord)
+      age
+      birthrecord)))
 
 (defn deathyear
   [id]

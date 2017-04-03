@@ -273,6 +273,7 @@
     [:div#display
      [:div#nameplate
       [:strong (d/get-name (:selected current))]
+      [:small (:selected current)]
       [:br]
       [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
      [:div#dadplate

@@ -130,6 +130,7 @@
     :fact/field 1
     :fact/type :role
     :fact/role :father
+    :fact/age 30
     :fact/persona -9}
    {:db/id -18
     :fact/field 2
