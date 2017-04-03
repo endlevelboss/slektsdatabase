@@ -2,7 +2,6 @@
     (:require [reagent.core :as r]
               [slekt.database :as d]
               [slekt.db-functions :as f]
-              ;[slekt.relations :as rels]
               [slekt.date :as date]
               [slekt.events :as events]))
 
@@ -24,17 +23,6 @@
        name
        " "
        [:small (birth-death-string birth death)]])))
-
-;(defn name-part-component
-;    [label id part]
-;    (let [value (get-in @d/state [:gui/state :window/edit :values id part])
-;          v (if (= nil value)
-;                ""
-;                value
-;        [:div (str label ": ")
-;         [:input {:type "text"
-;                  :value value
-;                  :on-change #(f/set-event-edit-field (-> % .-target .-value) id part)]))
 
 (defn change-person
   [id sex]
@@ -68,14 +56,7 @@
 (defn persona-selector
   []
   (let [personas-id (d/persona-list)]
-    [:div
-     {:style {:font-family      "arial"
-              :position         "absolute"
-              :background-color "grey"
-              :top              "20px"
-              :left             "580px"
-              :width            "300px"
-              :height           "700px"}}
+    [:div.persona-selector
      (for [pid personas-id]
        ^{:key pid}[person-select pid])
      [:input {:type "button"
@@ -289,79 +270,33 @@
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
-    [:div {:style {:font-family "arial"
-                   :position "absolute"
-                   :top "20px"
-                   :left "20px"}}
-     [:div
-      {:style
-       {:background-color "white"
-        :position "absolute"
-        :width "380px"
-        :height "60px"
-        :top "20px"
-        :left "20px"
-        :padding "5px"
-        :font-size "140%"}}
+    [:div#display
+     [:div#nameplate
       [:strong (d/get-name (:selected current))]
       [:br]
       [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
-     [:div
-      {:style
-       {:background-color "cadetblue"
-        :position "absolute"
-        :width "400px"
-        :height "35px"
-        :top "20px"
-        :left "420px"}}
+     [:div#dadplate
       (str (d/l :father) ":")
       [person-display-component dad]]
-     [:div
-      {:style {:background-color "lightcoral"
-               :position "absolute"
-               :width "400px"
-               :height "35px"
-               :top "55px"
-               :left "420px"}}
+     [:div#mumplate
       (str (d/l :mother) ":")
       [person-display-component mum]]
-     [:div {:style {:background-color "wheat"
-                    :position "absolute"
-                    :top "100px"
-                    :left "420px"
-                    :width "400px"}}
+     [:div#spouses
       (map #(spouse-children-component % spouselabel childrenlabel) sorted)]
-     [:div
-      {:style {:background-color "wheat"
-               :position "absolute"
-               :width "380px"
-               :top "100px"
-               :left "30px"}}
+     [:div#eventlist
       (str (d/l :events) ":")
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
-     [:input {:style {:position "absolute"
-                      :top "450px"
-                      :left "20px"}
-              :type "button"
-              :value (d/l :bapm-event)
-              :on-click #(f/set-event-edit :baptism :child)}]
-     [:input {:style {:position "absolute"
-                      :top "450px"
-                      :left "140px"}
-              :type "button"
+     [:input.b-birth {:type "button"
+                   :value (d/l :bapm-event)
+                   :on-click #(f/set-event-edit :baptism :child)}]
+     [:input.b-burial {:type "button"
               :value (d/l :buri-event)
               :on-click #(f/set-event-edit :burial :main)}]
-     [:input {:style {:position "absolute"
-                      :top "450px"
-                      :left "287px"}
-              :type "button"
+     [:input.b-marriage {:type "button"
               :value (d/l :marr-event)
               :on-click #(f/set-event-edit :marriage :main)}]
-     [:input {:style {:position "absolute"
-                      :top "450px"
-                      :left "391px"}
-              :type "button"
+     [:input.b-census {:type "button"
               :value (d/l :cens-event)
               :on-click #(f/set-event-edit :census :first)}]]))
 

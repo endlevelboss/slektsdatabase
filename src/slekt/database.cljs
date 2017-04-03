@@ -91,7 +91,8 @@
 
 (defn initdb
   []
-  (ds/transact! conn t/initdb-empty)
+  (ds/transact! conn t/initdb-full)                         ;; for db with entries
+  ;(ds/transact! conn t/initdb-empty)                        ;; for empty database
   (ds/transact! conn t/templates))
 
 (defn personas
