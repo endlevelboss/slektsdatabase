@@ -126,7 +126,6 @@
 
 (defn get-name
   ([id]
-   (println (str "get name " id))
    ( let [nameparts (if (not= nil id)
                       (get-name-parts id)
                       nil)
@@ -461,15 +460,16 @@
 (defn read-from-iddb
   [s]
   (let [db (dt/read-transit-str (:data s))]
-    (reset! conn db)
-    (let [personas (persona-list)]
-      (println personas)
-      (if (empty? personas)
-        (swap! state assoc-in [:gui/state :window/add :show] true)
-        (do
-          (set-current (first personas))
-          (println (get-in @state [:gui/state :current]))
-          (swap! state assoc-in [:gui/state :window/add :show] false))))))
+    (if (nil? db)
+      nil
+      (do
+        (reset! conn db)
+        (let [personas (persona-list)]
+          (if (empty? personas)
+            (swap! state assoc-in [:gui/state :window/add :show] true)
+            (do
+              (set-current (first personas))
+              (swap! state assoc-in [:gui/state :window/add :show] false))))))))
 
 (defn write-to-iddb
   []
@@ -479,10 +479,6 @@
 (defn initdb
   []
   (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
-  ;(ds/transact! conn t/initdb-full)                         ;; for db with entries
-  ;(ds/transact! conn t/initdb-empty)                        ;; for empty database
   (ds/transact! conn t/templates)
-
   (swap! state assoc-in [:gui/state :runonce] false)
-  (.addEventListener js/window "beforeunload" #(write-to-iddb) false)
-  )
+  (.addEventListener js/window "beforeunload" #(write-to-iddb) false))

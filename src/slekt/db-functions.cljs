@@ -80,7 +80,9 @@
   (let [birthrecord (event-year-multifact id :birth :baptism)
         age (:date (find-age id))]
     (if (nil? birthrecord)
-      (str "ca " age)
+      (if (nil? age)
+        nil
+        (str "ca " age))
       birthrecord)))
 
 (defn deathyear

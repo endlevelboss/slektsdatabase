@@ -270,7 +270,6 @@
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
-    (println current)
     [:div#display
      [:div#nameplate
       [:strong (d/get-name (:selected current))]
