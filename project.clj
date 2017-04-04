@@ -15,5 +15,8 @@
                         :source-paths ["src"]
                         :figwheel true
                         :compiler {:main "slekt.core"}}]}
+  :figwheel {
+             :css-dirs ["css"]
+             }
   )
 

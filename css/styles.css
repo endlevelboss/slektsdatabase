@@ -1,0 +1,78 @@
+.all{
+    background-color: white;
+    position: absolute;
+    border-style: solid;
+}
+
+.display{
+    font-family: "Arial";
+    background-color: beige;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    }
+
+.mainperson{
+    width: 450px;
+    height: 77px;
+    top: 20px;
+    left: 20px;
+    padding: 7px;
+    font-size: 140%;
+    border-style: solid;
+}
+
+.dadplate{
+    width: 400px;
+    height: 35px;
+    top: 20px;
+    left: 493px;
+}
+
+.mumplate{
+    width: 400px;
+    height: 35px;
+    top: 75px;
+    left: 493px;
+}
+
+.eventlist{
+    width: 464px;
+    top: 120px;
+    left: 20px;
+}
+
+.spouses {
+    top: 120px;
+    left: 493px;
+    width: 400px;
+}
+
+.b-birth {
+    position: absolute;
+    top: 450px;
+    left: 20px;
+}
+.b-burial {
+    position: absolute;
+    top: 450px;
+    left: 140px;
+}
+.b-marriage {
+    position: absolute;
+    top: 450px;
+    left: 287px;
+}
+.b-census {
+    position: absolute;
+    top: 450px;
+    left: 391px;
+}
+.persona-selector {
+    position: absolute;
+    background-color: grey;
+    top: 20px;
+    left: 580px;
+    width: 300px;
+    height: 700px;
+}

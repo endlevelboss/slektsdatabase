@@ -271,31 +271,21 @@
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
-    [:div {:style {:position "absolute"
-                   :background-color "white"
-                   :top "20px"
-                   :left "20px"
-                   }}
-     [:div {:style {:position "absolute"
-                    :background-color "white"
-                    :top "20px"
-                    :left "20px"
-                    :width "400px"
-                    :height "60px"
-                    }}
+    [:div.display
+     [:div.all.mainperson
       [:strong (d/get-name (:selected current))]
       [:small (:selected current)]
       [:br]
       [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
-     [:div {:style s/father-display}
+     [:div.all.dadplate
       (str (d/l :father) ":")
       [person-display-component dad]]
-     [:div
+     [:div.all.mumplate
       (str (d/l :mother) ":")
       [person-display-component mum]]
-     [:div
+     [:div.all.spouses
       (map #(spouse-children-component % spouselabel childrenlabel) sorted)]
-     [:div
+     [:div.all.eventlist
       (str (d/l :events) ":")
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
