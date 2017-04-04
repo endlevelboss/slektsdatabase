@@ -2,12 +2,14 @@
 
 /target
 /resources
+/out
 !/resources/public/index.html
 /.idea
 ./slekt.iml
 ./figwheel_server.log
 slekt.iml
 figwheel_server.log
+main.js
 
 
 # Windows image file caches

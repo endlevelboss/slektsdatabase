@@ -3,7 +3,8 @@
               [slekt.database :as d]
               [slekt.db-functions :as f]
               [slekt.date :as date]
-              [slekt.events :as events]))
+              [slekt.events :as events]
+              [slekt.styles :as s]))
 
 (enable-console-print!)
 
@@ -270,21 +271,31 @@
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
-    [:div#display
-     [:div#nameplate
+    [:div {:style {:position "absolute"
+                   :background-color "white"
+                   :top "20px"
+                   :left "20px"
+                   }}
+     [:div {:style {:position "absolute"
+                    :background-color "white"
+                    :top "20px"
+                    :left "20px"
+                    :width "400px"
+                    :height "60px"
+                    }}
       [:strong (d/get-name (:selected current))]
       [:small (:selected current)]
       [:br]
       [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
-     [:div#dadplate
+     [:div {:style s/father-display}
       (str (d/l :father) ":")
       [person-display-component dad]]
-     [:div#mumplate
+     [:div
       (str (d/l :mother) ":")
       [person-display-component mum]]
-     [:div#spouses
+     [:div
       (map #(spouse-children-component % spouselabel childrenlabel) sorted)]
-     [:div#eventlist
+     [:div
       (str (d/l :events) ":")
       (for [event events]
           ^{:key (:id event)} [event-display-component event])]
