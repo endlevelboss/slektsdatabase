@@ -187,7 +187,6 @@
 
 (defn transact-multi
   ([val f]
-   (println val)
    (transact-multi val f []))
   ([val f result]
    (if (empty? val)
@@ -307,7 +306,6 @@
         t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
         values (recur-fields fields data)]
-    (println values)
     (if (empty? fields)
       nil
       (ds/transact! d/conn [{:db/id          id

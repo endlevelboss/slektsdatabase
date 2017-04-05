@@ -2,70 +2,157 @@
     background-color: white;
     position: absolute;
     border-style: solid;
+    border-width: 2px;
 }
+
+
+/* Styles for current selected component and subcomponents */
 
 .display{
     font-family: "Arial";
     background-color: beige;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 10px;
+    left: 10px;
     }
 
 .mainperson{
     width: 450px;
-    height: 77px;
+    height: 78px;
     top: 20px;
     left: 20px;
     padding: 7px;
     font-size: 140%;
     border-style: solid;
 }
+.main-name{
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+.main-year{
+    position: absolute;
+    left: 340px;
+    top: 35px;
+}
+.mainperson-bar{
+    position: absolute;
+    background-color: dimgrey;
+    top: 10px;
+    left: 330px;
+    width: 3px;
+    height: 70px;
+}
 
 .dadplate{
     width: 400px;
-    height: 35px;
+    height: 36px;
     top: 20px;
     left: 493px;
+    padding: 3px;
 }
 
 .mumplate{
     width: 400px;
-    height: 35px;
-    top: 75px;
+    height: 36px;
+    top: 70px;
     left: 493px;
+    padding: 3px;
+}
+
+.hover div:hover{
+    background-color: #ddd;
 }
 
 .eventlist{
+    position: absolute;
     width: 464px;
     top: 120px;
     left: 20px;
 }
 
+.eventheader{
+    position: relative;
+    left: 20px;
+}
+
+.eventdivider{
+    background-color: dimgrey;
+    position: relative;
+    top: -1px;
+    left: 5px;
+    width: 450px;
+    height: 1px;
+}
+
+#eventcontent{
+    width: 100%
+}
+#eventcontent tr:nth-child(even){
+    background-color: #f2f2f2;
+}
+#eventcontent tr:hover {
+    background-color: #ddd;
+}
+
+.eventline{
+    text-align: left;
+}
+
+.eventtab1{
+    position: absolute;
+    left: 5px;
+}
+.eventtab2{
+    position: absolute;
+    left: 55px;
+}
+.eventtab3{
+    position: absolute;
+    left: 170px;
+}
+
 .spouses {
     top: 120px;
     left: 493px;
-    width: 400px;
+    width: 402px;
+    padding: 2px;
+}
+
+.child-list{
+    list-style-type: lower-roman;
+    margin: 0;
+}
+.child-list-element{
+    margin: 10;
+    padding: 5px;
+}
+
+.spouse-divider{
+    position: relative;
+    background-color: grey;
+    width: 401px;
+    height: 1px;
 }
 
 .b-birth {
     position: absolute;
-    top: 450px;
+    top: -10px;
     left: 20px;
 }
 .b-burial {
     position: absolute;
-    top: 450px;
+    top: -10px;
     left: 140px;
 }
 .b-marriage {
     position: absolute;
-    top: 450px;
+    top: -10px;
     left: 287px;
 }
 .b-census {
     position: absolute;
-    top: 450px;
+    top: -10px;
     left: 391px;
 }
 .persona-selector {
@@ -75,4 +162,80 @@
     left: 580px;
     width: 300px;
     height: 700px;
+}
+
+/* Styles for event edit component */
+.person-component{
+    background-color: white;
+    position: relative;
+    height: 60px;
+    border-style: solid;
+    border-width: 2px;
+}
+
+.dateplace-component{
+    background-color: white;
+    position: relative;
+    height: 60px;
+    border-style: solid;
+    border-width: 2px;
+}
+
+.event-edit{
+    font-family: sans-serif;
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    width: 700px;
+}
+.ee-label{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+.ee-name{
+    position: absolute;
+    top: 5px;
+    left: 95px;
+}
+.ee-change{
+    position: absolute;
+    top: 5px;
+    left: 500px;
+}
+.ee-role{
+    position: absolute;
+    top: 5px;
+    left: 300px;
+}
+.ee-placelabel{
+    position: absolute;
+    top: 35px;
+    left: 5px;
+}
+.ee-place{
+    position: absolute;
+    top: 35px;
+    left: 95px;
+}
+/* New name box */
+.nn-firstlabel{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.nn-firstname{
+    position: absolute;
+    top: 20px;
+    left: 0;
+}
+.nn-lastlabel{
+    position: absolute;
+    top: 0;
+    left: 175px;
+}
+.nn-lastname{
+    position: absolute;
+    top: 20px;
+    left: 175px;
 }

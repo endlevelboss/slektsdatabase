@@ -19,11 +19,11 @@
     (let [name (d/get-name id)
           birth (f/birthyear id)
           death (f/deathyear id)]
-      [:div
+      [:strong
        {:on-click #(f/setCurrent id)}
        name
        " "
-       [:small (birth-death-string birth death)]])))
+       [:small (birth-death-string birth death)]] )))
 
 (defn change-person
   [id sex]
@@ -75,11 +75,26 @@
   (swap! d/state assoc-in [:gui/state :comp/personaselector :field] field)
   (swap! d/state assoc-in [:gui/state :comp/personaselector :show] true))
 
+(defn new-name-component
+  [id]
+  (let [val (get-in @d/state [:gui/state :window/edit :values id])
+        first (:newfirst val)
+        last (:newlast val)]
+    [:div
+     [:div.nn-firstlabel (d/l :firstname)]
+     [:input.nn-firstname {:type "text"
+              :value first
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newfirst)}]
+     [:div.nn-lastlabel (d/l :lastname)]
+     [:input.nn-lastname {:type "text"
+              :value last
+              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newlast)}]]))
+
 (defn person-component
   [field]
   (let [id (get field 0)
         role (get (get field 1) 2)
-        label (get (get field 1) 2)
+        label (d/l (get (get field 1) 2))
         val (get-in @d/state [:gui/state :window/edit :values id])
         value (:value val)
         pid (:persona/by-id val)
@@ -88,40 +103,31 @@
         personaselector (if (get-in @d/state [:gui/state :comp/personaselector :show])
                           [persona-selector]
                           nil)
-        name (if (= nil pid)
-               [:div label
-                [:label "First name"]
-                [:input {:type      "text"
-                         :value     firstname
-                         :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newfirst)}]
-                [:label "Last name"]
-                [:input {:type      "text"
-                         :value     lastname
-                         :on-change #(f/set-event-edit-field (-> % .-target .-value) id :newlast)}]]
-               [:label (str label " : " (d/get-name pid))])]
-    [:div
-     name
-     [:input {:type     "button"
-              :value    "Change person"
-              :on-click #(button-show-persona-selector [id])}]
-     [:input {:type "text"
-              :value value
-              :on-change #(f/set-event-edit-field (-> % .-target .-value) id :value)}]
+        name (if (nil? pid)
+               [new-name-component id]
+               (d/get-name pid))]
+    [:div.person-component
+     [:div.ee-label label]
+     [:div.ee-name name]
+     [:input.ee-change
+      {:type     "button"
+       :value    "Change person"
+       :on-click #(button-show-persona-selector [id])}]
      personaselector]))
 
 (defn date-component
   [field]
   (let [id (get field 0)
-        label (get (get field 1) 2)
+        label (d/l (get (get field 1) 2))
         date (get-in @d/state [:gui/state :window/edit :values id :date])
         place (get-in @d/state [:gui/state :window/edit :values id :place])]
-    [:div
-     [:div label]
-     [:input {:type "text"
+    [:div.dateplace-component
+     [:div.ee-label label]
+     [:input.ee-name {:type "text"
               :value date
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :date)}]
-     [:div "Place"]
-     [:input {:type "text"
+     [:div.ee-placelabel (d/l :place)]
+     [:input.ee-place {:type "text"
               :value place
               :on-change #(f/set-event-edit-field (-> % .-target .-value) id :place)}]]))
 
@@ -154,19 +160,19 @@
         role (if (nil? r)
                "nil"
                r)]
-    [:div
-     (+ 1 index)
-     name
-     [:input {:type     "button"
+    [:div.person-component
+     [:div.ee-label (+ 1 index)]
+     [:div.ee-name name]
+     [:input.ee-change {:type     "button"
               :value    "Change person"
               :on-click #(button-show-persona-selector [field-id index])}]
-     [:select {:name "test" :value role :on-change #(set-list-value (-> % .-target .-value) field-id index :grouprole)}
-      [:option {:value "nil" :disabled "true"} "Select"]
-      [:option {:value "husband"} "Husband"]
-      [:option {:value "wife"} "Wife"]
-      [:option {:value "son"} "Son"]
-      [:option {:value "daughter"} "Daughter"]
-      [:option {:value "unknown"} "Unknown"]]
+     [:select.ee-role {:name "test" :value role :on-change #(set-list-value (-> % .-target .-value) field-id index :grouprole)}
+      [:option {:value "nil" :disabled "true"} (d/l :select)]
+      [:option {:value "husband"} (d/l :husband)]
+      [:option {:value "wife"} (d/l :wife)]
+      [:option {:value "son"} (d/l :son)]
+      [:option {:value "daughter"} (d/l :daughter)]
+      [:option {:value "unknown"} (d/l :unknown)]]
      personaselector]))
 
 (defn button-add-person-list-component
@@ -178,7 +184,7 @@
   (let [field-id (get field 0)
         list (get-in @d/state [:gui/state :window/edit :values field-id])
         count (count list)]
-    [:div "List of persons in household"
+    [:div (d/l :persons-household)
      (for [l list]
        ^{:key (get l 0)} [person-list-component l field-id])
      [:input {:type "button"
@@ -203,18 +209,15 @@
         template-type (get-in @d/state [:gui/state :window/edit :type])
         template (ffirst (d/get-id-of template-type :template/name))
         fields (d/get-template template)]
-    [:div {:style {:font-family "arial"
-                   :position "absolute"
-                   :top "20px"
-                   :left "30px"
-                   :width "700px"}}
+    [:div.event-edit
      [:h1 (:label template)]
      (field-generator fields)
+     [:br]
      [:input {:type "button"
-              :value "Ok"
+              :value (d/l :ok)
               :on-click #(f/save-event)}]
      [:input {:type "button"
-              :value "Cancel"
+              :value (d/l :cancel)
               :on-click #(f/set-event-edit nil nil)}]]))
 
 (defn event-display-component
@@ -225,15 +228,26 @@
         mainperson (ffirst (d/get-main-person (:event fact)))
         name (if (= mainperson (get-in @d/state [:gui/state :current :selected]))
                (:place fact)
-               (d/get-name mainperson))
-        eventstring (str year " - " label " : ")]
-    [:div
-     [:label
-      {:on-click #(f/edit-event (:event fact))}
-      eventstring]
-     [:label
+               [:strong (d/get-name mainperson)])
+        tab1 (str year " -")]
+    [:tr.eventline
+     [:td
+      {:style {:width "47px"
+               :text-align "center"}
+       :on-click #(f/edit-event (:event fact))}
+      year]
+     [:td
+      {:style {:width "100px"}
+       :on-click #(f/edit-event (:event fact))}
+      label]
+     [:td
       {:on-click #(f/setCurrent mainperson)}
       name]]))
+
+(defn child-list
+  [id]
+  [:li.child-list-element
+   [person-display-component id]])
 
 (defn spouse-children-component
   [info spouselabel childlabel]
@@ -249,16 +263,26 @@
                         (str childlabel ":")
                         nil)]
     ^{:key spouse}[:div
-                   labelspouse
+                   [:br]
                    [person-display-component sp]
-                   labelchildren
-                   (for [child children]
-                     ^{:key child} [person-display-component child])
-                   [:br]]))
+                   [:br]
+                   [:div.spouse-divider]
+                   [:ol.child-list
+                    (for [child children]
+                      ^{:key child} [child-list child])]
+                   ]))
+
+(defn remove-empty
+  [item]
+  (if (= :noparent (get item 0))
+    (if (empty? (get item 1))
+      false
+      true)
+    true))
 
 (defn current-selected-component []
   (let [current (get-in @d/state [:gui/state :current])
-        personinfo (d/get-name (:selected current))
+        nameparts (ffirst (d/get-name-parts (:selected current)))
         dad (if (= 1 (count (:father current)))
               (first (:father current))
               nil) ;; TODO: Gui handling possible multiple fathers
@@ -268,27 +292,44 @@
         children (:children current)
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
+        sorted2 (filter #(remove-empty %) sorted)
         events (f/event-list (:selected current))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
     [:div.display
      [:div.all.mainperson
-      [:strong (d/get-name (:selected current))]
-      [:small (:selected current)]
-      [:br]
-      [:small (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))]]
+      [:div.main-name
+       [:div
+        [:strong (get nameparts 0)]]
+       [:div
+        [:strong (get nameparts 1)]]]
+
+
+      [:small.main-year (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))
+       ]
+      [:div.mainperson-bar]]
+
      [:div.all.dadplate
       (str (d/l :father) ":")
+      [:br]
       [person-display-component dad]]
      [:div.all.mumplate
       (str (d/l :mother) ":")
+      [:br]
       [person-display-component mum]]
      [:div.all.spouses
-      (map #(spouse-children-component % spouselabel childrenlabel) sorted)]
+      (d/l :spouse-with-children)
+      [:label ": "]
+      [:br]
+      (map #(spouse-children-component % spouselabel childrenlabel) sorted2)]
      [:div.all.eventlist
-      (str (d/l :events) ":")
-      (for [event events]
-          ^{:key (:id event)} [event-display-component event])]
+      [:div.eventheader
+       (str (d/l :events) ":")]
+      [:div.eventdivider]
+      [:table#eventcontent
+       [:tbody
+        (for [event events]
+          ^{:key (:id event)} [event-display-component event])]]]
      [:input.b-birth {:type "button"
                    :value (d/l :bapm-event)
                    :on-click #(f/set-event-edit :baptism :child)}]
