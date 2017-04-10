@@ -201,6 +201,35 @@
         :event ^{:key id}[date-component field]
         :multirole ^{:key id} [multi-component field]))))
 
+(defn update-sourceref
+  [value index]
+  (let [refs (get-in @d/state [:gui/state :window/edit :values :source :refs])
+        ref (get refs index)
+        vals (assoc ref :value value)]
+    (if (= index (:index (last refs)))
+      (let [new-index (count refs)
+            new-refs (conj refs {:index new-index :id nil :value ""})]
+        (swap! d/state assoc-in [:gui/state :window/edit :values :source :refs] new-refs)))
+    (swap! d/state assoc-in [:gui/state :window/edit :values :source :refs index] vals)))
+
+(defn sourceref-component
+  [ref]
+  (let [index (:index ref)
+        id (:id ref)
+        value (:value ref)]
+    ^{:key index} [:div
+                   [:input {:type      "text"
+                            :value     value
+                            :on-change #(update-sourceref (-> % .-target .-value) index)}]
+                   [:br]]))
+
+(defn source-component
+  [id]
+  (let [sources (get-in @d/state [:gui/state :window/edit :values :source :refs])]
+    [:div.source
+     [:div "Kilderef."]
+     (map sourceref-component sources)]))
+
 (defn event-edit-component
   []
   (let [current (get-in @d/state [:gui/state :current :selected])
@@ -218,7 +247,10 @@
               :on-click #(f/save-event)}]
      [:input {:type "button"
               :value (d/l :cancel)
-              :on-click #(f/set-event-edit nil nil)}]]))
+              :on-click #(f/set-event-edit nil nil)}]
+     [:br]
+     [:br]
+     [source-component nil]]))
 
 (defn event-display-component
   [fact]

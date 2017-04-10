@@ -69,6 +69,10 @@
              :event/template {:db/cardinality :db.cardinality/one}
              :event/fields {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/many}
+             :event/source {:db/type :db.type/ref
+                            :db/cardinality :db.cardinality/one}
+             :source/parent {:db/type :db.type/ref
+                             :db/cardinality :db.cardinality/one}
              :date/parsed {:db/cardinality :db.cardinality/one}
              :date/year {:db/cardinality :db.cardinality/one}
              :date/month {:db/cardinality :db.cardinality/one}

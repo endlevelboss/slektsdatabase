@@ -239,3 +239,11 @@
     top: 20px;
     left: 175px;
 }
+
+/* Source styles*/
+.source{
+    width: 700px;
+    border-style: solid;
+    border-width: 2px;
+    background-color: khaki;
+}

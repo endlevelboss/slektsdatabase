@@ -19,17 +19,6 @@
       nil
       {:id fact-id :type type :date date :place place :sortable (date/sortable-date date) :event event-id})))
 
-;(defn events-into-list
-; ([nestedlist]
-; (events-into-list nestedlist ()))
-;([nestedlist final-list]
-; (if (empty? nestedlist)
-;   final-list
-;  (do
-;    (recur (rest nestedlist) (concat final-list (first nestedlist)))}))
-
-;(println (events-into-list (list (list :a :b) (list :c :d) (list :e :f))))
-
 (defn compare-dates
   [event1 event2]
   (let [date1 (:sortable event1)
@@ -105,30 +94,6 @@
   [value]
   (swap! d/state assoc-in [:gui/state :current] (setCurrentSelected value)))
 
-(defn getFieldTypeID
-  [type fields]
-  (first (filter #(= type (:type %)) fields)))
-
-;(defn getPlaceDeprecated ; to be removed
-;  [event]
-;  (let [template (:template event)
-;        t (template (:facttemplates @d/state))
-;        fields (:fields t)
-;        fieldindex (getFieldTypeID :place fields)
-;       (get (:value event) (:id fieldindex))))
-
-
-;(defn parse-name
-;    "Creates map of name according to its template"
-;    ([value]
-;     (let [template (:template value)
-;           f (get-in @d/state [:fieldtemplates template])
-;           name (:name value))
-;        (parse-name name f {:template template})
-;    ([name fields result]
-;     (if (empty? fields)
-;         result
-;         (recur name (rest fields) (assoc result (:id (first fields)) (get name (:id (first fields)))))))
 
 (defn parse-name
   [eventid fieldid]
@@ -150,14 +115,6 @@
         f-id (ffirst (d/get-field-id eventid fieldid :fact/field))]
     {:date date :place place :db/id f-id}))
 
-;(defn name-stringOLD
-;    ([props]
-;     (let [nameparts (:name props)]
-;         (name-stringOLD nameparts "")})
-;    ([nameparts name]
-;     (if (empty? nameparts)
-;         name
-;         (recur (rest nameparts) (str name " " (first nameparts)))}))
 (defn recur-multi
   ([ids field-id]
     (recur-multi ids field-id {}))
@@ -193,12 +150,12 @@
 
 
 
-(defn populate-event-field
+(defn populate-from-template
   "Loops through the template of an event to make sure each field gets the correct value from the event"
   ([event]
    (let [fields (flatten (into [] (d/get-template-of-event event)))
          ordered-fields (d/order-event-fields fields)]
-     (populate-event-field ordered-fields event {})))
+     (populate-from-template ordered-fields event {})))
   ([fields event result]
    (if (empty? fields)
      result
@@ -206,19 +163,41 @@
            parsed (parse-event-field id event)]
        (recur (rest fields) event (assoc result (get id 0) parsed))))))
 
+(defn source-info
+  ([event]
+   (let [source-id (ffirst (d/get-fact-detail event :event/source))]
+     (source-info source-id [])))
+  ([id result]
+    (if (nil? id)
+      (let [res (into [] (reverse result))]
+        (conj res {:id nil :value ""}))
+      (let [next (ffirst (d/get-fact-detail id :source/parent))
+            val (ffirst (d/get-fact-detail id :source/value))
+            new-result (conj result {:id id :value val})]
+        (recur next new-result)))))
+
+(defn recur-indexing
+  ([source-vec]
+    (recur-indexing source-vec 0 []))
+  ([source-vec index result]
+    (if (empty? source-vec)
+      result
+      (let [new (assoc (first source-vec) :index index)
+            newres (conj result new)]
+        (recur (rest source-vec) (inc index) newres)))))
+
+(defn populate-event-field
+  [event]
+  (let [template (populate-from-template event)
+        source (source-info event)
+        s (recur-indexing source)]
+    (assoc-in template [:source :refs] s)))
+
 (defn set-event-edit-field
   ([value key]
    (swap! d/state assoc-in [:gui/state :window/edit :values key] value))
   ([value key subid]
    (swap! d/state assoc-in [:gui/state :window/edit :values key subid] value)))
-
-;(defn find-role-id
-;    [role fields]
-;    (if (= role (:role (first fields)))
-;        (:id (first fields))
-;        (if (empty? fields)
-;            nil
-;            (recur role (rest fields)))))
 
 (defn set-roles-recur
   [template]
@@ -246,19 +225,6 @@
         :first (swap! d/state assoc-in [:gui/state :window/edit :values id] {0 {:persona/by-id (:selected curr)}}))
       (recur (rest template)))))
 
-(defn set-roles
-  [templateid]
-  (let [expected-roles (ffirst (d/get-value-of templateid :template/expected))]
-    (set-roles-recur expected-roles)))
-
-(defn set-current-role-old
-  [role template]
-  (let [id (ffirst (d/get-template-field-for-role template role))
-        expected-roles (ffirst (d/get-value-of template :template/expected))
-        pid (get-in @d/state [:gui/state :current :selected])
-        value {:persona/by-id pid}]
-    (set-roles template)))
-
 (defn set-current-role
   [_ template-id]
   (let [expected-roles (ffirst (d/get-value-of template-id :template/expected))]
@@ -273,7 +239,9 @@
       (swap! d/state assoc-in [:gui/state :window/edit :values] {}))
     (let [template (ffirst (d/get-id-of key :template/name))]
       (if (not= nil role)
-        (set-current-role role template)
+        (do
+          (set-current-role role template)
+          (swap! d/state assoc-in [:gui/state :window/edit :values :source :refs] [{:index 0 :id nil :value ""}]))
         nil)
       (swap! d/state assoc-in [:gui/state :window/edit :type] key))))
 
@@ -283,18 +251,11 @@
   (swap! d/state assoc-in [:gui/state :window/edit :values] (populate-event-field event))
   (set-event-edit (ffirst (d/get-template-name event)) nil))
 
-(defn get-nametemplate
-  ([]
-   (let [default (get-in @d/state [:fieldtemplates :defaultnametemplate])]
-     (get-in @d/state [:fieldtemplates default])))
-  ([templatename]
-   (get-in @d/state [:fieldtemplates templatename])))
-
 (defn save-event
   []
   (let [edit (get-in @d/state [:gui/state :window/edit :values])
         originalevent (get-in @d/state [:gui/state :window/edit :event/by-id])
-        originaldata (if (= nil originalevent)
+        originaldata (if (nil? originalevent)
                        nil
                        (populate-event-field originalevent))
         currentuser (get-in @d/state [:gui/state :current :selected])]

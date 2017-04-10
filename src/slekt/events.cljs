@@ -296,6 +296,33 @@
                       (conj result parsed)))]
        (recur (rest fields) data newres)))))
 
+(defn recur-source
+  ([source]
+    (let [refs (:refs source)]
+      (recur-source refs nil)))
+  ([refs parent]
+   (println refs)
+   (println parent)
+   (if (empty? refs)
+      parent
+      (let [ref (first refs)
+            id (if (nil? (:id ref))
+                 -1
+                 (:id ref))
+            val (:value ref)]
+        (if (empty? val)
+          parent
+          (let [t (ds/transact! d/conn [{:db/id id
+                                         :source/value val}])
+                p (if (nil? (newid t))
+                    id
+                    (newid t))]
+            (if (nil? parent)
+              nil
+              (ds/transact! d/conn [{:db/id p
+                                     :source/parent parent}]))
+            (recur (rest refs) p)))))))
+
 (defn save-event
   []
   (let [data (get-in @d/state [:gui/state :window/edit])
@@ -305,10 +332,22 @@
              eventid)
         t-id (ffirst (d/get-id-of (:type data) :template/name))
         fields (d/get-template t-id)
-        values (recur-fields fields data)]
+        values (recur-fields fields data)
+        source (recur-source (:source (:values data)))]
     (if (empty? fields)
       nil
-      (ds/transact! d/conn [{:db/id          id
-                             :event/type     (:type data)
-                             :event/template (:type data)   ;; TODO Fix for custom templates
-                             :event/fields   values}]))))
+      (let [t (ds/transact! d/conn [{:db/id          id
+                                     :event/type     (:type data)
+                                     :event/template (:type data) ;; TODO Fix for custom templates
+                                     :event/fields   values
+                                     }])
+            e-id (newid t)
+            e (if (nil? e-id)
+                id
+                e-id)]
+        (println source)
+        (if (nil? source)
+          nil
+          (ds/transact! d/conn [{:db/id e
+                                 :event/source source}]))
+        ))))
