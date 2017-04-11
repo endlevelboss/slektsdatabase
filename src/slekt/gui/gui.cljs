@@ -1,4 +1,4 @@
-(ns slekt.gui
+(ns slekt.gui.gui
     (:require [reagent.core :as r]
               [slekt.database :as d]
               [slekt.db-functions :as f]
@@ -430,32 +430,6 @@
               :value "Refresh"
               :on-click #(check-loaded)}]]))
 
-(defn menu-bars []
-  (let [show-add-window (get-in @d/state [:gui/state :window/add :show])]
-    [:div {:style {:position "absolute" :top "0px" :left "0px"}}
-     [:div {:style {:position         "absolute" :top "0px" :left "0px"
-                    :width            "20px" :height "850px"
-                    :background-color "grey"}}]
-     [:div {:style {:position         "absolute" :top "0px" :left "20px"
-                    :width            "900px" :height "20px"
-                    :background-color "#555555"}}]
-     (if show-add-window
-       [add-window]
-       [init-window])]))
 
-(defn runonce
-  "Initializes data at the startup, to be run after indexeddb has loaded"
-  []
-  (let [run (get-in @d/state [:gui/state :runonce])]
-    (if run
-      (d/initdb)
-      nil)))
 
-(defn start-window
-  []
-  (if (not= nil @d/db)
-    (do
-      (runonce)
-      [menu-bars])
-    [:div "Loading indexeddb..."]))
 

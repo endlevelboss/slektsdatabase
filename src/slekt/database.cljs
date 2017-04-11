@@ -6,7 +6,9 @@
               [slekt.test-database :as t]
               [slekt.language :as lang]))
 
-(def database {:gui/state {:runonce true
+(def database {:mainwindow :div
+               :runonce true
+               :gui/state {:runonce true
                            :loaded false
                            :language lang/norsk
                            :current {:selected nil
@@ -484,5 +486,5 @@
   []
   (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
   (ds/transact! conn t/templates)
-  (swap! state assoc-in [:gui/state :runonce] false)
+  (swap! state assoc-in [:runonce] false)
   (.addEventListener js/window "beforeunload" #(write-to-iddb) false))

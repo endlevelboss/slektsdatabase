@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [slekt.database :as d]
             [slekt.db-functions :as f]
-            [slekt.gui :as gui]
+            [slekt.gui.init :as gui]
             [slekt.date :as date]))
 
 (enable-console-print!)

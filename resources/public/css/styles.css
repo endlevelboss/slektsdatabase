@@ -9,11 +9,11 @@
 /* Styles for current selected component and subcomponents */
 
 .display{
-    font-family: "Arial";
+    font-family: "Cardo";
     background-color: beige;
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 20px;
+    left: 50px;
     }
 
 .mainperson{
@@ -246,4 +246,39 @@
     border-style: solid;
     border-width: 2px;
     background-color: khaki;
+}
+
+/* Menu bars*/
+.firstdiv{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.leftbar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 850px;
+    background-color: grey;
+    }
+.topbar{
+    position: absolute;
+    top: 0;
+    left: 50px;
+    width: 900px;
+    height: 20px;
+    background-color: #555555;
+}
+.mainview-button{
+    position: absolute;
+    top: 180px;
+    left: 5px;
+    background-color: goldenrod;
+    text-align: center;
+    border-radius: 20px;
+    color: yellow;
+    width: 40px;
+    height: 40px;
 }
