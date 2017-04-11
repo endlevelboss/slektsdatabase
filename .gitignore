@@ -1,12 +1,13 @@
 # Added by littly blittly meweee
 
 /target
-/resources
 /out
+/resources/*
+!/resources/public
+/resources/public/*
 !/resources/public/index.html
+!/resources/public/css
 /.idea
-./slekt.iml
-./figwheel_server.log
 slekt.iml
 figwheel_server.log
 main.js
