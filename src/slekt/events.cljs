@@ -325,7 +325,7 @@
 
 (defn save-event
   []
-  (let [data (get-in @d/state [:gui/state :window/edit])
+  (let [data (get-in @d/state [:window/edit])
         eventid (:event/by-id data)
         id (if (nil? eventid)                              ;; update old event or create new?
              -1

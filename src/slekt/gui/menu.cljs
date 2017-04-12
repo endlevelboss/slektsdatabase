@@ -1,7 +1,9 @@
 (ns slekt.gui.menu
   (:require [slekt.database :as d]
             [slekt.gui.gui :as gui]
-            [slekt.gui.add-person :as add]))
+            [slekt.gui.add-person :as add]
+            [slekt.gui.mainwindow :as main]
+            [slekt.gui.persona :as persona]))
 
 (defn select-view
   [view]
@@ -10,19 +12,18 @@
   )
 
 (defn menu-bars []
-  (let [show-add-window (get-in @d/state [:gui/state :window/add :show])
-        mainwindow (get-in @d/state [:mainwindow])]
+  (let [mainwindow (get-in @d/state [:mainwindow])]
     [:div.firstdiv
      [:div.leftbar]
      [:div.topbar]
+     [:div.addperson-button
+      {:on-click #(select-view add/add-window)}
+      "a"]
      [:div.mainview-button
-      {:on-click #(select-view gui/init-window)}
+      {:on-click #(select-view main/init-window)}
       "m"]
      [:div.personaview-button
-      {:on-click #(select-view gui/init-window)}
+      {:on-click #(select-view persona/persona-view)}
       "p"]
      [mainwindow]
-     ;(if show-add-window
-     ;  [add-window]
-     ;  [init-window])
      ]))

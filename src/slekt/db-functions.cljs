@@ -92,7 +92,7 @@
 
 (defn setCurrent
   [value]
-  (swap! d/state assoc-in [:gui/state :current] (setCurrentSelected value)))
+  (swap! d/state assoc-in [:current] (setCurrentSelected value)))
 
 
 (defn parse-name
@@ -195,9 +195,9 @@
 
 (defn set-event-edit-field
   ([value key]
-   (swap! d/state assoc-in [:gui/state :window/edit :values key] value))
+   (swap! d/state assoc-in [:window/edit :values key] value))
   ([value key subid]
-   (swap! d/state assoc-in [:gui/state :window/edit :values key subid] value)))
+   (swap! d/state assoc-in [:window/edit :values key subid] value)))
 
 (defn set-roles-recur
   [template]
@@ -205,9 +205,9 @@
     nil
     (let [id (get (first template) 0)
           type (get (first template) 1)
-          curr (get-in @d/state [:gui/state :current])
+          curr (get-in @d/state [:current])
           curr-sex (ffirst (d/find-sex-of-person (:selected curr)))
-          spouse (first (get-in @d/state [:gui/state :current :spouses]))
+          spouse (first (get-in @d/state [:current :spouses]))
           husband (if (= :m curr-sex)
                     {:persona/by-id (:selected curr) :sex :m}
                     {:persona/by-id spouse :sex :m})
@@ -215,14 +215,14 @@
                  {:persona/by-id (:selected curr) :sex :f}
                  {:persona/by-id spouse :sex :f})]
       (case type
-        :main (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (:selected curr)})
-        :father (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:father curr))
+        :main (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (:selected curr)})
+        :father (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (first (:father curr))
                                                                               :sex :m})
-        :mother (swap! d/state assoc-in [:gui/state :window/edit :values id] {:persona/by-id (first (:mother curr))
+        :mother (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (first (:mother curr))
                                                                               :sex :f})
-        :husband (swap! d/state assoc-in [:gui/state :window/edit :values id] husband)
-        :wife (swap! d/state assoc-in [:gui/state :window/edit :values id] wife)
-        :first (swap! d/state assoc-in [:gui/state :window/edit :values id] {0 {:persona/by-id (:selected curr)}}))
+        :husband (swap! d/state assoc-in [:window/edit :values id] husband)
+        :wife (swap! d/state assoc-in [:window/edit :values id] wife)
+        :first (swap! d/state assoc-in [:window/edit :values id] {0 {:persona/by-id (:selected curr)}}))
       (recur (rest template)))))
 
 (defn set-current-role
@@ -234,31 +234,31 @@
   [key role]
   (if (= key nil)
     (do
-      (swap! d/state assoc-in [:gui/state :window/edit :type] nil)
-      (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] nil)
-      (swap! d/state assoc-in [:gui/state :window/edit :values] {}))
+      (swap! d/state assoc-in [:window/edit :type] nil)
+      (swap! d/state assoc-in [:window/edit :event/by-id] nil)
+      (swap! d/state assoc-in [:window/edit :values] {}))
     (let [template (ffirst (d/get-id-of key :template/name))]
       (if (not= nil role)
         (do
           (set-current-role role template)
-          (swap! d/state assoc-in [:gui/state :window/edit :values :source :refs] [{:index 0 :id nil :value ""}]))
+          (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}]))
         nil)
-      (swap! d/state assoc-in [:gui/state :window/edit :type] key))))
+      (swap! d/state assoc-in [:window/edit :type] key))))
 
 (defn edit-event
   [event]
-  (swap! d/state assoc-in [:gui/state :window/edit :event/by-id] event)
-  (swap! d/state assoc-in [:gui/state :window/edit :values] (populate-event-field event))
+  (swap! d/state assoc-in [:window/edit :event/by-id] event)
+  (swap! d/state assoc-in [:window/edit :values] (populate-event-field event))
   (set-event-edit (ffirst (d/get-template-name event)) nil))
 
 (defn save-event
   []
-  (let [edit (get-in @d/state [:gui/state :window/edit :values])
-        originalevent (get-in @d/state [:gui/state :window/edit :event/by-id])
+  (let [edit (get-in @d/state [:window/edit :values])
+        originalevent (get-in @d/state [:window/edit :event/by-id])
         originaldata (if (nil? originalevent)
                        nil
                        (populate-event-field originalevent))
-        currentuser (get-in @d/state [:gui/state :current :selected])]
+        currentuser (get-in @d/state [:current :selected])]
     (if (= originaldata edit)
       (do
         (println "No changes, exiting")

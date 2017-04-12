@@ -12,12 +12,12 @@
                          :children #{}
                          :spouses #{}
                          :events #{}}
+               :defaultwindow :div
                :language lang/norsk
                :loaded false
                :mainwindow :div
                :runonce true
-               :window/add {:show true
-                            :sex "m"}
+               :window/add {:sex "m"}
                :window/edit {:type nil
                              :event/by-id nil
                              :values {}}
@@ -59,7 +59,7 @@
 
 (defn l
   [label]
-  (get-in @state [:gui/state :language label]))
+  (get-in @state [:language label]))
 
 
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------
@@ -473,7 +473,7 @@
 
 (defn set-current
   [value]
-  (swap! state assoc-in [:gui/state :current] (set-current-selected value)))
+  (swap! state assoc-in [:current] (set-current-selected value)))
 
 
 (defn read-from-iddb
@@ -485,10 +485,10 @@
         (reset! conn db)
         (let [personas (persona-list)]
           (if (empty? personas)
-            (swap! state assoc-in [:gui/state :window/add :show] true)
+            (swap! state assoc-in [:window/add :show] true)
             (do
               (set-current (first personas))
-              (swap! state assoc-in [:gui/state :window/add :show] false))))))))
+              (swap! state assoc-in [:window/add :show] false))))))))
 
 (defn write-to-iddb
   []
