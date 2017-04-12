@@ -12,6 +12,8 @@
                          :children #{}
                          :spouses #{}
                          :events #{}}
+               :comp/personaselector {:show false
+                                      :field nil}
                :defaultwindow :div
                :language lang/norsk
                :loaded false
@@ -73,6 +75,8 @@
                             :db/cardinality :db.cardinality/one}
              :persona/persons {:db/type :db.type/ref
                                :db/cardinality :db.cardinality/many}
+             :assert/personas {:db/type :db.type/ref
+                               :db/cardinality :db.cardinality/many}
              :name/parts {:db/cardinality :db.cardinality/one}
              :name/template {:db/type :db.type/ref
                              :db/cardinality :db.cardinality/one}
@@ -107,15 +111,7 @@
              :fact/persona {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/one}})
 
-
-
 (def conn (ds/create-conn schema))
-
-
-
-
-
-
 
 (defn testing
   []

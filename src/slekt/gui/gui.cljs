@@ -61,7 +61,7 @@
      [:input.ee-change
       {:type     "button"
        :value    "Change person"
-       :on-click #(button-show-persona-selector [id])}]
+       :on-click #(button-show-persona-selector [:window/edit :values id])}]
      ]))
 
 (defn date-component
@@ -112,7 +112,7 @@
      [:div.ee-name name]
      [:input.ee-change {:type     "button"
               :value    "Change person"
-              :on-click #(button-show-persona-selector [field-id index])}]
+              :on-click #(button-show-persona-selector [:window/edit :values field-id index])}]
      [:select.ee-role {:name "test" :value role :on-change #(set-list-value (-> % .-target .-value) field-id index :grouprole)}
       [:option {:value "nil" :disabled "true"} (d/l :select)]
       [:option {:value "husband"} (d/l :husband)]

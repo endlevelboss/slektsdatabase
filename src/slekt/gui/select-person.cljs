@@ -5,8 +5,8 @@
 
 (defn change-person
   [id sex]
-  (let [field (get-in @d/state [:comp/personaselector :field])
-        path (into [:window/edit :values] field)
+  (let [path (get-in @d/state [:comp/personaselector :field])
+        ildpath (into [:window/edit :values] nil)
         s (if (nil? id)
             sex
             (ffirst (d/find-sex-of-person id)))]

@@ -311,3 +311,8 @@
     top: 20px;
     left: 50px;
 }
+.b-assert {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+}
