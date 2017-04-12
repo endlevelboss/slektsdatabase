@@ -3,8 +3,7 @@
               [slekt.database :as d]
               [slekt.db-functions :as f]
               [slekt.date :as date]
-              [slekt.events :as events]
-              [slekt.styles :as s]))
+              [slekt.events :as events]))
 
 (enable-console-print!)
 
@@ -335,12 +334,9 @@
         [:strong (get nameparts 0)]]
        [:div
         [:strong (get nameparts 1)]]]
-
-
       [:small.main-year (birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))
        ]
       [:div.mainperson-bar]]
-
      [:div.all.dadplate
       (str (d/l :father) ":")
       [:br]
@@ -380,56 +376,3 @@
   (if (not= nil (get-in @d/state [:gui/state :window/edit :type]))
     [event-edit-component]
     [current-selected-component]))
-
-(defn update-add
-  [value key]
-  (swap! d/state assoc-in [:gui/state :window/add key] value))
-
-(defn button-add-person
-  []
-  (let [persona (get-in @d/state [:gui/state :window/add])
-        p2 (assoc persona :sex (keyword (:sex persona)))
-        p-id (events/transact-persona p2 nil)]
-    (f/setCurrent p-id)
-    (swap! d/state assoc-in [:gui/state :window/add :show] false)))
-
-(defn check-loaded
-  []
-  (let [personas (d/persona-list)]
-    (if (empty? personas)
-      nil
-      (do
-        (swap! d/state assoc-in [:gui/state :window/add :show] false)
-        (d/set-current (first personas))))))
-
-(defn add-window
-  []
-  (let [firstname (get-in @d/state [:gui/state :window/add :newfirst])
-        lastname (get-in @d/state [:gui/state :window/add :newlast])
-        sex (get-in @d/state [:gui/state :window/add :sex])]
-    [:div {:style {:position "absolute"
-                   :top      "40px"
-                   :left     "40px"
-                   :width    "800px"}}
-     "Add first person to your genealogy database"
-     [:br]
-     [:input {:type      "text"
-              :value     firstname
-              :on-change #(update-add (-> % .-target .-value) :newfirst)}]
-     [:input {:type      "text"
-              :value     lastname
-              :on-change #(update-add (-> % .-target .-value) :newlast)}]
-     [:select {:name "sex" :value sex :on-change #(update-add (-> % .-target .-value) :sex)}
-      [:option {:value "m"} "Male"]
-      [:option {:value "f"} "Female"]]
-     [:br]
-     [:input {:type "button"
-              :value "OK"
-              :on-click #(button-add-person)}]
-     [:input {:type "button"
-              :value "Refresh"
-              :on-click #(check-loaded)}]]))
-
-
-
-

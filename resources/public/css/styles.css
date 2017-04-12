@@ -282,3 +282,14 @@
     width: 40px;
     height: 40px;
 }
+.personaview-button{
+    position: absolute;
+    top: 230px;
+    left: 5px;
+    background-color: forestgreen;
+    text-align: center;
+    border-radius: 20px;
+    color: yellow;
+    width: 40px;
+    height: 40px;
+}

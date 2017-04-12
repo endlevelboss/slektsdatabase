@@ -6,8 +6,21 @@
               [slekt.test-database :as t]
               [slekt.language :as lang]))
 
-(def database {:mainwindow :div
+(def database {:current {:selected nil
+                         :father nil
+                         :mother nil
+                         :children #{}
+                         :spouses #{}
+                         :events #{}}
+               :language lang/norsk
+               :loaded false
+               :mainwindow :div
                :runonce true
+               :window/add {:show true
+                            :sex "m"}
+               :window/edit {:type nil
+                             :event/by-id nil
+                             :values {}}
                :gui/state {:runonce true
                            :loaded false
                            :language lang/norsk
