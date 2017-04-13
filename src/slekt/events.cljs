@@ -346,9 +346,10 @@
 ;;;;;;;;;;;;  assert ;;;;;;;;;;;;;;;;
 
 (defn save-assert
-  [assert-id persona-id-array]
+  [assert-id first second]
   (let [a-id (if (nil? assert-id)
                -1
-               assert-id)]
-    (ds/transact! d/conn [{:db/id a-id
-                           :assert/personas persona-id-array}])))
+               assert-id)
+        vals [first second]]
+    (newid (ds/transact! d/conn [{:db/id           a-id
+                                  :assert/personas vals}]))))

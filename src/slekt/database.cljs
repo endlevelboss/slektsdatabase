@@ -4,7 +4,8 @@
               [datascript.core :as ds]
               [datascript.transit :as dt]
               [slekt.test-database :as t]
-              [slekt.language :as lang]))
+              [slekt.language :as lang]
+              [slekt.template.template :as template]))
 
 (def database {:current {:selected nil
                          :father nil
@@ -68,52 +69,9 @@
 
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------
 
-(def schema {:database/name {:db/unique :db.unique/identity}
-             :database/selected {:db/cardinality :db.cardinality/one}
-             :database/personas {:db/type :db.type/ref
-                                 :db/cardinality :db.cardinality/many}
-             :persona/id {:db/unique :db.unique/identity}
-             :persona/name {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}
-             :persona/persons {:db/type :db.type/ref
-                               :db/cardinality :db.cardinality/many}
-             :assert/personas {:db/type :db.type/ref
-                               :db/cardinality :db.cardinality/many}
-             :name/parts {:db/cardinality :db.cardinality/one}
-             :name/template {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :template/name {:db/unique :db.unique/identity}
-             :template/expected {:db/cardinality :db.cardinality/one}
-             :template/parts {:db/type :db.type/ref
-                              :db/cardinality :db.cardinality/many}
-             :event/type {:db/cardinality :db.cardinality/one}
-             :event/template {:db/cardinality :db.cardinality/one}
-             :event/fields {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/many}
-             :event/source {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}
-             :source/parent {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :date/parsed {:db/cardinality :db.cardinality/one}
-             :date/year {:db/cardinality :db.cardinality/one}
-             :date/month {:db/cardinality :db.cardinality/one}
-             :date/day {:db/cardinality :db.cardinality/one}
-             :date/text {:db/cardinality :db.cardinality/one}
-             :place/value {:db/cardinality :db.cardinality/one}
-             :place/address {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :fact/role {:db/cardinality :db.cardinality/one}
-             :fact/date {:db/type :db.type/ref
-                         :db/cardinality :db.cardinality/one}
-             :fact/place {:db/type :db.type/ref
-                          :db/cardinality :db.cardinality/one}
-             :fact/type {:db/cardinality :db.cardinality/one}
-             :fact/name {:db/type :db.type/ref
-                         :db/cardinality :db.cardinality/one}
-             :fact/persona {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}})
 
-(def conn (ds/create-conn schema))
+
+(def conn (ds/create-conn template/schema))
 
 (defn testing
   []
@@ -440,6 +398,14 @@
           [?pid :field/id ?fid]]
         @conn tid role))
 
+(defn get-asserts
+  [pid]
+  (ds/q '[:find ?aid
+          :in $ ?pid
+          :where
+          [?aid :assert/personas ?pid]]
+        @conn pid))
+
 (defn order-event-fields
   ([field-ids]
    (order-event-fields {} field-ids))
@@ -496,6 +462,6 @@
 (defn initdb
   []
   (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
-  (ds/transact! conn t/templates)
+  (ds/transact! conn template/templates)
   (swap! state assoc-in [:runonce] false)
   (.addEventListener js/window "beforeunload" #(write-to-iddb) false))

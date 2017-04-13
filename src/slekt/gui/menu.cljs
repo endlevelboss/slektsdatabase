@@ -6,10 +6,18 @@
             [slekt.gui.persona :as persona]))
 
 (defn select-view
-  [view]
+  [view func]
   (swap! d/state assoc-in [:mainwindow] view)
-  ;(swap! d/state assoc-in [:mainwindow] add/add-window)
+  (if (nil? func)
+    nil
+    (func))
   )
+
+(defn asserts
+  []
+  (let [sel (get-in @d/state [:current :selected])
+        ass (ffirst (d/get-asserts sel))]
+    (swap! d/state assoc-in [:window/persona :assert] ass)))
 
 (defn menu-bars []
   (let [mainwindow (get-in @d/state [:mainwindow])]
@@ -17,13 +25,13 @@
      [:div.leftbar]
      [:div.topbar]
      [:div.addperson-button
-      {:on-click #(select-view add/add-window)}
+      {:on-click #(select-view add/add-window nil)}
       "a"]
      [:div.mainview-button
-      {:on-click #(select-view main/init-window)}
+      {:on-click #(select-view main/init-window nil)}
       "m"]
      [:div.personaview-button
-      {:on-click #(select-view persona/persona-view)}
+      {:on-click #(select-view persona/persona-view asserts)}
       "p"]
      [mainwindow]
      ]))

@@ -74,7 +74,6 @@
                        :on-click #(f/set-event-edit :census :first)}]]))
 
 (defn init-window []
-  (println "*")
   (if (not= nil (get-in @d/state [:window/edit :type]))
     [gui/event-edit-component]
     [current-selected-component]))
