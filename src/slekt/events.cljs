@@ -101,17 +101,7 @@
                 :event nil)
             (recur data (rest fields)))))
 
-(defn create-event-old
-  [data]
-  (println data)
-  (let [event-id (create-new-eventid)
-        d (assoc data :event/by-id event-id)
-        template (get-in @d/state [:facttemplates (:type d)])
-        fields (:fields template)
-        parsed (recur-data d fields)
-        value {:id event-id :template (:type d) :value parsed}]
-    (recur-personas value fields)
-    (swap! d/state assoc-in [:event/by-id event-id] value)))
+
 
 
 
@@ -351,3 +341,14 @@
           (ds/transact! d/conn [{:db/id e
                                  :event/source source}]))
         ))))
+
+
+;;;;;;;;;;;;  assert ;;;;;;;;;;;;;;;;
+
+(defn save-assert
+  [assert-id persona-id-array]
+  (let [a-id (if (nil? assert-id)
+               -1
+               assert-id)]
+    (ds/transact! d/conn [{:db/id a-id
+                           :assert/personas persona-id-array}])))

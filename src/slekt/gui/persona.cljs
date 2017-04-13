@@ -2,11 +2,25 @@
   (:require [slekt.gui.utilities :as u]
             [slekt.db-functions :as f]
             [slekt.database :as d]
-            [slekt.gui.select-person :as select]))
+            [slekt.gui.select-person :as select]
+            [slekt.events :as events]))
+
+(defn on-persona-selected
+  []
+  (let [add (:persona/by-id (get-in @d/state [:window/persona :add]))
+        assert (get-in @d/state [:window/persona :assert])
+        selected (get-in @d/state [:current :selected])
+        arr [add selected]]
+    (if (nil? add)
+      nil
+      (events/save-assert assert arr))
+    (swap! d/state assoc-in [:window/persona :add] nil)
+    (swap! d/state assoc-in [:comp/personaselector :on-complete] nil)))
 
 (defn show-persona-selector
   [field]
   (swap! d/state assoc-in [:comp/personaselector :field] field)
+  (swap! d/state assoc-in [:comp/personaselector :on-complete] on-persona-selected)
   (swap! d/state assoc-in [:comp/personaselector :show] true))
 
 (defn persona-view
@@ -29,5 +43,5 @@
      personaselector
      [:input.b-assert {:type "button"
                        :value "Assert"
-                       :on-click #(show-persona-selector nil)
+                       :on-click #(show-persona-selector [:window/persona :add])
                        }]]))

@@ -23,6 +23,8 @@
                :window/edit {:type nil
                              :event/by-id nil
                              :values {}}
+               :window/persona {:assert nil
+                                :add nil}
                :gui/state {:runonce true
                            :loaded false
                            :language lang/norsk

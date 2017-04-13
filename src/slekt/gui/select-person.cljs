@@ -5,7 +5,8 @@
 
 (defn change-person
   [id sex]
-  (let [path (get-in @d/state [:comp/personaselector :field])
+  (let [on-complete (get-in @d/state [:comp/personaselector :on-complete])
+        path (get-in @d/state [:comp/personaselector :field])
         ildpath (into [:window/edit :values] nil)
         s (if (nil? id)
             sex
@@ -13,7 +14,10 @@
     (swap! d/state assoc-in [:comp/personaselector :show] false)
     (swap! d/state assoc-in path {:persona/by-id id
                                   :sex s
-                                  :value nil})))
+                                  :value nil})
+    (if (nil? on-complete)
+      nil
+      (on-complete))))
 
 (defn change-person-cancel
   []
