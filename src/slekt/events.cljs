@@ -345,11 +345,24 @@
 
 ;;;;;;;;;;;;  assert ;;;;;;;;;;;;;;;;
 
+(defn get-asserts
+  [id]
+  (let [asserts (first (d/get-value-of id :persona/asserts))]
+    (if (nil? asserts)
+      []
+      asserts)))
+
 (defn save-assert
   [assert-id first second]
   (let [a-id (if (nil? assert-id)
                -1
                assert-id)
-        vals [first second]]
-    (newid (ds/transact! d/conn [{:db/id           a-id
-                                  :assert/personas vals}]))))
+        assert (newid (ds/transact! d/conn [{:db/id           a-id
+                                             :assert/note     ""}]))]
+    (ds/transact! d/conn [[:db/add first :persona/assert assert]
+                          [:db/add second :persona/assert assert]])
+    assert))
+
+(defn update-assert-note
+  [text id]
+  (ds/transact! d/conn [[:db/add id :assert/note text]]))

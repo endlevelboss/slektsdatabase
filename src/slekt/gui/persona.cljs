@@ -5,6 +5,24 @@
             [slekt.gui.select-person :as select]
             [slekt.events :as events]))
 
+(defn init-persona
+  []
+  (let [sel (get-in @d/state [:current :selected])
+        ass (ffirst (d/get-value-of sel :persona/assert))
+        text (if (nil? ass)
+               nil
+               (ffirst (d/get-value-of ass :assert/note)))]
+    (swap! d/state assoc-in [:window/persona :assert] ass)
+    (swap! d/state assoc-in [:window/persona :note] text)))
+
+(defn exit-persona
+  []
+  (let [assert-id (get-in @d/state [:window/persona :assert])
+        text (get-in @d/state [:window/persona :note])]
+    (if (nil? assert-id)
+      nil
+      (events/update-assert-note text assert-id))))
+
 (defn on-persona-selected                                   ;; TODO: disable poss. of creating new persona here
   []
   (let [add (:persona/by-id (get-in @d/state [:window/persona :add]))
@@ -35,24 +53,35 @@
        [:strong (get nameparts 1)]]]
      [:small.main-year (u/birth-death-string (f/birthyear id) (f/deathyear id))
       ]
-     [:div.mainperson-bar]])
+     [:div.mainperson-bar]]))
+
+(defn update-note
+  [text]
+  (swap! d/state assoc-in [:window/persona :note] text)
   )
 
 (defn persona-view
   []
   (let [selected (get-in @d/state [:current :selected])
-        asserts (get-in @d/state [:window/persona :assert])
-        pids (remove #(= selected %) (if (nil? asserts)
+        assert (get-in @d/state [:window/persona :assert])
+        note (get-in @d/state [:window/persona :note])
+        pids (remove #(= selected %) (if (nil? assert)
                                            []
-                                           (flatten (into [] (d/get-value-of asserts :assert/personas)))))
+                                           (flatten (into [] (d/get-id-of assert :persona/assert)))))
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
                           nil)]
+    (println pids)
     [:div.persona
      [:div.sel-pos
       [person selected]]
+     (if (nil? assert)
+       nil
+       [:div.note-pos.all
+        [:textarea.assert-note {:value     note
+                    :on-change #(update-note (-> % .-target .-value))}]])
      [:div.ass-pos
-      (map person pids)]
+      (map person pids) ]
      personaselector
      [:input.b-assert {:type "button"
                        :value "Add to Assert"

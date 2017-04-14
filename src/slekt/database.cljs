@@ -19,13 +19,15 @@
                :language lang/norsk
                :loaded false
                :mainwindow :div
+               :mainwindow-exit nil
                :runonce true
                :window/add {:sex "m"}
                :window/edit {:type nil
                              :event/by-id nil
                              :values {}}
                :window/persona {:assert nil
-                                :add nil}
+                                :add nil
+                                :note nil}
                :gui/state {:runonce true
                            :loaded false
                            :language lang/norsk
@@ -465,3 +467,11 @@
   (ds/transact! conn template/templates)
   (swap! state assoc-in [:runonce] false)
   (.addEventListener js/window "beforeunload" #(write-to-iddb) false))
+
+(defn p
+  [id]
+  (ds/q '[:find ?field ?val
+          :in $ ?id
+          :where
+          [?id ?field ?val]]
+        @conn id))

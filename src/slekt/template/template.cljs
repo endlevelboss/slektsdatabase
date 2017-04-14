@@ -7,10 +7,9 @@
              :persona/id {:db/unique :db.unique/identity}
              :persona/name {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/one}
-             :persona/persons {:db/type :db.type/ref
-                               :db/cardinality :db.cardinality/many}
-             :assert/personas {:db/type :db.type/ref
-                               :db/cardinality :db.cardinality/many}
+             :persona/assert {:db/type :db.type/ref
+                              :db/cardinality :db.cardinality/one}
+             :assert/note {:db/cardinality :db.cardinality/one}
              :name/parts {:db/cardinality :db.cardinality/one}
              :name/template {:db/type :db.type/ref
                              :db/cardinality :db.cardinality/one}
