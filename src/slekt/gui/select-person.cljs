@@ -7,14 +7,15 @@
   [id sex]
   (let [on-complete (get-in @d/state [:comp/personaselector :on-complete])
         path (get-in @d/state [:comp/personaselector :field])
-        ildpath (into [:window/edit :values] nil)
+        values (get-in @d/state [:comp/personaselector :values])
         s (if (nil? id)
             sex
-            (ffirst (d/find-sex-of-person id)))]
+            (ffirst (d/find-sex-of-person id)))
+        vals (conj values {:persona/by-id id
+                           :sex s
+                           :value nil})]
     (swap! d/state assoc-in [:comp/personaselector :show] false)
-    (swap! d/state assoc-in path {:persona/by-id id
-                                  :sex s
-                                  :value nil})
+    (swap! d/state assoc-in path vals)
     (if (nil? on-complete)
       nil
       (on-complete))))
@@ -31,7 +32,7 @@
           birth (f/birthyear id)
           death (f/deathyear id)]
       [:div
-       {:on-click #(change-person id nil)}
+       {:on-click #(change-person id nil )}
        name
        " "
        [:small (u/birth-death-string birth death)]])))
@@ -44,10 +45,10 @@
        ^{:key pid}[person-select pid])
      [:input {:type "button"
               :value "New male"
-              :on-click #(change-person nil :m)}]
+              :on-click #(change-person nil :m )}]
      [:input {:type "button"
               :value "New female"
-              :on-click #(change-person nil :f)}]
+              :on-click #(change-person nil :f )}]
      [:input {:type "button"
               :value "Cancel"
               :on-click #(change-person-cancel)}]]))

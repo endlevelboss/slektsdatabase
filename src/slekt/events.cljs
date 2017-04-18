@@ -365,4 +365,7 @@
 
 (defn update-assert-note
   [text id]
-  (ds/transact! d/conn [[:db/add id :assert/note text]]))
+  (let [txt (if (nil? text)
+              ""
+              text)]
+    (ds/transact! d/conn [[:db/add id :assert/note txt]])))

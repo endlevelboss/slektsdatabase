@@ -23,8 +23,9 @@
        [:small (u/birth-death-string birth death)]] )))
 
 (defn button-show-persona-selector
-  [field]
+  [field values]
   (swap! d/state assoc-in [:comp/personaselector :field] field)
+  (swap! d/state assoc-in [:comp/personaselector :values] values)
   (swap! d/state assoc-in [:comp/personaselector :show] true))
 
 (defn new-name-component
@@ -49,19 +50,21 @@
         label (d/l (get (get field 1) 2))
         val (get-in @d/state [:window/edit :values id])
         value (:value val)
+        dbid (:db/id val)
         pid (:persona/by-id val)
         firstname (:newfirst val)
         lastname (:newlast val)
         name (if (nil? pid)
                [new-name-component id]
                (d/get-name pid))]
+    (println val)
     [:div.person-component
      [:div.ee-label label]
      [:div.ee-name name]
      [:input.ee-change
       {:type     "button"
        :value    "Change person"
-       :on-click #(button-show-persona-selector [:window/edit :values id])}]
+       :on-click #(button-show-persona-selector [:window/edit :values id] {:db/id dbid})}]
      ]))
 
 (defn date-component
@@ -89,6 +92,7 @@
   (let [index (get listelement 0)
         p-id (:persona/by-id (get listelement 1))
         val (get-in @d/state [:window/edit :values field-id index])
+        dbid (:db/id val)
         firstname (:newfirst val)
         lastname (:newlast val)
 
@@ -112,7 +116,7 @@
      [:div.ee-name name]
      [:input.ee-change {:type     "button"
               :value    "Change person"
-              :on-click #(button-show-persona-selector [:window/edit :values field-id index])}]
+              :on-click #(button-show-persona-selector [:window/edit :values field-id index] {:db/id dbid})}]
      [:select.ee-role {:name "test" :value role :on-change #(set-list-value (-> % .-target .-value) field-id index :grouprole)}
       [:option {:value "nil" :disabled "true"} (d/l :select)]
       [:option {:value "husband"} (d/l :husband)]
