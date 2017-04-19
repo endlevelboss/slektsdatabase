@@ -57,7 +57,6 @@
         name (if (nil? pid)
                [new-name-component id]
                (d/get-name pid))]
-    (println val)
     [:div.person-component
      [:div.ee-label label]
      [:div.ee-name name]

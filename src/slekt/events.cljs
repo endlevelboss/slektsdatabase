@@ -146,14 +146,16 @@
         pid (if (nil? (:persona/by-id val))
               (transact-persona val type)
               (:persona/by-id val))]
-    (newid (ds/transact! d/conn [{:db/id           id
-                                  :fact/type       :role
-                                  :fact/field      field
-                                  :fact/role       type
-                                  :fact/value      value
-                                  :fact/groupindex group
-                                  :fact/grouprole  g-role
-                                  :fact/persona    pid}]))))
+    (if (nil? pid)
+      nil
+      (newid (ds/transact! d/conn [{:db/id           id
+                                    :fact/type       :role
+                                    :fact/field      field
+                                    :fact/role       type
+                                    :fact/value      value
+                                    :fact/groupindex group
+                                    :fact/grouprole  g-role
+                                    :fact/persona    pid}])))))
 
 (defn parse-group-role
   [group-role]
@@ -291,8 +293,6 @@
     (let [refs (:refs source)]
       (recur-source refs nil)))
   ([refs parent]
-   (println refs)
-   (println parent)
    (if (empty? refs)
       parent
       (let [ref (first refs)
@@ -335,7 +335,6 @@
             e (if (nil? e-id)
                 id
                 e-id)]
-        (println source)
         (if (nil? source)
           nil
           (ds/transact! d/conn [{:db/id e

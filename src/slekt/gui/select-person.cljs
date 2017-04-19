@@ -35,6 +35,8 @@
        {:on-click #(change-person id nil )}
        name
        " "
+       id
+       " "
        [:small (u/birth-death-string birth death)]])))
 
 (defn persona-selector
