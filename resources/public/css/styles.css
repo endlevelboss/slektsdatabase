@@ -341,8 +341,22 @@
 }
 .ass-pos{
     position: absolute;
+    background-color: white;
+    border-style: solid;
+    display: table;
     top: 150px;
     left: 500px;
+    width: 450px;    
+}
+.p-assert-trow{
+    display: table-row;
+}
+.list-name{
+    width: 300px;
+    display: table-cell;
+}
+.list-year{
+    display: table-cell;
 }
 .note-pos{
     position: absolute;

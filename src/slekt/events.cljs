@@ -351,16 +351,29 @@
       []
       asserts)))
 
+(defn recur-asserts
+  [p-arr a-id]
+  (if (empty? p-arr)
+    a-id
+    (do
+      (ds/transact! d/conn [{:db/id (first p-arr)
+                             :persona/assert a-id}])
+      (recur (rest p-arr) a-id))))
+
 (defn save-assert
-  [assert-id first second]
+  [assert-id persona-array]
   (let [a-id (if (nil? assert-id)
-               -1
-               assert-id)
-        assert (newid (ds/transact! d/conn [{:db/id           a-id
-                                             :assert/note     ""}]))]
-    (ds/transact! d/conn [[:db/add first :persona/assert assert]
-                          [:db/add second :persona/assert assert]])
-    assert))
+               (newid (ds/transact! d/conn [{:db/id -1 :assert/note ""}]))
+               assert-id)]
+    (println (str "save-assert:persona-array: " persona-array))
+    (println (str "save-assert:a-id: " a-id))
+    (println (str "save-assert:assert-id: " assert-id))
+    (recur-asserts persona-array a-id)
+    ;(map #(ds/transact! d/conn [[:db/add % :persona/assert assert]]) persona-array)
+    ;(map #(println %) persona-array)
+    ;(ds/transact! d/conn [[:db/add first :persona/assert assert]
+    ;                      [:db/add second :persona/assert assert]])
+    ))
 
 (defn update-assert-note
   [text id]
