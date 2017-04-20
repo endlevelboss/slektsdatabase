@@ -11,9 +11,16 @@
         s (if (nil? id)
             sex
             (ffirst (d/find-sex-of-person id)))
-        vals (conj values {:persona/by-id id
-                           :sex s
-                           :value nil})]
+        v {:persona/by-id id
+           :sex s
+           :value nil}
+        vals (if (nil? values)
+               v
+               (conj values v))]
+    (println (str "change-person:path: " path))
+    (println (str "change-person:vals: " vals))
+    (println (str "change-person:values: " values))
+    (println values)
     (swap! d/state assoc-in [:comp/personaselector :show] false)
     (swap! d/state assoc-in path vals)
     (if (nil? on-complete)

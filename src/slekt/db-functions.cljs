@@ -32,8 +32,6 @@
    (let [roles (flatten (into [] (func id)))
          facts (flatten (apply concat (map #(d/get-fact-from-role %) roles)))
          parsed (remove nil? (map parse-fact facts))]
-     (println roles)
-     (println facts)
      (sort (comp compare-dates) parsed)))
   ([id]
     (event-list id d/get-role true))

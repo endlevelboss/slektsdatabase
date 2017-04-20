@@ -71,7 +71,8 @@
                          :on-click #(f/set-event-edit :marriage :main)}]
      [:input.b-census {:type "button"
                        :value (d/l :cens-event)
-                       :on-click #(f/set-event-edit :census :first)}]]))
+                       :on-click #(f/set-event-edit :census :first)}]
+     ]))
 
 (defn init-window []
   (if (not= nil (get-in @d/state [:window/edit :type]))

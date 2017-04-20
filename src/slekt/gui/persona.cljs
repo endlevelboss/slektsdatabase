@@ -28,10 +28,12 @@
   (let [add (:persona/by-id (get-in @d/state [:window/persona :add]))
         assert (get-in @d/state [:window/persona :assert])
         selected (get-in @d/state [:current :selected])
-        arr [add selected]
         new-assert(if (nil? add)
                     nil
                     (events/save-assert assert selected add))]
+    (println (get-in @d/state [:window/persona]))
+    (println (str "on-persona-selected:add: " add))
+    (println (str "on-persona-selected:assert: " assert))
     (swap! d/state assoc-in [:window/persona :add] nil)
     (swap! d/state assoc-in [:comp/personaselector :on-complete] nil)
     (swap! d/state assoc-in [:window/persona :assert] new-assert)))
@@ -71,7 +73,7 @@
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
                           nil)]
-    (println pids)
+    (println (str "persona-view:pids: " pids))
     [:div.persona
      [:div.sel-pos
       [person selected]]

@@ -303,6 +303,17 @@
     width: 40px;
     height: 40px;
 }
+.selectperson-button{
+    position: absolute;
+    top: 50px;
+    left: 5px;
+    background-color: darkcyan;
+    text-align: center;
+    border-radius: 20px;
+    color: yellow;
+    width: 40px;
+    height: 40px;
+}
 
 /* persona view*/
 .persona{
