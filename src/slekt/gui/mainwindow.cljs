@@ -12,8 +12,21 @@
       true)
     true))
 
+(defn event-list
+  ([personas]
+    (event-list personas []))
+  ([personas result]
+    (if (empty? personas)
+      result
+      (let [e (f/event-list (first personas))
+            evs (map #(assoc % :assert true) e)]
+        (recur (rest personas) (into result evs))))))
+
 (defn current-selected-component []
   (let [current (get-in @d/state [:current])
+        sel (:selected current)
+        ass (ffirst (d/get-value-of sel :persona/assert))
+        ass-personas (u/asserted-personas ass)
         nameparts (ffirst (d/get-name-parts (:selected current)))
         dad (if (= 1 (count (:father current)))
               (first (:father current))
@@ -26,8 +39,15 @@
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
         sorted2 (filter #(remove-empty %) sorted)
         events (f/event-list (:selected current))
+        event-ass (event-list ass-personas)
+        eventlist (sort (comp f/compare-dates) (into events event-ass))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
+    ;(println (str "current-selected-component:ass-personas: " ass-personas))
+    ;(println "current-selected-component:event-ass: ")
+    ;(println event-ass)
+    ;(println events)
+    ;(println eventlist)
     [:div.display
      [:div.all.mainperson
       [:div.main-name
@@ -58,7 +78,7 @@
       [:div.eventdivider]
       [:table#eventcontent
        [:tbody
-        (for [event events]
+        (for [event eventlist]
           ^{:key (:id event)} [gui/event-display-component event])]]]
      [:input.b-birth {:type "button"
                       :value (d/l :bapm-event)

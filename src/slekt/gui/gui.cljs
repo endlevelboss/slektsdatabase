@@ -212,22 +212,27 @@
         date (:date fact)
         year (date/getyear date)
         mainperson (ffirst (d/get-main-person (:event fact)))
-        name (if (= mainperson (get-in @d/state [:current :selected]))
+        name (if (or (:assert fact) (= mainperson (get-in @d/state [:current :selected])))
                (:place fact)
                [:strong (d/get-name mainperson)])
-        tab1 (str year " -")]
+        color (if (:assert fact)
+                "darkred"
+                "black")]
     [:tr.eventline
      [:td
       {:style {:width "47px"
-               :text-align "center"}
+               :text-align "center"
+               :color color}
        :on-click #(f/edit-event (:event fact))}
       year]
      [:td
-      {:style {:width "100px"}
+      {:style {:width "100px"
+               :color color}
        :on-click #(f/edit-event (:event fact))}
       label]
      [:td
-      {:on-click #(f/setCurrent mainperson)}
+      {:style {:color color}
+       :on-click #(f/setCurrent mainperson)}
       name]]))
 
 (defn child-list

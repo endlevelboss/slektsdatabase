@@ -5,12 +5,7 @@
             [slekt.gui.select-person :as select]
             [slekt.events :as events]))
 
-(defn asserted-personas
-  [assert]
-  (let [selected (get-in @d/state [:current :selected])]
-    (remove #(= selected %) (if (nil? assert)
-                              []
-                              (flatten (into [] (d/get-id-of assert :persona/assert)))))))
+
 
 (defn init-persona
   []
@@ -35,8 +30,8 @@
   (let [note1 (ffirst (d/get-value-of ass1 :assert/note))
         note2 (ffirst (d/get-value-of ass2 :assert/note))
         new-note (str note1 " " note2)
-        p1 (asserted-personas ass1)
-        p2 (asserted-personas ass2)
+        p1 (u/asserted-personas ass1)
+        p2 (u/asserted-personas ass2)
         sel (get-in @d/state [:current :selected])
         personas (conj (into p1 p2) sel)]
     (println (str "merge-asserts:personas: " personas))
@@ -111,11 +106,11 @@
   (let [selected (get-in @d/state [:current :selected])
         assert (get-in @d/state [:window/persona :assert])
         note (get-in @d/state [:window/persona :note])
-        pids (asserted-personas assert)
+        pids (u/asserted-personas assert)
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
                           nil)]
-    (println (str "persona-view:pids: " pids))
+    ;(println (str "persona-view:pids: " pids))
     [:div.persona
      [:div.sel-pos
       [person selected]]
