@@ -66,13 +66,15 @@
 
 (defn birthyear
   [id]
-  (let [birthrecord (event-year-multifact id :birth :baptism)
-        age (:date (find-age id))]
-    (if (nil? birthrecord)
-      (if (nil? age)
-        nil
-        (str "ca " age))
-      birthrecord)))
+  (if (nil? id)
+    nil
+    (let [birthrecord (event-year-multifact id :birth :baptism)
+          age (:date (find-age id))]
+      (if (nil? birthrecord)
+        (if (nil? age)
+          nil
+          (str "ca " age))
+        birthrecord))))
 
 (defn deathyear
   [id]

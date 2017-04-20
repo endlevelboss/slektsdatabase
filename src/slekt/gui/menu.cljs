@@ -4,7 +4,8 @@
             [slekt.gui.add-person :as add]
             [slekt.gui.mainwindow :as main]
             [slekt.gui.persona :as persona]
-            [slekt.gui.select-person :as sel]))
+            [slekt.gui.select-person :as sel]
+            [slekt.gui.ancestors :as ancestors]))
 
 (defn select-view
   [view initfunction exitfunction]
@@ -51,5 +52,8 @@
      [:div.personaview-button
       {:on-click #(select-view persona/persona-view persona/init-persona persona/exit-persona)}
       "p"]
+     [:div.ancestry-button
+      {:on-click #(select-view ancestors/mainwindow nil nil)}
+      "g"]
      [mainwindow]
      ]))
