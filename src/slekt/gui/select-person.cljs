@@ -35,23 +35,30 @@
   [id]
   (if (nil? id)
     nil
-    (let [name (d/get-name id)
+    (let [nameparts (ffirst (d/get-name-parts id))
+          firstname (get nameparts 0)
+          lastname (get nameparts 1)
           lifespan (ffirst (d/get-value-of id :persona/lifespan))]
-      [:div
+      [:div.ps-item
        {:on-click #(change-person id nil )}
-       name
-       " "
-       id
-       " "
-       [:small lifespan]])))
+       [:div.ps-id id]
+       [:div.ps-firstname firstname]
+       [:div.ps-lastname lastname]
+       [:small.ps-lifespan lifespan]])))
 
 
 (defn persona-selector
   []
   (let [personas-id (d/persona-list)]
     [:div.all.persona-selector
-     (for [pid personas-id]
-       ^{:key pid}[person-select pid])
+     [:div.ps-table
+      [:div.ps-item
+       [:div.ps-id "ID:"]
+       [:div.ps-firstname "Fornavn:"]
+       [:div.ps-lastname "Etternavn:"]
+       [:div.ps-lifespan "Levetid"]]
+      (for [pid personas-id]
+        ^{:key pid} [person-select pid])]
      [:input {:type "button"
               :value "New male"
               :on-click #(change-person nil :m )}]

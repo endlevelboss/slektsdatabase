@@ -1,7 +1,6 @@
 (ns slekt.gui.init
   (:require [slekt.database :as d]
             [slekt.gui.menu :as menu]
-            [slekt.gui.gui :as gui]
             [slekt.gui.mainwindow :as main]))
 
 (defn runonce

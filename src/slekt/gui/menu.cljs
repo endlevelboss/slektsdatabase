@@ -1,6 +1,5 @@
 (ns slekt.gui.menu
   (:require [slekt.database :as d]
-            [slekt.gui.gui :as gui]
             [slekt.gui.add-person :as add]
             [slekt.gui.mainwindow :as main]
             [slekt.gui.persona :as persona]

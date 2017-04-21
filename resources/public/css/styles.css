@@ -5,6 +5,15 @@
     border-width: 2px;
 }
 
+.divtable{
+    display: table;
+}
+.divrow{
+    display: table-row;
+}
+.divcell{
+    display: table-cell;
+}
 
 /* Styles for current selected component and subcomponents */
 
@@ -156,27 +165,51 @@
 }
 .persona-selector {
     position: absolute;
-    top: 20px;
-    left: 720px;
-    width: 300px;
-    height: 700px;
+    top: 30px;
+    left: 520px;
+    width: 430px;
+}
+.ps-table{
+    display: table;
+}
+.ps-item{
+    display: table-row;
+    cursor: pointer;
+}
+.ps-id{
+    display: table-cell;
+    width: 30px;
+}
+.ps-firstname{
+    display: table-cell;
+    width: 120px;
+}
+.ps-lastname{
+    display: table-cell;
+    width: 160px;
+}
+.ps-lifespan{
+    display: table-cell;
 }
 
 /* Styles for event edit component */
 .person-component{
     background-color: white;
     position: relative;
-    height: 60px;
+    min-height: 38px;
+    width: 700px;
     border-style: solid;
     border-width: 2px;
+    padding: 3px;
 }
 
 .dateplace-component{
     background-color: white;
     position: relative;
-    height: 60px;
+    display: table;
     border-style: solid;
     border-width: 2px;
+    padding: 3px;
 }
 
 .event-edit{
@@ -186,20 +219,38 @@
     left: 70px;
     width: 700px;
 }
+.ee-filler{
+    display: table-cell;
+    width: 20px;
+}
+.ee-tablepos{
+    top: 30px;
+    left: 20px;
+}
+.ee-table{
+    display: table;
+    width: 650px;
+}
+.ee-row{
+    display: table-row;
+}
 .ee-label{
-    position: absolute;
-    top: 5px;
-    left: 5px;
+    display: table-cell;
 }
 .ee-name{
-    position: absolute;
-    top: 5px;
-    left: 95px;
+    display: table-cell;
+    width: 400px;
+}
+.ee-change-button{
+    display: table-cell;
+    width: 30px;
+        
 }
 .ee-change{
-    position: absolute;
-    top: 5px;
-    left: 500px;
+    height: 15px;
+    width: 15px;
+    background-color: green;
+    border-radius: 10px;
 }
 .ee-role{
     position: absolute;
