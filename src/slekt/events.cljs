@@ -2,7 +2,8 @@
     (:require [slekt.database :as d]
               [datascript.core :as ds]
               [slekt.date :as date]
-              [clojure.string :as s]))
+              [clojure.string :as s]
+              [slekt.lifespan :as ls]))
 
 (defn create-new-eventid
     []
@@ -381,3 +382,36 @@
               ""
               text)]
     (ds/transact! d/conn [[:db/add id :assert/note txt]])))
+
+(defn birth-death-string
+  [birthyear deathyear]
+  (str "(" birthyear " - " deathyear ")"))
+
+(defn update-lifespan-persona
+  [value]
+  (let [id (:persona/by-id value)]
+    (if (nil? id)
+      nil
+      (let [birthyear (ls/birthyear id)
+            deathyear (ls/deathyear id)
+            span (birth-death-string birthyear deathyear)]
+        (ds/transact! d/conn [[:db/add id :persona/lifespan span]])))))
+
+(defn recur-update-lifespan
+  [fields data]
+  (if (empty? fields)
+    nil
+    (let [field (first fields)
+          field-id (get field 0)
+          field-type (get (get field 1) 1)
+          value (get-in data [:values field-id])]
+      (if (= :role field-type)
+        (update-lifespan-persona value))
+      (recur (rest fields) data))))
+
+(defn update-lifespan
+  []
+  (let [data (get-in @d/state [:window/edit])
+        t-id (ffirst (d/get-id-of (:type data) :template/name))
+        fields (d/get-template t-id)]
+    (recur-update-lifespan fields data)))

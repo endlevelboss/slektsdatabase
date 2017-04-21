@@ -39,7 +39,7 @@
        [:strong (get nameparts 1)]]
       (if id
         [:small {:style {:position "absolute" :top "20px" :left "9px"}}
-         (u/birth-death-string (f/birthyear id) (f/deathyear id))])]
+         (ffirst (d/get-value-of id :persona/lifespan))])]
      (if (< generation 4)
        [:div
         [person father (- 0 adjusttop) 240 (inc generation)]

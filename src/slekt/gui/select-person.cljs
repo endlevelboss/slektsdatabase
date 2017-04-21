@@ -17,10 +17,10 @@
         vals (if (nil? values)
                v
                (conj values v))]
-    (println (str "change-person:path: " path))
-    (println (str "change-person:vals: " vals))
-    (println (str "change-person:values: " values))
-    (println values)
+    ;(println (str "change-person:path: " path))
+    ;(println (str "change-person:vals: " vals))
+    ;(println (str "change-person:values: " values))
+    ;(println values)
     (swap! d/state assoc-in [:comp/personaselector :show] false)
     (swap! d/state assoc-in path vals)
     (if (nil? on-complete)
@@ -36,15 +36,15 @@
   (if (nil? id)
     nil
     (let [name (d/get-name id)
-          birth (f/birthyear id)
-          death (f/deathyear id)]
+          lifespan (ffirst (d/get-value-of id :persona/lifespan))]
       [:div
        {:on-click #(change-person id nil )}
        name
        " "
        id
        " "
-       [:small (u/birth-death-string birth death)]])))
+       [:small lifespan]])))
+
 
 (defn persona-selector
   []

@@ -14,13 +14,13 @@
   (if (nil? id)
     nil
     (let [name (d/get-name id)
-          birth (f/birthyear id)
-          death (f/deathyear id)]
+          lifespan (ffirst (d/get-value-of id :persona/lifespan))
+          ]
       [:strong
        {:on-click #(f/setCurrent id)}
        name
        " "
-       [:small (u/birth-death-string birth death)]] )))
+       [:small lifespan]] )))
 
 (defn button-show-persona-selector
   [field values]

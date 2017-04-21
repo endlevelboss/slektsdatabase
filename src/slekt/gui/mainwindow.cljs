@@ -55,7 +55,7 @@
         [:strong (get nameparts 0)]]
        [:div
         [:strong (get nameparts 1)]]]
-      [:small.main-year (u/birth-death-string (f/birthyear (:selected current)) (f/deathyear (:selected current)))
+      [:small.main-year (ffirst (d/get-value-of sel :persona/lifespan))
        ]
       [:div.mainperson-bar]]
 

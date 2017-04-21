@@ -267,5 +267,6 @@
         (set-event-edit nil nil))
       (do
         (events/save-event)
+        (events/update-lifespan)
         (set-event-edit nil nil)))
     (setCurrent currentuser)))

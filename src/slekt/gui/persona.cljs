@@ -79,7 +79,7 @@
        [:strong (get nameparts 0)]]
       [:div
        [:strong (get nameparts 1)]]]
-     [:small.main-year (u/birth-death-string (f/birthyear id) (f/deathyear id))
+     [:small.main-year (ffirst (d/get-value-of id :persona/lifespan))
       ]
      [:div.mainperson-bar]]))
 
@@ -92,7 +92,7 @@
                   [:strong (get nameparts 0)]]
                  [:div
                   [:strong (get nameparts 1)]]]
-                [:small.list-year (u/birth-death-string (f/birthyear id) (f/deathyear id))
+                [:small.list-year (ffirst (d/get-value-of id :persona/lifespan))
                  ]
                 [:div]]))
 

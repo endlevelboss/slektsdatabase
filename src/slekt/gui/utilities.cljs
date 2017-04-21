@@ -1,7 +1,7 @@
 (ns slekt.gui.utilities
   (:require [slekt.database :as d]))
 
-(defn birth-death-string
+(defn birth-death-string2
   [birthyear deathyear]
   (str "(" birthyear " - " deathyear ")"))
 
