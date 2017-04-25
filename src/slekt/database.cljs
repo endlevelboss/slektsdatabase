@@ -4,10 +4,30 @@
               [datascript.core :as ds]
               [datascript.transit :as dt]
               [slekt.test-database :as t]
-              [slekt.language :as lang]))
+              [slekt.language :as lang]
+              [slekt.template.template :as template]))
 
-(def database {:mainwindow :div
+(def database {:current {:selected nil
+                         :father nil
+                         :mother nil
+                         :children #{}
+                         :spouses #{}
+                         :events #{}}
+               :comp/personaselector {:show false
+                                      :field nil}
+               :defaultwindow :div
+               :language lang/norsk
+               :loaded false
+               :mainwindow :div
+               :mainwindow-exit nil
                :runonce true
+               :window/add {:sex "m"}
+               :window/edit {:type nil
+                             :event/by-id nil
+                             :values {}}
+               :window/persona {:assert nil
+                                :add nil
+                                :note nil}
                :gui/state {:runonce true
                            :loaded false
                            :language lang/norsk
@@ -46,63 +66,14 @@
 
 (defn l
   [label]
-  (get-in @state [:gui/state :language label]))
+  (get-in @state [:language label]))
 
 
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------
 
-(def schema {:database/name {:db/unique :db.unique/identity}
-             :database/selected {:db/cardinality :db.cardinality/one}
-             :database/personas {:db/type :db.type/ref
-                                 :db/cardinality :db.cardinality/many}
-             :persona/id {:db/unique :db.unique/identity}
-             :persona/name {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}
-             :persona/persons {:db/type :db.type/ref
-                               :db/cardinality :db.cardinality/many}
-             :name/parts {:db/cardinality :db.cardinality/one}
-             :name/template {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :template/name {:db/unique :db.unique/identity}
-             :template/expected {:db/cardinality :db.cardinality/one}
-             :template/parts {:db/type :db.type/ref
-                              :db/cardinality :db.cardinality/many}
-             :event/type {:db/cardinality :db.cardinality/one}
-             :event/template {:db/cardinality :db.cardinality/one}
-             :event/fields {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/many}
-             :event/source {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}
-             :source/parent {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :date/parsed {:db/cardinality :db.cardinality/one}
-             :date/year {:db/cardinality :db.cardinality/one}
-             :date/month {:db/cardinality :db.cardinality/one}
-             :date/day {:db/cardinality :db.cardinality/one}
-             :date/text {:db/cardinality :db.cardinality/one}
-             :place/value {:db/cardinality :db.cardinality/one}
-             :place/address {:db/type :db.type/ref
-                             :db/cardinality :db.cardinality/one}
-             :fact/role {:db/cardinality :db.cardinality/one}
-             :fact/date {:db/type :db.type/ref
-                         :db/cardinality :db.cardinality/one}
-             :fact/place {:db/type :db.type/ref
-                          :db/cardinality :db.cardinality/one}
-             :fact/type {:db/cardinality :db.cardinality/one}
-             :fact/name {:db/type :db.type/ref
-                         :db/cardinality :db.cardinality/one}
-             :fact/persona {:db/type :db.type/ref
-                            :db/cardinality :db.cardinality/one}})
 
 
-
-(def conn (ds/create-conn schema))
-
-
-
-
-
-
+(def conn (ds/create-conn template/schema))
 
 (defn testing
   []
@@ -178,6 +149,9 @@
                  :father
                  :mother)
         children (into #{} (flatten (into [] (get-relation :child myrole id))))]
+    ;(println id)
+    ;(println myrole)
+    ;(println children)
     children))
 
 (defn find-spouses
@@ -429,6 +403,14 @@
           [?pid :field/id ?fid]]
         @conn tid role))
 
+(defn get-asserts
+  [pid]
+  (ds/q '[:find ?aid
+          :in $ ?pid
+          :where
+          [?aid :assert/personas ?pid]]
+        @conn pid))
+
 (defn order-event-fields
   ([field-ids]
    (order-event-fields {} field-ids))
@@ -460,7 +442,7 @@
 
 (defn set-current
   [value]
-  (swap! state assoc-in [:gui/state :current] (set-current-selected value)))
+  (swap! state assoc-in [:current] (set-current-selected value)))
 
 
 (defn read-from-iddb
@@ -472,10 +454,10 @@
         (reset! conn db)
         (let [personas (persona-list)]
           (if (empty? personas)
-            (swap! state assoc-in [:gui/state :window/add :show] true)
+            (swap! state assoc-in [:window/add :show] true)
             (do
               (set-current (first personas))
-              (swap! state assoc-in [:gui/state :window/add :show] false))))))))
+              (swap! state assoc-in [:window/add :show] false))))))))
 
 (defn write-to-iddb
   []
@@ -485,6 +467,14 @@
 (defn initdb
   []
   (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
-  (ds/transact! conn t/templates)
+  (ds/transact! conn template/templates)
   (swap! state assoc-in [:runonce] false)
   (.addEventListener js/window "beforeunload" #(write-to-iddb) false))
+
+(defn p
+  [id]
+  (ds/q '[:find ?field ?val
+          :in $ ?id
+          :where
+          [?id ?field ?val]]
+        @conn id))

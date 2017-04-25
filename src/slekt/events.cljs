@@ -2,7 +2,8 @@
     (:require [slekt.database :as d]
               [datascript.core :as ds]
               [slekt.date :as date]
-              [clojure.string :as s]))
+              [clojure.string :as s]
+              [slekt.lifespan :as ls]))
 
 (defn create-new-eventid
     []
@@ -101,17 +102,7 @@
                 :event nil)
             (recur data (rest fields)))))
 
-(defn create-event-old
-  [data]
-  (println data)
-  (let [event-id (create-new-eventid)
-        d (assoc data :event/by-id event-id)
-        template (get-in @d/state [:facttemplates (:type d)])
-        fields (:fields template)
-        parsed (recur-data d fields)
-        value {:id event-id :template (:type d) :value parsed}]
-    (recur-personas value fields)
-    (swap! d/state assoc-in [:event/by-id event-id] value)))
+
 
 
 
@@ -156,14 +147,16 @@
         pid (if (nil? (:persona/by-id val))
               (transact-persona val type)
               (:persona/by-id val))]
-    (newid (ds/transact! d/conn [{:db/id           id
-                                  :fact/type       :role
-                                  :fact/field      field
-                                  :fact/role       type
-                                  :fact/value      value
-                                  :fact/groupindex group
-                                  :fact/grouprole  g-role
-                                  :fact/persona    pid}]))))
+    (if (nil? pid)
+      nil
+      (newid (ds/transact! d/conn [{:db/id           id
+                                    :fact/type       :role
+                                    :fact/field      field
+                                    :fact/role       type
+                                    :fact/value      value
+                                    :fact/groupindex group
+                                    :fact/grouprole  g-role
+                                    :fact/persona    pid}])))))
 
 (defn parse-group-role
   [group-role]
@@ -301,8 +294,6 @@
     (let [refs (:refs source)]
       (recur-source refs nil)))
   ([refs parent]
-   (println refs)
-   (println parent)
    (if (empty? refs)
       parent
       (let [ref (first refs)
@@ -325,7 +316,7 @@
 
 (defn save-event
   []
-  (let [data (get-in @d/state [:gui/state :window/edit])
+  (let [data (get-in @d/state [:window/edit])
         eventid (:event/by-id data)
         id (if (nil? eventid)                              ;; update old event or create new?
              -1
@@ -345,9 +336,82 @@
             e (if (nil? e-id)
                 id
                 e-id)]
-        (println source)
         (if (nil? source)
           nil
           (ds/transact! d/conn [{:db/id e
                                  :event/source source}]))
         ))))
+
+
+;;;;;;;;;;;;  assert ;;;;;;;;;;;;;;;;
+
+(defn get-asserts
+  [id]
+  (let [asserts (first (d/get-value-of id :persona/asserts))]
+    (if (nil? asserts)
+      []
+      asserts)))
+
+(defn recur-asserts
+  [p-arr a-id]
+  (if (empty? p-arr)
+    a-id
+    (do
+      (ds/transact! d/conn [{:db/id (first p-arr)
+                             :persona/assert a-id}])
+      (recur (rest p-arr) a-id))))
+
+(defn save-assert
+  [assert-id persona-array]
+  (let [a-id (if (nil? assert-id)
+               (newid (ds/transact! d/conn [{:db/id -1 :assert/note ""}]))
+               assert-id)]
+    (println (str "save-assert:persona-array: " persona-array))
+    (println (str "save-assert:a-id: " a-id))
+    (println (str "save-assert:assert-id: " assert-id))
+    (recur-asserts persona-array a-id)
+    ;(map #(ds/transact! d/conn [[:db/add % :persona/assert assert]]) persona-array)
+    ;(map #(println %) persona-array)
+    ;(ds/transact! d/conn [[:db/add first :persona/assert assert]
+    ;                      [:db/add second :persona/assert assert]])
+    ))
+
+(defn update-assert-note
+  [text id]
+  (let [txt (if (nil? text)
+              ""
+              text)]
+    (ds/transact! d/conn [[:db/add id :assert/note txt]])))
+
+(defn birth-death-string
+  [birthyear deathyear]
+  (str "(" birthyear " - " deathyear ")"))
+
+(defn update-lifespan-persona
+  [value]
+  (let [id (:persona/by-id value)]
+    (if (nil? id)
+      nil
+      (let [birthyear (ls/birthyear id)
+            deathyear (ls/deathyear id)
+            span (birth-death-string birthyear deathyear)]
+        (ds/transact! d/conn [[:db/add id :persona/lifespan span]])))))
+
+(defn recur-update-lifespan
+  [fields data]
+  (if (empty? fields)
+    nil
+    (let [field (first fields)
+          field-id (get field 0)
+          field-type (get (get field 1) 1)
+          value (get-in data [:values field-id])]
+      (if (= :role field-type)
+        (update-lifespan-persona value))
+      (recur (rest fields) data))))
+
+(defn update-lifespan
+  []
+  (let [data (get-in @d/state [:window/edit])
+        t-id (ffirst (d/get-id-of (:type data) :template/name))
+        fields (d/get-template t-id)]
+    (recur-update-lifespan fields data)))

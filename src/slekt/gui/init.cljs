@@ -1,13 +1,16 @@
 (ns slekt.gui.init
   (:require [slekt.database :as d]
-            [slekt.gui.menu :as menu]))
+            [slekt.gui.menu :as menu]
+            [slekt.gui.mainwindow :as main]))
 
 (defn runonce
   "Initializes data at the startup, to be run after indexeddb has loaded"
   []
   (let [run (get-in @d/state [:runonce])]
     (if run
-      (d/initdb)
+      (do
+        (swap! d/state assoc-in [:defaultwindow] main/init-window)
+        (d/initdb))
       nil)))
 
 (defn start-window
