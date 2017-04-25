@@ -149,6 +149,9 @@
                  :father
                  :mother)
         children (into #{} (flatten (into [] (get-relation :child myrole id))))]
+    ;(println id)
+    ;(println myrole)
+    ;(println children)
     children))
 
 (defn find-spouses

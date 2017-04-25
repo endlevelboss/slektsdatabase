@@ -120,6 +120,7 @@
     ;(println event-ass)
     ;(println events)
     ;(println eventlist)
+    ;(println children)
     [:div.display
      [:div.all.mainperson
       [:div.main-name
