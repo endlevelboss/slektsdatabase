@@ -468,6 +468,7 @@
   []
   (idx/get-by-key @db store-name "slekt" #(read-from-iddb %))
   (ds/transact! conn template/templates)
+  (ds/transact! conn template/event-templates)
   (swap! state assoc-in [:runonce] false)
   (.addEventListener js/window "beforeunload" #(write-to-iddb) false))
 

@@ -161,7 +161,7 @@
               :on-click #(f/save-event)}]
      [:input {:type "button"
               :value (d/l :cancel)
-              :on-click #(f/set-event-edit nil nil)}]
+              :on-click #(f/set-event-edit nil)}]
      [:br]
      [:br]
      [source/source-component nil]

@@ -3,6 +3,7 @@
             [slekt.database :as d]
             [slekt.date :as date]
             [slekt.events :as events]
+            [slekt.templatehandler :as th]
             [clojure.string :as s]))
 
 (enable-console-print!)
@@ -228,30 +229,28 @@
       (recur (rest template)))))
 
 (defn set-current-role
-  [_ template-id]
-  (let [expected-roles (ffirst (d/get-value-of template-id :template/expected))]
+  [template]
+  (println template)
+  (let [expected-roles (ffirst (d/get-value-of template :template/expected))]
     (set-roles-recur expected-roles)))
 
 (defn set-event-edit
-  [key role]
-  (if (= key nil)
-    (do
+  [key]
+  (if (nil? key)
+    (do                                                     ;; deletes the edit-event and resets
       (swap! d/state assoc-in [:window/edit :type] nil)
       (swap! d/state assoc-in [:window/edit :event/by-id] nil)
       (swap! d/state assoc-in [:window/edit :values] {}))
-    (let [template (ffirst (d/get-id-of key :template/name))]
-      (if (not= nil role)
-        (do
-          (set-current-role role template)
-          (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}]))
-        nil)
+    (let [template (th/get-template key)] ;; creates edit-window
+      (set-current-role template)
+      (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}])
       (swap! d/state assoc-in [:window/edit :type] key))))
 
 (defn edit-event
   [event]
   (swap! d/state assoc-in [:window/edit :event/by-id] event)
   (swap! d/state assoc-in [:window/edit :values] (populate-event-field event))
-  (set-event-edit (ffirst (d/get-template-name event)) nil))
+  (set-event-edit (ffirst (d/get-template-name event))))
 
 (defn save-event
   []
@@ -264,9 +263,9 @@
     (if (= originaldata edit)
       (do
         (println "No changes, exiting")
-        (set-event-edit nil nil))
+        (set-event-edit nil))
       (do
         (events/save-event)
         (events/update-lifespan)
-        (set-event-edit nil nil)))
+        (set-event-edit nil)))
     (setCurrent currentuser)))

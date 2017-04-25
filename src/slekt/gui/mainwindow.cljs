@@ -155,16 +155,16 @@
           ^{:key (:id event)} [event-display-component event])]]]
      [:input.b-birth {:type "button"
                       :value (d/l :bapm-event)
-                      :on-click #(f/set-event-edit :baptism :child)}]
+                      :on-click #(f/set-event-edit :baptism-record)}]
      [:input.b-burial {:type "button"
                        :value (d/l :buri-event)
-                       :on-click #(f/set-event-edit :burial :main)}]
+                       :on-click #(f/set-event-edit :burial )}]
      [:input.b-marriage {:type "button"
                          :value (d/l :marr-event)
-                         :on-click #(f/set-event-edit :marriage :main)}]
+                         :on-click #(f/set-event-edit :marriage )}]
      [:input.b-census {:type "button"
                        :value (d/l :cens-event)
-                       :on-click #(f/set-event-edit :census :first)}]
+                       :on-click #(f/set-event-edit :census )}]
      ]))
 
 (defn init-window []
