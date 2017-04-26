@@ -207,6 +207,7 @@
   (if (empty? template)
     nil
     (let [id (get (first template) 0)
+          path [:window/edit :values :roles id]
           type (get (first template) 1)
           curr (get-in @d/state [:current])
           curr-sex (ffirst (d/find-sex-of-person (:selected curr)))
@@ -218,14 +219,15 @@
                  {:persona/by-id (:selected curr) :sex :f}
                  {:persona/by-id spouse :sex :f})]
       (case type
-        :main (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (:selected curr)})
-        :father (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (first (:father curr))
+        :child (swap! d/state assoc-in path {:persona/by-id (:selected curr)})
+        :main (swap! d/state assoc-in path {:persona/by-id (:selected curr)})
+        :father (swap! d/state assoc-in path {:persona/by-id (first (:father curr))
                                                                               :sex :m})
-        :mother (swap! d/state assoc-in [:window/edit :values id] {:persona/by-id (first (:mother curr))
+        :mother (swap! d/state assoc-in path {:persona/by-id (first (:mother curr))
                                                                               :sex :f})
-        :husband (swap! d/state assoc-in [:window/edit :values id] husband)
-        :wife (swap! d/state assoc-in [:window/edit :values id] wife)
-        :first (swap! d/state assoc-in [:window/edit :values id] {0 {:persona/by-id (:selected curr)}}))
+        :husband (swap! d/state assoc-in path husband)
+        :wife (swap! d/state assoc-in path wife)
+        :multirole (swap! d/state assoc-in path {0 {:persona/by-id (:selected curr)}}))
       (recur (rest template)))))
 
 (defn set-current-role
@@ -241,8 +243,8 @@
       (swap! d/state assoc-in [:window/edit :type] nil)
       (swap! d/state assoc-in [:window/edit :event/by-id] nil)
       (swap! d/state assoc-in [:window/edit :values] {}))
-    (let [template (th/get-template key)] ;; creates edit-window
-      (set-current-role template)
+    (let [template (th/get-roles key)] ;; creates edit-window
+      (set-roles-recur template)
       (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}])
       (swap! d/state assoc-in [:window/edit :type] key))))
 

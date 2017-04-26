@@ -2,7 +2,8 @@
   (:require [slekt.database :as d]
             [slekt.db-functions :as f]
             [slekt.gui.select-person :as select]
-            [slekt.gui.source :as source]))
+            [slekt.gui.source :as source]
+            [slekt.templatehandler :as th]))
 
 (defn set-event-value
   [value path]
@@ -14,6 +15,7 @@
   (swap! d/state assoc-in [:comp/personaselector :field] field)
   (swap! d/state assoc-in [:comp/personaselector :values] values)
   (swap! d/state assoc-in [:comp/personaselector :show] true))
+
 
 (defn new-name-component
   [path]
@@ -64,19 +66,19 @@
   [field]
   (let [field-id (get field 0)
         label (d/l (get (get field 1) 2))
-        val (get-in @d/state [:window/edit :values field-id])
+        val (get-in @d/state [:window/edit :values :roles field-id])
         ]
     [:div
      [:div (str "rolle/fixme: " label)]
-     [person-display val [field-id]]]
+     [person-display val [:roles field-id]]]
     ))
 
 (defn date-component
   [field]
   (let [id (get field 0)
         label (d/l (get (get field 1) 2))
-        date (get-in @d/state [:window/edit :values id :date])
-        place (get-in @d/state [:window/edit :values id :place])]
+        date (get-in @d/state [:window/edit :values :events id :date])
+        place (get-in @d/state [:window/edit :values :events id :place])]
     [:div.dateplace-component
      [:div.divrow
       [:strong.divcell label]]
@@ -84,12 +86,12 @@
       [:div.divcell (str "dato/fixme" ": ")]
       [:input.divcell {:type      "text"
                        :value     date
-                       :on-change #(set-event-value (-> % .-target .-value) [id :date])}]]
+                       :on-change #(set-event-value (-> % .-target .-value) [:events id :date])}]]
      [:div.divrow
       [:div.divcell (str (d/l :place) ": ")]
       [:input.divcell {:type      "text"
                        :value     place
-                       :on-change #(set-event-value (-> % .-target .-value) [id :place])}]]]))
+                       :on-change #(set-event-value (-> % .-target .-value) [:events id :place])}]]]))
 
 (defn person-role-selector
   [field-id index]
@@ -121,7 +123,7 @@
 (defn multi-component
   [field]
   (let [field-id (get field 0)
-        list (get-in @d/state [:window/edit :values field-id])
+        list (get-in @d/state [:window/edit :values :roles field-id])
         count (count list)]
     [:div (d/l :persons-household)
      (for [l list]
@@ -130,15 +132,22 @@
               :value "+"
               :on-click #(button-add-person-list-component field-id count)}]]))
 
-(defn field-generator
+(defn person-generator
   [fields]
   (for [field fields]
-    (let [type (get (get field 1) 1)
-          id (get field 0)]
-      (case type
-        :role ^{:key id}[person-component field]
-        :event ^{:key id}[date-component field]
-        :multirole ^{:key id} [multi-component field]))))
+    (let [id (get field 0)
+          type (get field 1)]
+      (if (= :multirole type)
+        ^{:key id} [multi-component field]
+        ^{:key id} [person-component field])
+      )))
+
+(defn event-generator
+  [fields]
+  (for [field fields]
+    (let [id (get field 0)]
+      ^{:key id} [date-component field]
+      )))
 
 (defn event-edit-component
   []
@@ -146,15 +155,16 @@
         eventtype (get-in @d/state [:window/edit :type])
         event (get-in @d/state [:window/edit :event/by-id])
         template-type (get-in @d/state [:window/edit :type])
-        template (ffirst (d/get-id-of template-type :template/name))
-        fields (d/get-template template)
+        template (th/get-template template-type)
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
                           nil)]
+    (println template)
     [:div.event-edit
      [:h2 template-type]
      [:div
-      (field-generator fields)]
+      (person-generator (:roles template))
+      (event-generator (:events template))]
      [:br]
      [:input {:type "button"
               :value (d/l :ok)

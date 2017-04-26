@@ -44,18 +44,16 @@
                             :db/cardinality :db.cardinality/one}})
 
 (def event-templates
-  [{:eventtemplate/name :baptism-record
+  [{:eventtemplate/name          :baptism-record
     :eventtemplate/template-type :child-parents
-    :eventtemplate/events {0 :birth 1 :baptism}}])
+    :eventtemplate/events        [[0 :birth] [1 :baptism]]}])
 
 (def templates
-  [{:template/name :child-parents
-    :template/main 0
-    :template/expected {0 :child 1 :father 2 :mother}}
-   {:template/name :single
-    :template/main 0
-    :template/expected {0 :main}}
-   {:template/name :couple
-    :template/expected {0 :husband 1 :wife}}
-   {:template/name :list
-    :template/expected {0 :multirole}}])
+  [{:template/name  :child-parents
+    :template/roles [[0 :child] [1 :father] [2 :mother]]}
+   {:template/name  :single
+    :template/roles [[0 :main]]}
+   {:template/name  :couple
+    :template/roles [[0 :husband] [1 :wife]]}
+   {:template/name  :list
+    :template/roles [[0 :multirole]]}])

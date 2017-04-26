@@ -3,7 +3,8 @@
               [datascript.core :as ds]
               [slekt.date :as date]
               [clojure.string :as s]
-              [slekt.lifespan :as ls]))
+              [slekt.lifespan :as ls]
+              [slekt.templatehandler :as th]))
 
 (defn create-new-eventid
     []
@@ -235,7 +236,7 @@
 
 
 
-(defn transact-fact
+(defn transact-event
   [val field]
   (let [date (:date val)
         place (:place val)
@@ -271,7 +272,7 @@
       nil
       (case fieldtype
         :role (transact-role value field)
-        :event (transact-fact value field)
+        :event (transact-event value field)
         :multirole (transact-multi value field)
         nil))))
 
@@ -321,8 +322,7 @@
         id (if (nil? eventid)                              ;; update old event or create new?
              -1
              eventid)
-        t-id (ffirst (d/get-id-of (:type data) :template/name))
-        fields (d/get-template t-id)
+        fields (th/get-template (:type data))
         values (recur-fields fields data)
         source (recur-source (:source (:values data)))]
     (if (empty? fields)
