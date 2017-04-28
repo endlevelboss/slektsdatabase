@@ -133,15 +133,15 @@
 
 (defn transact-role
   [val f]
-  (let [type (get (get f 1) 2)
+  (println "slekt.events:transact-role")
+  (println val)
+  (println f)
+  (let [type (get f 1)
         field (get f 0)
-        id (if (= nil (:db/id val))
+        id (if (nil? (:db/id val))
              -1
              (:db/id val))
-        value (if (= nil (:value val))
-                ""
-                (:value val))
-        group (get (get f 1) 0)
+        ;group (get (get f 1) 0)
         g-role (if (nil? (:grouprole val))
                  ""
                  (:grouprole val))
@@ -151,13 +151,11 @@
     (if (nil? pid)
       nil
       (newid (ds/transact! d/conn [{:db/id           id
-                                    :fact/type       :role
-                                    :fact/field      field
-                                    :fact/role       type
-                                    :fact/value      value
-                                    :fact/groupindex group
-                                    :fact/grouprole  g-role
-                                    :fact/persona    pid}])))))
+                                    :role/field      field
+                                    :role/type       type
+                                    ;:fact/groupindex group
+                                    :role/grouprole  g-role
+                                    :role/persona    pid}])))))
 
 (defn parse-group-role
   [group-role]
@@ -238,57 +236,62 @@
 
 (defn transact-event
   [val field]
+  (println "slekt.events:transact-event")
+  (println val)
+  (println field)
   (let [date (:date val)
         place (:place val)
         id (:db/id val)]
     (if (and (nil? id) (s/blank? date) (s/blank? place))
       nil
-      (let [id (if (= nil (:db/id val))
+      (let [id (if (nil? (:db/id val))
                  -1
                  (:db/id val))
-            type (get (get field 1) 2)
+            type (get field 1)
             field (get field 0)
             date (transact-date val)
             place (transact-place val)
             reg1 {:db/id      id
-                  :fact/type  :event
                   :fact/role  type
                   :fact/field field}
-            reg2 (if (= nil date)
+            reg2 (if (nil? date)
                    reg1
                    (assoc reg1 :fact/date date))
-            reg3 (if (= nil place)
+            reg3 (if (nil? place)
                    reg2
                    (assoc reg2 :fact/place place))
             t (ds/transact! d/conn [reg3])]
         (newid t)))))
 
 (defn parse-field
-  [field data]
+  [field data type]
+  (println "in parsefield")
+  (println data)
+  (println field)
   (let [fieldid (get field 0)
-        fieldtype (get (get field 1) 1)
-        value (get-in data [:values fieldid])]
+        value (get-in data [:values type fieldid])]
+    (println value)
     (if (= nil value)
       nil
-      (case fieldtype
-        :role (transact-role value field)
-        :event (transact-event value field)
+      (case type
+        :roles (transact-role value field)
+        :events (transact-event value field)
         :multirole (transact-multi value field)
         nil))))
 
 (defn recur-fields
-  ([fields data]
-   (recur-fields fields data []))
-  ([fields data result]
+  ([fields data type]
+   (recur-fields fields data [] type))
+  ([fields data result type]
    (if (empty? fields)
      result
-     (let [parsed (parse-field (first fields) data)
+     (let [parsed (parse-field (first fields) data type)
            newres (if (nil? parsed)
                     result
                     (if (vector? parsed)
                       (into result parsed)
                       (conj result parsed)))]
-       (recur (rest fields) data newres)))))
+       (recur (rest fields) data newres type)))))
 
 (defn recur-source
   ([source]
@@ -323,14 +326,19 @@
              -1
              eventid)
         fields (th/get-template (:type data))
-        values (recur-fields fields data)
+        role-template (:roles fields)
+        event-template (:events fields)
+        role-values (recur-fields role-template data :roles)
+        event-values (recur-fields event-template data :events)
         source (recur-source (:source (:values data)))]
+    (println "save-event")
     (if (empty? fields)
       nil
       (let [t (ds/transact! d/conn [{:db/id          id
                                      :event/type     (:type data)
                                      :event/template (:type data) ;; TODO Fix for custom templates
-                                     :event/fields   values
+                                     :event/roles     role-values
+                                     :event/facts     event-values
                                      }])
             e-id (newid t)
             e (if (nil? e-id)
@@ -340,6 +348,7 @@
           nil
           (ds/transact! d/conn [{:db/id e
                                  :event/source source}]))
+        (println "done saveevent")
         ))))
 
 
@@ -383,10 +392,6 @@
               text)]
     (ds/transact! d/conn [[:db/add id :assert/note txt]])))
 
-(defn birth-death-string
-  [birthyear deathyear]
-  (str "(" birthyear " - " deathyear ")"))
-
 (defn update-lifespan-persona
   [value]
   (let [id (:persona/by-id value)]
@@ -394,24 +399,27 @@
       nil
       (let [birthyear (ls/birthyear id)
             deathyear (ls/deathyear id)
-            span (birth-death-string birthyear deathyear)]
+            span (ls/birth-death-string birthyear deathyear)]
         (ds/transact! d/conn [[:db/add id :persona/lifespan span]])))))
 
 (defn recur-update-lifespan
   [fields data]
+  ;(println "slekt.events:recur-update-lifespan")
+  ;(println fields)
+  ;(println data)
   (if (empty? fields)
     nil
     (let [field (first fields)
           field-id (get field 0)
-          field-type (get (get field 1) 1)
-          value (get-in data [:values field-id])]
-      (if (= :role field-type)
-        (update-lifespan-persona value))
+          value (get-in data [:values :roles field-id])]
+      (update-lifespan-persona value)
       (recur (rest fields) data))))
 
 (defn update-lifespan
   []
   (let [data (get-in @d/state [:window/edit])
-        t-id (ffirst (d/get-id-of (:type data) :template/name))
-        fields (d/get-template t-id)]
+        fields (th/get-roles (:type data))]
+    ;(println "slekt.events:update-lifespan")
+    ;(println data)
+    ;(println fields)
     (recur-update-lifespan fields data)))

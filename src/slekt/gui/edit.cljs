@@ -159,7 +159,7 @@
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
                           nil)]
-    (println template)
+    ;(println template)
     [:div.event-edit
      [:h2 template-type]
      [:div

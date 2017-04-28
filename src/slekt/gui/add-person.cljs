@@ -18,7 +18,7 @@
   (let [persona (get-in @d/state [:window/add])
         p2 (assoc persona :sex (keyword (:sex persona)))
         p-id (events/transact-persona p2 nil)]
-    (f/setCurrent p-id)
+    (d/set-current p-id)
     (cancel)))
 
 (defn add-window

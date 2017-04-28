@@ -3,7 +3,9 @@
             [slekt.db-functions :as f]
             [slekt.date :as date]
             [slekt.gui.edit :as edit]
-            [slekt.gui.utilities :as u]))
+            [slekt.gui.utilities :as u]
+            [slekt.eventlist :as el]
+            [slekt.comparator :as comp]))
 
 (defn person-display-component
   [id]
@@ -13,7 +15,7 @@
           lifespan (ffirst (d/get-value-of id :persona/lifespan))
           ]
       [:strong
-       {:on-click #(f/setCurrent id)}
+       {:on-click #(d/set-current id)}
        name
        " "
        [:small lifespan]] )))
@@ -30,6 +32,9 @@
         color (if (:assert fact)
                 "darkred"
                 "black")]
+    (println "slekt.gui.mainwindow:event-display-component")
+    (println fact)
+    (println mainperson)
     [:tr.eventline
      [:td
       {:style {:width "47px"
@@ -44,7 +49,7 @@
       label]
      [:td
       {:style {:color color}
-       :on-click #(f/setCurrent mainperson)}
+       :on-click #(d/set-current mainperson)}
       name]]))
 
 (defn child-list
@@ -90,7 +95,7 @@
   ([personas result]
     (if (empty? personas)
       result
-      (let [e (f/event-list (first personas))
+      (let [e (el/event-list (first personas))
             evs (map #(assoc % :assert true) e)]
         (recur (rest personas) (into result evs))))))
 
@@ -110,15 +115,16 @@
         spouses (:spouses current)
         sorted (d/arrange-children-by-parent (:selected current) spouses children)
         sorted2 (filter #(remove-empty %) sorted)
-        events (f/event-list (:selected current))
+        events (el/event-list (:selected current))
         event-ass (event-list ass-personas)
-        eventlist (sort (comp f/compare-dates) (into events event-ass))
+        eventlist (sort (comp comp/compare-dates) (into events event-ass))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
+    (println "slekt.gui.mainwindow:current-selected-component")
     ;(println (str "current-selected-component:ass-personas: " ass-personas))
     ;(println "current-selected-component:event-ass: ")
     ;(println event-ass)
-    ;(println events)
+    (println events)
     ;(println eventlist)
     ;(println children)
     [:div.display
@@ -158,7 +164,7 @@
                       :on-click #(f/set-event-edit :baptism-record)}]
      [:input.b-burial {:type "button"
                        :value (d/l :buri-event)
-                       :on-click #(f/set-event-edit :burial )}]
+                       :on-click #(f/set-event-edit :burial-record )}]
      [:input.b-marriage {:type "button"
                          :value (d/l :marr-event)
                          :on-click #(f/set-event-edit :marriage )}]

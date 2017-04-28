@@ -126,12 +126,12 @@
   (ds/q '[:find ?parentid
           :in $ ?role ?idrole ?e ?sex
           :where
-          [?c :fact/persona ?e]
-          [?c :fact/role ?idrole]
-          [?evt :event/fields ?c]
-          [?evt :event/fields ?f]
-          [?f :fact/role ?role]
-          [?f :fact/persona ?parentid]]
+          [?c :role/persona ?e]
+          [?c :role/type ?idrole]
+          [?evt :event/roles ?c]
+          [?evt :event/roles ?f]
+          [?f :role/type ?role]
+          [?f :role/persona ?parentid]]
         @conn role idrole id))
 
 (defn get-parent
@@ -200,9 +200,8 @@
   (ds/q '[:find ?fact
           :in $ ?rid
           :where
-          [?eid :event/fields ?rid]
-          [?eid :event/fields ?fact]
-          [?fact :fact/type :event]]
+          [?eid :event/roles ?rid]
+          [?eid :event/facts ?fact]]
         @conn rid))
 
 (defn test-fact
@@ -213,26 +212,21 @@
           [?eid :event/fields ?rid]]
         @conn rid))
 
-(defn get-role
+(defn get-role-from-persona
   [pid]
   (ds/q '[:find ?rid
           :in $ ?pid
           :where
-          [?rid :fact/persona ?pid]
-          [?eid :event/fields ?rid]]
+          [?rid :role/persona ?pid]]
         @conn pid))
 
 (defn get-role-main
   [pid]
-  (ds/q '[:find ?factid
+  (ds/q '[:find ?roleid
           :in $ ?pid
           :where
-          [?eid :event/template ?template]
-          [?tid :template/name ?template]
-          [?tid :template/main ?field]
-          [?eid :event/fields ?factid]
-          [?factid :fact/field ?field]
-          [?factid :fact/persona ?pid]]
+          [?roleid :role/persona ?pid]
+          [?roleid :role/field 0]]
         @conn pid))
 
 (defn find-fact
@@ -281,7 +275,7 @@
   (ds/q '[:find ?eid
           :in $ ?fid
           :where
-          [?eid :event/fields ?fid]]
+          [?eid :event/facts ?fid]]
         @conn fact-id))
 
 (defn get-person-in-event
@@ -299,12 +293,10 @@
   (ds/q '[:find ?pid
           :in $ ?eid
           :where
-          [?eid :event/template ?template]
-          [?tid :template/name ?template]
-          [?tid :template/main ?field]
-          [?eid :event/fields ?fid]
-          [?fid :fact/field ?field]
-          [?fid :fact/persona ?pid]]
+          [?eid :event/roles ?r]
+          [?r :role/field 0]
+          [?r :role/persona ?pid]
+          ]
         @conn eid))
 
 (defn get-template-of-event
@@ -351,6 +343,25 @@
           [?fid :field/role ?role]]
         @conn fieldid))
 
+(defn get-role-from-field
+  [eventid field]
+  (ds/q '[:find ?rid
+          :in $ ?eid ?f
+          :where
+          [?eid :event/roles ?rid]
+          [?rid :role/field ?f]]
+        @conn eventid field))
+
+(defn get-persona-from-field
+  [eventid field]
+  (ds/q '[:find ?pid
+          :in $ ?eid ?f
+          :where
+          [?eid :event/roles ?rid]
+          [?rid :role/field ?f]
+          [?rid :role/persona ?pid]]
+        @conn eventid field))
+
 (defn get-field-id
   [eventid field fieldtype]
   (ds/q '[:find ?id
@@ -383,12 +394,12 @@
           [?fid :fact/value ?val]]
         @conn eventid fieldid))
 
-(defn get-field-id-of-event-facts
+(defn get-fact-detail-id-from-field
   [eventid field type]
   (ds/q '[:find ?val
           :in $ ?eid ?f ?type
           :where
-          [?eid :event/fields ?fid]
+          [?eid :event/facts ?fid]
           [?fid :fact/field ?f]
           [?fid ?type ?val]]
         @conn eventid field type))

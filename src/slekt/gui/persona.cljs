@@ -73,7 +73,7 @@
 (defn person
   [id]
   (let [nameparts (ffirst (d/get-name-parts id))]
-    ^{:key id} [:div.all.person-plate {:on-click #(f/setCurrent id)}
+    ^{:key id} [:div.all.person-plate {:on-click #(d/set-current id)}
      [:div.main-name
       [:div
        [:strong (get nameparts 0)]]
@@ -86,7 +86,7 @@
 (defn person-list-component
   [id]
   (let [nameparts (ffirst (d/get-name-parts id))]
-    ^{:key id} [:div.p-assert-trow {:on-click #(f/setCurrent id)}
+    ^{:key id} [:div.p-assert-trow {:on-click #(d/set-current id)}
                 [:div.list-name
                  [:div
                   [:strong (get nameparts 0)]]

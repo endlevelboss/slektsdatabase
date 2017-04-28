@@ -19,8 +19,10 @@
                               :db/cardinality :db.cardinality/many}
              :event/type {:db/cardinality :db.cardinality/one}
              :event/template {:db/cardinality :db.cardinality/one}
-             :event/fields {:db/type :db.type/ref
+             :event/roles {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/many}
+             :event/facts {:db/type :db.type/ref
+                           :db/cardinality :db.cardinality/many}
              :event/source {:db/type :db.type/ref
                             :db/cardinality :db.cardinality/one}
              :source/parent {:db/type :db.type/ref
@@ -46,7 +48,11 @@
 (def event-templates
   [{:eventtemplate/name          :baptism-record
     :eventtemplate/template-type :child-parents
-    :eventtemplate/events        [[0 :birth] [1 :baptism]]}])
+    :eventtemplate/events        [[0 :birth] [1 :baptism]]}
+   {:eventtemplate/name          :burial-record
+    :eventtemplate/template-type :single
+    :eventtemplate/events        [[0 :death] [1 :burial]]}
+   ])
 
 (def templates
   [{:template/name  :child-parents
