@@ -8,96 +8,6 @@
 
 (enable-console-print!)
 
-;(defn parse-fact-D
-;  [fact-id]
-;  (let [type (ffirst (d/get-fact-detail fact-id :fact/role))
-;        placeref (ffirst (d/get-fact-detail fact-id :fact/place))
-;        place (ffirst (d/get-place placeref))
-;        dateref (ffirst (d/get-fact-detail fact-id :fact/date))
-;        date (d/get-date dateref)                           ;; TODO check for nil
-;        event-id (ffirst (d/get-event-id fact-id))]
-;    (if (= nil type)
-;      nil
-;      {:id fact-id :type type :date date :place place :sortable (date/sortable-date date) :event event-id})))
-
-;(defn compare-dates-D
-;  [event1 event2]
-;  (let [date1 (:sortable event1)
-;        date2 (:sortable event2)]
-;    (if (< date1 date2)
-;      true
-;      false)))
-
-;(defn event-list-D
-;  ([id func _]
-;   (let [roles (flatten (into [] (func id)))
-;         facts (flatten (apply concat (map #(d/get-fact-from-role %) roles)))
-;         parsed (remove nil? (map parse-fact facts))]
-;     (sort (comp compare-dates) parsed)))
-;  ([id]
-;    (event-list id d/get-role true))
-;  ([id usemain]
-;    (event-list id d/get-role-main true)))
-
-;(defn event-year-multifact-D
-;  "For finding years possibly given by multiple different facts, like birth/baptism or death/burial"
-;  [id type1 type2]
-;  (if (= nil id)
-;    nil
-;    (let [births (filter #(= type1 (:type %)) (event-list id true))
-;          bapms (filter #(= type2 (:type %)) (event-list id true))
-;          total (sort (comp compare-dates) (into births bapms))
-;          firstevent (first total)]
-;      (date/getyear (:date firstevent)))))
-
-;(defn age-calc-D
-;  [fact-id]
-;  (let [age (ffirst (d/get-fact-detail fact-id :fact/age))
-;        facts (flatten (into [] (d/get-fact-from-role fact-id)))
-;        parsed (sort (comp compare-dates) (remove nil? (map parse-fact facts)))]
-;    (if (nil? age)
-;      nil
-;      (let [year (date/getyear (:date (first parsed)))]
-;        {:sortable (:sortable (first parsed)) :date (- year age)}))))
-
-;(defn find-age-D
-;  [id]
-;  (first (sort (comp compare-dates) (remove nil? (map #(age-calc (first %)) (d/get-role id)))))
-;  )
-
-;(defn birthyear-D
-;  [id]
-;  (if (nil? id)
-;    nil
-;    (let [birthrecord (event-year-multifact id :birth :baptism)
-;          age (:date (find-age id))]
-;      (if (nil? birthrecord)
-;        (if (nil? age)
-;          nil
-;          (str "ca " age))
-;        birthrecord))))
-;
-;(defn deathyear-D
-;  [id]
-;  (event-year-multifact id :death :burial))
-
-;(defn setCurrentSelected-D
-;  [id]
-;  (let [father (d/find-parent :father id)
-;        mother (d/find-parent :mother id)
-;        children (d/find-children id)
-;        spouses (d/find-spouses id)]
-;    {:selected id
-;     :father   father
-;     :mother   mother
-;     :children children
-;     :spouses  spouses}))
-;
-;(defn setCurrent-D
-;  [value]
-;  (swap! d/state assoc-in [:current] (setCurrentSelected value)))
-
-
 (defn parse-name
   [eventid fieldid]
   (println "slekt.db-functions:parse-name")
@@ -106,9 +16,6 @@
   (let [
         id (ffirst (d/get-persona-from-field eventid fieldid))
         f-id (ffirst (d/get-role-from-field eventid fieldid))
-        ;value (ffirst (d/get-field-id-of-event eventid fieldid :fact/value))
-        ;id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))
-        ;f-id (ffirst (d/get-field-id eventid fieldid :role/field))
         ]
     {:persona/by-id id :db/id f-id}))
 
@@ -195,8 +102,6 @@
    (let [
          template (ffirst (d/get-value-of event :event/template))
          fields (th/get-template template)
-         ;fields (flatten (into [] (d/get-template-of-event event)))
-         ;ordered-fields (d/order-event-fields fields)
          ]
      (println fields)
      {:roles (populate-recur (:roles fields) event :roles) :events (populate-recur (:events fields) event :events)}
