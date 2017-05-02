@@ -141,7 +141,9 @@
         id (if (nil? (:db/id val))
              -1
              (:db/id val))
-        ;group (get (get f 1) 0)
+        group (if (nil? (get f 2))
+                ""
+                (get f 2))
         g-role (if (nil? (:grouprole val))
                  ""
                  (:grouprole val))
@@ -153,7 +155,7 @@
       (newid (ds/transact! d/conn [{:db/id           id
                                     :role/field      field
                                     :role/type       type
-                                    ;:fact/groupindex group
+                                    :role/groupindex group
                                     :role/grouprole  g-role
                                     :role/persona    pid}])))))
 
@@ -185,13 +187,23 @@
       result
       (let [v (first val)
             values (get v 1)
-            field [(get f 0) [(get v 0) :multirole (parse-group-role (:grouprole values))]]
+            field [(get f 0) (parse-group-role (:grouprole values)) (get v 0)]
             pval (assoc values :sex (parse-group-role-sex (:grouprole values)))
             role (transact-role pval field)
             res (if (nil? role)
                   result
                   (conj result role))]
         (recur (rest val) f res)))))
+
+(defn determine-if-multirole
+  [val f]
+  (println "slekt.events:determine-if-multirole")
+  (println val)
+  (println f)
+  (let [t (get f 1)]
+    (if (= t :multirole)
+      (transact-multi val f)
+      (transact-role val f))))
 
 (defn transact-date
   [val]
@@ -232,8 +244,6 @@
                                      :place/value place}])]
         (newid t)))))
 
-
-
 (defn transact-event
   [val field]
   (println "slekt.events:transact-event")
@@ -271,12 +281,11 @@
   (let [fieldid (get field 0)
         value (get-in data [:values type fieldid])]
     (println value)
-    (if (= nil value)
+    (if (nil? value)
       nil
       (case type
-        :roles (transact-role value field)
+        :roles (determine-if-multirole value field)
         :events (transact-event value field)
-        :multirole (transact-multi value field)
         nil))))
 
 (defn recur-fields

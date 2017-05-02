@@ -52,6 +52,12 @@
    {:eventtemplate/name          :burial-record
     :eventtemplate/template-type :single
     :eventtemplate/events        [[0 :death] [1 :burial]]}
+   {:eventtemplate/name          :marriage-record
+    :eventtemplate/template-type :couple
+    :eventtemplate/events        [[0 :marriage]]}
+   {:eventtemplate/name          :census-record
+    :eventtemplate/template-type :list
+    :eventtemplate/events        [[0 :census]]}
    ])
 
 (def templates

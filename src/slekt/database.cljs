@@ -367,7 +367,7 @@
   (ds/q '[:find ?id
           :in $ ?eid ?f ?ftype
           :where
-          [?eid :event/fields ?id]
+          [?eid :event/facts ?id]
           [?id ?ftype ?f]]
         @conn eventid field fieldtype))
 
@@ -381,17 +381,17 @@
           [?fid ?type ?val]]
         @conn eventid field type))
 
-(defn get-field-multigroup
+(defn get-roles-multigroup
   [eventid fieldid]
-  (ds/q '[:find ?pid ?grole ?gindex ?val ?fid
+  (ds/q '[:find ?fid ?pid ?grole ?gindex
           :in $ ?eid ?field
           :where
-          [?eid :event/fields ?fid]
-          [?fid :fact/field ?field]
-          [?fid :fact/persona ?pid]
-          [?fid :fact/grouprole ?grole]
-          [?fid :fact/groupindex ?gindex]
-          [?fid :fact/value ?val]]
+          [?eid :event/roles ?fid]
+          [?fid :role/field ?field]
+          [?fid :role/persona ?pid]
+          [?fid :role/grouprole ?grole]
+          [?fid :role/groupindex ?gindex]
+          ]
         @conn eventid fieldid))
 
 (defn get-fact-detail-id-from-field

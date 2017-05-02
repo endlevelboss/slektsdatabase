@@ -95,11 +95,11 @@
 
 (defn person-role-selector
   [field-id index]
-  (let [r (get-in @d/state [:window/edit :values field-id index :grouprole])
+  (let [r (get-in @d/state [:window/edit :values :roles field-id index :grouprole])
         role (if (nil? r)
                "nil"
                r)]
-    [:select {:name "test" :value role :on-change #(set-event-value (-> % .-target .-value) [field-id index :grouprole])}
+    [:select {:name "test" :value role :on-change #(set-event-value (-> % .-target .-value) [:roles field-id index :grouprole])}
      [:option {:value "nil" :disabled "true"} (d/l :select)]
      [:option {:value "husband"} (d/l :husband)]
      [:option {:value "wife"} (d/l :wife)]
@@ -110,21 +110,28 @@
 (defn person-list-component
   [listelement field-id]
   (let [index (get listelement 0)
-        val (get-in @d/state [:window/edit :values field-id index])]
+        val (get-in @d/state [:window/edit :values :roles field-id index])]
+    (println "slekt.gui.edit:person-list-component")
+    (println listelement)
+    (println index)
+    (println val)
     [:div
      [person-role-selector field-id index]
-     [person-display val [field-id index]]]
+     [person-display val [:roles field-id index]]]
     ))
 
 (defn button-add-person-list-component
   [field-id index]
-  (swap! d/state assoc-in [:window/edit :values field-id index] {:persona/by-id nil}))
+  (swap! d/state assoc-in [:window/edit :values :roles field-id index] {:persona/by-id nil}))
 
 (defn multi-component
   [field]
+  (println "slekt.gui.edit:multi-component")
+  (println field)
   (let [field-id (get field 0)
         list (get-in @d/state [:window/edit :values :roles field-id])
         count (count list)]
+    (println list)
     [:div (d/l :persons-household)
      (for [l list]
        ^{:key (get l 0)} [person-list-component l field-id])

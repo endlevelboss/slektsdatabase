@@ -167,13 +167,14 @@
                        :on-click #(f/set-event-edit :burial-record )}]
      [:input.b-marriage {:type "button"
                          :value (d/l :marr-event)
-                         :on-click #(f/set-event-edit :marriage )}]
+                         :on-click #(f/set-event-edit :marriage-record )}]
      [:input.b-census {:type "button"
                        :value (d/l :cens-event)
-                       :on-click #(f/set-event-edit :census )}]
+                       :on-click #(f/set-event-edit :census-record )}]
      ]))
 
 (defn init-window []
-  (if (not= nil (get-in @d/state [:window/edit :type]))
+  (if (nil? (get-in @d/state [:window/edit :type]))
+    [current-selected-component]
     [edit/event-edit-component]
-    [current-selected-component]))
+    ))

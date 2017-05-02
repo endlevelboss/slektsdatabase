@@ -100,9 +100,12 @@
 
 (defn parse-name
   [eventid fieldid]
+  (println "slekt.db-functions:parse-name")
+  (println eventid)
+  (println fieldid)
   (let [
-        id (d/get-persona-from-field eventid fieldid)
-        f-id (d/get-role-from-field eventid fieldid)
+        id (ffirst (d/get-persona-from-field eventid fieldid))
+        f-id (ffirst (d/get-role-from-field eventid fieldid))
         ;value (ffirst (d/get-field-id-of-event eventid fieldid :fact/value))
         ;id (ffirst (d/get-field-id-of-event eventid fieldid :role/persona))
         ;f-id (ffirst (d/get-field-id eventid fieldid :role/field))
@@ -134,20 +137,20 @@
   ([ids field-id result]
    (if (empty? ids)
      result
-     (let [v (first ids)
-           pid (get v 0)
-           grole (get v 1)
-           gindex (get v 2)
-           val (get v 3)
-           db-id (get v 4)]
+     (let [v (first ids)                                    ;Data fra slekt.database:get-roles-multigroup
+           pid (get v 1)                                    ;index 1 - persona id
+           grole (get v 2)                                  ;index 2 - grouprole
+           gindex (get v 3)                                 ;index 3 - groupindex
+           db-id (get v 0)]                                 ;index 0 - database id
        (recur (rest ids) field-id (assoc result gindex {:persona/by-id pid
                                                         :grouprole grole
-                                                        :value val
                                                         :db/id db-id}))))))
 
 (defn parse-multi
   [event field-id]
-  (let [ids (d/get-field-multigroup event field-id)]
+  (let [ids (d/get-roles-multigroup event field-id)]
+    (println "slekt.db-functions:parse-multi")
+    (println ids)
     (recur-multi ids field-id)))
 
 (defn parse-event-field
@@ -161,6 +164,14 @@
       :event (parse-fact-field event fieldid)
       :multirole (parse-multi event fieldid))))
 
+(defn determine-if-multirole
+  [event field]
+  (let [field-id (get field 0)
+        field-type (get field 1)]
+    (if (= :multirole field-type)
+      (parse-multi event field-id)
+      (parse-name event field-id))))
+
 (defn populate-recur
   ([fields event type]
    (println "slekt.db-functions:populate-recur")
@@ -172,7 +183,7 @@
       (let [val (first fields)
             id (get val 0)
             res (case type
-                  :roles (parse-name event id)
+                  :roles (determine-if-multirole event val)
                   :events (parse-fact-field event id))]
         (recur (rest fields) event type (assoc result id res))))))
 
@@ -235,6 +246,7 @@
 
 (defn set-roles-recur
   [template]
+  (println "slekt.db-functions:set-roles-recur")
   (if (empty? template)
     nil
     (let [id (get (first template) 0)
@@ -283,7 +295,9 @@
   [event]
   (swap! d/state assoc-in [:window/edit :event/by-id] event)
   (swap! d/state assoc-in [:window/edit :values] (populate-event-field event))
-  (set-event-edit (ffirst (d/get-template-name event))))
+  (swap! d/state assoc-in [:window/edit :type] (ffirst (d/get-value-of event :event/template)))
+  ;(set-event-edit (ffirst (d/get-template-name event)))
+  )
 
 (defn save-event
   []
