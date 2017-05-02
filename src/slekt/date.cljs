@@ -15,7 +15,8 @@
         9 "sep"
         10 "oct"
         11 "nov"
-        12 "dec"))
+        12 "dec"
+        nil))
 
 (defn month-converter
     [s]
