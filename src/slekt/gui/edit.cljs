@@ -57,7 +57,7 @@
        [:div.ee-name name]]]
      [:div.divtable
       [:div.divrow
-       [:div.divcell "Alder: "]
+       [:div.divcell (str (d/l :age) ": ")]
        [:input.divcell {:type "text"
                         :value age
                         :on-change #(set-event-value (-> % .-target .-value) (conj path :age))}]]]]))
@@ -69,7 +69,7 @@
         val (get-in @d/state [:window/edit :values :roles field-id])
         ]
     [:div
-     [:div (str "rolle/fixme: " label)]
+     [:div (str (d/l :role) ": " label)]
      [person-display val [:roles field-id]]]
     ))
 
@@ -83,7 +83,7 @@
      [:div.divrow
       [:strong.divcell label]]
      [:div.divrow
-      [:div.divcell (str "dato/fixme" ": ")]
+      [:div.divcell (str (d/l :date) ": ")]
       [:input.divcell {:type      "text"
                        :value     date
                        :on-change #(set-event-value (-> % .-target .-value) [:events id :date])}]]
@@ -168,7 +168,7 @@
                           nil)]
     ;(println template)
     [:div.event-edit
-     [:h2 template-type]
+     [:h2 (d/l template-type)]
      [:div
       (person-generator (:roles template))
       (event-generator (:events template))]

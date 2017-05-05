@@ -66,7 +66,10 @@
 
 (defn l
   [label]
-  (get-in @state [:language label]))
+  (let [text (get-in @state [:language label])]
+    (if (nil? text)
+      (str "missing text for: " label)
+      text)))
 
 
 ;;-------------------- DATASCRIPT BEGINS HERE -----------------------------

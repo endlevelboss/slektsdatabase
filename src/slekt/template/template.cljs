@@ -49,6 +49,9 @@
   [{:eventtemplate/name          :baptism-record
     :eventtemplate/template-type :child-parents
     :eventtemplate/events        [[0 :birth] [1 :baptism]]}
+   {:eventtemplate/name          :confirmation-record
+    :eventtemplate/template-type :child-parents
+    :eventtemplate/events        [[0 :confirmation] [1 :birth]]}
    {:eventtemplate/name          :burial-record
     :eventtemplate/template-type :single
     :eventtemplate/events        [[0 :death] [1 :burial]]}
@@ -58,14 +61,17 @@
    {:eventtemplate/name          :census-record
     :eventtemplate/template-type :list
     :eventtemplate/events        [[0 :census]]}
+   {:eventtemplate/name          :misc-record
+    :eventtemplate/template-type :list
+    :eventtemplate/events        [[0 :census]]}
    ])
 
 (def templates
   [{:template/name  :child-parents
-    :template/roles [[0 :child] [1 :father] [2 :mother]]}
+    :template/roles [[0 :child] [1 :father] [2 :mother] [3 :multirole]]}
    {:template/name  :single
-    :template/roles [[0 :main]]}
+    :template/roles [[0 :main] [1 :multirole]]}
    {:template/name  :couple
-    :template/roles [[0 :husband] [1 :wife]]}
+    :template/roles [[0 :husband] [1 :wife] [2 :multirole]]}
    {:template/name  :list
     :template/roles [[0 :multirole]]}])
