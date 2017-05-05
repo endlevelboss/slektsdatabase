@@ -344,7 +344,6 @@
     (if (empty? fields)
       nil
       (let [t (ds/transact! d/conn [{:db/id          id
-                                     :event/type     (:type data)
                                      :event/template (:type data) ;; TODO Fix for custom templates
                                      :event/roles     role-values
                                      :event/facts     event-values

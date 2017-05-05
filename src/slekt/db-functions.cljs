@@ -8,110 +8,110 @@
 
 (enable-console-print!)
 
-(defn parse-name
-  [eventid fieldid]
-  (println "slekt.db-functions:parse-name")
-  (println eventid)
-  (println fieldid)
-  (let [
-        id (ffirst (d/get-persona-from-field eventid fieldid))
-        f-id (ffirst (d/get-role-from-field eventid fieldid))
-        ]
-    {:persona/by-id id :db/id f-id}))
+;(defn parse-name
+;  [eventid fieldid]
+;  (println "slekt.db-functions:parse-name")
+;  (println eventid)
+;  (println fieldid)
+;  (let [
+;        id (ffirst (d/get-persona-from-field eventid fieldid))
+;        f-id (ffirst (d/get-role-from-field eventid fieldid))
+;        ]
+;    {:persona/by-id id :db/id f-id}))
 
-(defn parse-fact-field
-  [eventid fieldid]
-  (println "slekt.db-functions:parse-fact-field")
-  (println eventid)
-  (println fieldid)
-  (let [dateid (ffirst (d/get-fact-detail-id-from-field eventid fieldid :fact/date))
-        date (if (not= nil dateid)
-               (date/date-to-string (d/get-date dateid))
-               nil)
-        placeid (ffirst (d/get-fact-detail-id-from-field eventid fieldid :fact/place))
-        place (if (not= nil placeid)
-                (ffirst (d/get-value-of placeid :place/value))
-                nil)
-        f-id (ffirst (d/get-field-id eventid fieldid :fact/field))]
-    (println date)
-    (println place)
-    {:date date :place place :db/id f-id}))
+;(defn parse-fact-field
+;  [eventid fieldid]
+;  (println "slekt.db-functions:parse-fact-field")
+;  (println eventid)
+;  (println fieldid)
+;  (let [dateid (ffirst (d/get-fact-detail-id-from-field eventid fieldid :fact/date))
+;        date (if (not= nil dateid)
+;               (date/date-to-string (d/get-date dateid))
+;               nil)
+;        placeid (ffirst (d/get-fact-detail-id-from-field eventid fieldid :fact/place))
+;        place (if (not= nil placeid)
+;                (ffirst (d/get-value-of placeid :place/value))
+;                nil)
+;        f-id (ffirst (d/get-field-id eventid fieldid :fact/field))]
+;    (println date)
+;    (println place)
+;    {:date date :place place :db/id f-id}))
 
 
-(defn recur-multi
-  ([ids field-id]
-    (recur-multi ids field-id {}))
-  ([ids field-id result]
-   (if (empty? ids)
-     result
-     (let [v (first ids)                                    ;Data fra slekt.database:get-roles-multigroup
-           pid (get v 1)                                    ;index 1 - persona id
-           grole (get v 2)                                  ;index 2 - grouprole
-           gindex (get v 3)                                 ;index 3 - groupindex
-           db-id (get v 0)]                                 ;index 0 - database id
-       (recur (rest ids) field-id (assoc result gindex {:persona/by-id pid
-                                                        :grouprole grole
-                                                        :db/id db-id}))))))
+;(defn recur-multi
+;  ([ids field-id]
+;    (recur-multi ids field-id {}))
+;  ([ids field-id result]
+;   (if (empty? ids)
+;     result
+;     (let [v (first ids)                                    ;Data fra slekt.database:get-roles-multigroup
+;           pid (get v 1)                                    ;index 1 - persona id
+;           grole (get v 2)                                  ;index 2 - grouprole
+;           gindex (get v 3)                                 ;index 3 - groupindex
+;           db-id (get v 0)]                                 ;index 0 - database id
+;       (recur (rest ids) field-id (assoc result gindex {:persona/by-id pid
+;                                                        :grouprole grole
+;                                                        :db/id db-id}))))))
 
-(defn parse-multi
-  [event field-id]
-  (let [ids (d/get-roles-multigroup event field-id)]
-    (println "slekt.db-functions:parse-multi")
-    (println ids)
-    (recur-multi ids field-id)))
+;(defn parse-multi
+;  [event field-id]
+;  (let [ids (d/get-roles-multigroup event field-id)]
+;    (println "slekt.db-functions:parse-multi")
+;    (println ids)
+;    (recur-multi ids field-id)))
 
-(defn parse-event-field
-  "Parses the event field to get correct values and updates the gui state"
-  [field event]
-  (let [vals (get field 1)
-        type (get vals 1)
-        fieldid (get vals 0)]
-    (case type
-      :role (parse-name event fieldid)
-      :event (parse-fact-field event fieldid)
-      :multirole (parse-multi event fieldid))))
+;(defn parse-event-field
+;  "Parses the event field to get correct values and updates the gui state"
+;  [field event]
+;  (let [vals (get field 1)
+;        type (get vals 1)
+;        fieldid (get vals 0)]
+;    (case type
+;      :role (parse-name event fieldid)
+;      :event (parse-fact-field event fieldid)
+;      :multirole (parse-multi event fieldid))))
 
-(defn determine-if-multirole
-  [event field]
-  (let [field-id (get field 0)
-        field-type (get field 1)]
-    (if (= :multirole field-type)
-      (parse-multi event field-id)
-      (parse-name event field-id))))
+;(defn determine-if-multirole
+;  [event field]
+;  (let [field-id (get field 0)
+;        field-type (get field 1)]
+;    (if (= :multirole field-type)
+;      (parse-multi event field-id)
+;      (parse-name event field-id))))
 
-(defn populate-recur
-  ([fields event type]
-   (println "slekt.db-functions:populate-recur")
-   (println fields)
-   (populate-recur fields event type {}))
-  ([fields event type result]
-    (if (empty? fields)
-      result
-      (let [val (first fields)
-            id (get val 0)
-            res (case type
-                  :roles (determine-if-multirole event val)
-                  :events (parse-fact-field event id))]
-        (recur (rest fields) event type (assoc result id res))))))
+;(defn populate-recur
+;  ([fields event type]
+;   (println "slekt.db-functions:populate-recur")
+;   (println fields)
+;   (populate-recur fields event type {}))
+;  ([fields event type result]
+;    (if (empty? fields)
+;      result
+;      (let [val (first fields)
+;            id (get val 0)
+;            res (case type
+;                  :roles (determine-if-multirole event val)
+;                  :events (parse-fact-field event id))]
+;        (recur (rest fields) event type (assoc result id res))))))
 
-(defn populate-from-template
-  "Loops through the template of an event to make sure each field gets the correct value from the event"
-  ([event]
-   (println "slekt.db-functions:populate-from-template")
-   (println event)
-   (let [
-         template (ffirst (d/get-value-of event :event/template))
-         fields (th/get-template template)
-         ]
-     (println fields)
-     {:roles (populate-recur (:roles fields) event :roles) :events (populate-recur (:events fields) event :events)}
-     ))
-  ([fields event result]
-   (if (empty? fields)
-     result
-     (let [id (first fields)
-           parsed (parse-event-field id event)]
-       (recur (rest fields) event (assoc result (get id 0) parsed))))))
+;(defn populate-from-template-D
+;  "Loops through the template of an event to make sure each field gets the correct value from the event"
+;  ([event]
+;   (println "slekt.db-functions:populate-from-template")
+;   (println event)
+;   (let [
+;         template (ffirst (d/get-value-of event :event/template))
+;         fields (th/get-template template)
+;         ]
+;     (println fields)
+;     {:roles (populate-recur (:roles fields) event :roles) :events (populate-recur (:events fields) event :events)}
+;     ))
+;  ([fields event result]
+;   (if (empty? fields)
+;     result
+;     (let [id (first fields)
+;           parsed (parse-event-field id event)]
+;       (recur (rest fields) event (assoc result (get id 0) parsed))))))
 
 (defn source-info
   ([event]
@@ -185,7 +185,7 @@
 
 (defn populate-event-field
   [event]
-  (let [template2 (populate-from-template event)
+  (let [
         template (populate-event event)
         source (source-info event)
         s (recur-indexing source)]
