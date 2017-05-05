@@ -160,16 +160,16 @@
         (for [event eventlist]
           ^{:key (:id event)} [event-display-component event])]]]
      [:input.b-birth {:type "button"
-                      :value (d/l :bapm-event)
+                      :value (d/l :event-bapm)
                       :on-click #(f/set-event-edit :baptism-record)}]
      [:input.b-burial {:type "button"
-                       :value (d/l :buri-event)
+                       :value (d/l :event-buri)
                        :on-click #(f/set-event-edit :burial-record )}]
      [:input.b-marriage {:type "button"
-                         :value (d/l :marr-event)
+                         :value (d/l :event-marr)
                          :on-click #(f/set-event-edit :marriage-record )}]
      [:input.b-census {:type "button"
-                       :value (d/l :cens-event)
+                       :value (d/l :event-cens)
                        :on-click #(f/set-event-edit :census-record )}]
      ]))
 

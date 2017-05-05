@@ -136,9 +136,57 @@
             newres (conj result new)]
         (recur (rest source-vec) (inc index) newres)))))
 
+(defn populate-people
+  ([persons]
+    (populate-people persons {}))
+  ([persons result]
+    (if (empty? persons)
+      result
+      (let [p (ffirst persons)
+            index (ffirst (d/get-value-of p :role/field))
+            persona (ffirst (d/get-value-of p :role/persona))
+            role (ffirst (d/get-value-of p :role/type))
+            vals {:persona/by-id persona :db/id p :role role}]
+        (recur (rest persons) (assoc result index vals)))))
+  )
+
+(defn pop-fact-detail
+  [fact]
+  (println "slekt.db-functions:parse-fact-field")
+  (println fact)
+  (let [dateid (ffirst (d/get-value-of fact :fact/date))
+        date (if (nil? dateid)
+               nil
+               (date/date-to-string (d/get-date dateid)))
+        placeid (ffirst (d/get-value-of fact :fact/place))
+        place (if (nil? placeid)
+                nil
+                (ffirst (d/get-value-of placeid :place/value)))
+        role (ffirst (d/get-value-of fact :fact/role))]
+    (println date)
+    (println place)
+    {:date date :place place :db/id fact :role role}))
+
+(defn populate-facts
+  ([facts]
+    (populate-facts facts {}))
+  ([facts result]
+    (if (empty? facts)
+      result
+      (let [f (ffirst facts)
+            field (ffirst (d/get-value-of f :fact/field))]
+        (recur (rest facts) (assoc result field (pop-fact-detail f) ))))))
+
+(defn populate-event
+  [event]
+  (let [persons (d/get-value-of event :event/roles)
+        facts (d/get-value-of event :event/facts)]
+    {:roles (populate-people persons) :events (populate-facts facts)}))
+
 (defn populate-event-field
   [event]
-  (let [template (populate-from-template event)
+  (let [template2 (populate-from-template event)
+        template (populate-event event)
         source (source-info event)
         s (recur-indexing source)]
     (assoc-in template [:source :refs] s)))
@@ -175,7 +223,18 @@
                                                                               :sex :f})
         :husband (swap! d/state assoc-in path husband)
         :wife (swap! d/state assoc-in path wife)
-        :multirole (swap! d/state assoc-in path {0 {:persona/by-id (:selected curr)}}))
+        )
+      (recur (rest template)))))
+
+(defn set-events-recur
+  [template]
+  (if (empty? template)
+    nil
+    (let [f (first template)
+          id (get f 0)
+          type (get f 1)
+          path [:window/edit :values :events id]]
+      (swap! d/state assoc-in path {:role type})
       (recur (rest template)))))
 
 (defn set-current-role
@@ -191,8 +250,9 @@
       (swap! d/state assoc-in [:window/edit :type] nil)
       (swap! d/state assoc-in [:window/edit :event/by-id] nil)
       (swap! d/state assoc-in [:window/edit :values] {}))
-    (let [template (th/get-roles key)] ;; creates edit-window
-      (set-roles-recur template)
+    (let [template (th/get-template key)] ;; creates edit-window
+      (set-roles-recur (:roles template))
+      (set-events-recur (:events template))
       (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}])
       (swap! d/state assoc-in [:window/edit :type] key))))
 
@@ -201,7 +261,6 @@
   (swap! d/state assoc-in [:window/edit :event/by-id] event)
   (swap! d/state assoc-in [:window/edit :values] (populate-event-field event))
   (swap! d/state assoc-in [:window/edit :type] (ffirst (d/get-value-of event :event/template)))
-  ;(set-event-edit (ffirst (d/get-template-name event)))
   )
 
 (defn save-event

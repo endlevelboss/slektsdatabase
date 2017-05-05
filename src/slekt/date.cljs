@@ -1,21 +1,26 @@
 (ns slekt.date
-    (:require [clojure.string :as s]))
+    (:require [clojure.string :as s]
+              [slekt.database :as d]))
+
+(defn str-month
+  [label]
+  (s/lower-case (apply str (take 3 (d/l label)))))
 
 (defn parsemonth
     [value]
     (case value
-        1 "jan"
-        2 "feb"
-        3 "mar"
-        4 "apr"
-        5 "may"
-        6 "jun"
-        7 "jul"
-        8 "aug"
-        9 "sep"
-        10 "oct"
-        11 "nov"
-        12 "dec"
+        1 (str-month :jan)
+        2 (str-month :feb)
+        3 (str-month :mar)
+        4 (str-month :apr)
+        5 (str-month :may)
+        6 (str-month :jun)
+        7 (str-month :jul)
+        8 (str-month :aug)
+        9 (str-month :sep)
+        10 (str-month :oct)
+        11 (str-month :nov)
+        12 (str-month :dec)
         nil))
 
 (defn month-converter

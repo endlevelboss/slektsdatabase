@@ -68,10 +68,10 @@
 
 (def templates
   [{:template/name  :child-parents
-    :template/roles [[0 :child] [1 :father] [2 :mother] [3 :multirole]]}
+    :template/roles [[0 :child] [1 :father] [2 :mother]]}
    {:template/name  :single
-    :template/roles [[0 :main] [1 :multirole]]}
+    :template/roles [[0 :main] ]}
    {:template/name  :couple
-    :template/roles [[0 :husband] [1 :wife] [2 :multirole]]}
+    :template/roles [[0 :husband] [1 :wife]]}
    {:template/name  :list
-    :template/roles [[0 :multirole]]}])
+    :template/roles [[0 :main]]}])

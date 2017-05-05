@@ -65,23 +65,29 @@
 (defn person-component
   [field]
   (let [field-id (get field 0)
-        label (d/l (get (get field 1) 2))
+
         val (get-in @d/state [:window/edit :values :roles field-id])
+        label (:role val)
         ]
+    (println "slekt.gui.edit:person-component")
+    (println val)
+    (println field)
     [:div
-     [:div (str (d/l :role) ": " label)]
+     [:div (str (d/l :role) ": " (d/l label))]
      [person-display val [:roles field-id]]]
     ))
 
 (defn date-component
-  [field]
-  (let [id (get field 0)
-        label (d/l (get (get field 1) 2))
+  [fact]
+  (println "slekt.gui.edit:date-component")
+  (println fact)
+  (let [id (get fact 0)
+        label (get-in @d/state [:window/edit :values :events id :role])
         date (get-in @d/state [:window/edit :values :events id :date])
         place (get-in @d/state [:window/edit :values :events id :place])]
     [:div.dateplace-component
      [:div.divrow
-      [:strong.divcell label]]
+      [:strong.divcell (d/l label)]]
      [:div.divrow
       [:div.divcell (str (d/l :date) ": ")]
       [:input.divcell {:type      "text"
@@ -121,8 +127,8 @@
     ))
 
 (defn button-add-person-list-component
-  [field-id index]
-  (swap! d/state assoc-in [:window/edit :values :roles field-id index] {:persona/by-id nil}))
+  [index]
+  (swap! d/state assoc-in [:window/edit :values :roles index] {:persona/by-id nil}))
 
 (defn multi-component
   [field]
@@ -137,23 +143,20 @@
        ^{:key (get l 0)} [person-list-component l field-id])
      [:input {:type "button"
               :value "+"
-              :on-click #(button-add-person-list-component field-id count)}]]))
+              :on-click #(button-add-person-list-component  count)}]]))
 
 (defn person-generator
-  [fields]
-  (for [field fields]
-    (let [id (get field 0)
-          type (get field 1)]
-      (if (= :multirole type)
-        ^{:key id} [multi-component field]
-        ^{:key id} [person-component field])
+  [persons]
+  (for [person persons]
+    (let [id (get person 0)]
+      ^{:key id} [person-component person]
       )))
 
 (defn event-generator
-  [fields]
-  (for [field fields]
-    (let [id (get field 0)]
-      ^{:key id} [date-component field]
+  [events]
+  (for [event events]
+    (let [id (get event 0)]
+      ^{:key id} [date-component event]
       )))
 
 (defn event-edit-component
@@ -161,23 +164,28 @@
   (let [current (get-in @d/state [:current :selected])
         eventtype (get-in @d/state [:window/edit :type])
         event (get-in @d/state [:window/edit :event/by-id])
-        template-type (get-in @d/state [:window/edit :type])
-        template (th/get-template template-type)
         personaselector (if (get-in @d/state [:comp/personaselector :show])
                           [select/persona-selector]
-                          nil)]
+                          nil)
+        persons (get-in @d/state [:window/edit :values :roles])
+        events (get-in @d/state [:window/edit :values :events])
+        count (count persons)
+        ]
     ;(println template)
     [:div.event-edit
-     [:h2 (d/l template-type)]
+     [:h2 (d/l eventtype)]
      [:div
-      (person-generator (:roles template))
-      (event-generator (:events template))]
+      (person-generator persons)
+      [:input {:type "button"
+               :value "+"
+               :on-click #(button-add-person-list-component count)}]
+      (event-generator events)]
      [:br]
      [:input {:type "button"
-              :value (d/l :ok)
+              :value (d/l :button-ok)
               :on-click #(f/save-event)}]
      [:input {:type "button"
-              :value (d/l :cancel)
+              :value (d/l :button-cancel)
               :on-click #(f/set-event-edit nil)}]
      [:br]
      [:br]
