@@ -32,9 +32,9 @@
         color (if (:assert fact)
                 "darkred"
                 "black")]
-    (println "slekt.gui.mainwindow:event-display-component")
-    (println fact)
-    (println mainperson)
+    ;(println "slekt.gui.mainwindow:event-display-component")
+    ;(println fact)
+    ;(println mainperson)
     [:tr.eventline
      [:td
       {:style {:width "47px"
@@ -120,11 +120,11 @@
         eventlist (sort (comp comp/compare-dates) (into events event-ass))
         spouselabel (d/l :spouse)
         childrenlabel (d/l :children)]
-    (println "slekt.gui.mainwindow:current-selected-component")
+    ;(println "slekt.gui.mainwindow:current-selected-component")
     ;(println (str "current-selected-component:ass-personas: " ass-personas))
     ;(println "current-selected-component:event-ass: ")
     ;(println event-ass)
-    (println events)
+    ;(println events)
     ;(println eventlist)
     ;(println children)
     [:div.display

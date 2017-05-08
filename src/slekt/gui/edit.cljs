@@ -16,6 +16,22 @@
   (swap! d/state assoc-in [:comp/personaselector :values] values)
   (swap! d/state assoc-in [:comp/personaselector :show] true))
 
+(defn person-role-selector
+  [field-id]
+  (let [r (get-in @d/state [:window/edit :values :roles field-id :role])
+        role (if (nil? r)
+               "nil"
+               (name r))]
+    [:select {:name "test" :value role :on-change #(set-event-value (keyword (-> % .-target .-value)) [:roles field-id :role])}
+     [:option {:value "nil" :disabled "true"} (d/l :select)]
+     [:option {:value "child"} (d/l :child)]
+     [:option {:value "mother"} (d/l :mother)]
+     [:option {:value "father"} (d/l :father)]
+     [:option {:value "husband"} (d/l :husband)]
+     [:option {:value "wife"} (d/l :wife)]
+     [:option {:value "son"} (d/l :son)]
+     [:option {:value "daughter"} (d/l :daughter)]
+     [:option {:value "unknown"} (d/l :unknown)]]))
 
 (defn new-name-component
   [path]
@@ -74,6 +90,7 @@
     (println field)
     [:div
      [:div (str (d/l :role) ": " (d/l label))]
+     [person-role-selector field-id]
      [person-display val [:roles field-id]]]
     ))
 
@@ -99,19 +116,6 @@
                        :value     place
                        :on-change #(set-event-value (-> % .-target .-value) [:events id :place])}]]]))
 
-(defn person-role-selector
-  [field-id index]
-  (let [r (get-in @d/state [:window/edit :values :roles field-id index :grouprole])
-        role (if (nil? r)
-               "nil"
-               r)]
-    [:select {:name "test" :value role :on-change #(set-event-value (-> % .-target .-value) [:roles field-id index :grouprole])}
-     [:option {:value "nil" :disabled "true"} (d/l :select)]
-     [:option {:value "husband"} (d/l :husband)]
-     [:option {:value "wife"} (d/l :wife)]
-     [:option {:value "son"} (d/l :son)]
-     [:option {:value "daughter"} (d/l :daughter)]
-     [:option {:value "unknown"} (d/l :unknown)]]))
 
 (defn person-list-component
   [listelement field-id]
@@ -128,7 +132,7 @@
 
 (defn button-add-person-list-component
   [index]
-  (swap! d/state assoc-in [:window/edit :values :roles index] {:persona/by-id nil}))
+  (swap! d/state assoc-in [:window/edit :values :roles index] {:persona/by-id nil :role nil}))
 
 (defn multi-component
   [field]

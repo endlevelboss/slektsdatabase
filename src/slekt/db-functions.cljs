@@ -204,7 +204,7 @@
     nil
     (let [id (get (first template) 0)
           path [:window/edit :values :roles id]
-          type (get (first template) 1)
+          role (get (first template) 1)
           curr (get-in @d/state [:current])
           curr-sex (ffirst (d/find-sex-of-person (:selected curr)))
           spouse (first (get-in @d/state [:current :spouses]))
@@ -214,7 +214,7 @@
           wife (if (= :f curr-sex)
                  {:persona/by-id (:selected curr) :sex :f}
                  {:persona/by-id spouse :sex :f})]
-      (case type
+      (case role
         :child (swap! d/state assoc-in path {:persona/by-id (:selected curr)})
         :main (swap! d/state assoc-in path {:persona/by-id (:selected curr)})
         :father (swap! d/state assoc-in path {:persona/by-id (first (:father curr))
@@ -224,6 +224,7 @@
         :husband (swap! d/state assoc-in path husband)
         :wife (swap! d/state assoc-in path wife)
         )
+      (swap! d/state assoc-in (conj path :role) role)
       (recur (rest template)))))
 
 (defn set-events-recur
