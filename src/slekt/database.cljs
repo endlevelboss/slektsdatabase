@@ -143,7 +143,19 @@
 
 (defn find-parent
   [role id]
-  (into #{} (flatten (into [] (get-relation role :child id)))))
+  (if (= role :father)
+    (let [
+          p1 (into #{} (flatten (into [] (get-relation :father :child id))))
+          p2 (into p1 (flatten (into [] (get-relation :husband :son id))))
+          p3 (into p2 (flatten (into [] (get-relation :husband :daughter id))))
+          ]
+      p3)
+    (let [
+          p1 (into #{} (flatten (into [] (get-relation :mother :child id))))
+          p2 (into p1 (flatten (into [] (get-relation :wife :son id))))
+          p3 (into p2 (flatten (into [] (get-relation :wife :daughter id))))
+          ]
+      p3)))
 
 (defn find-children
   [id]
