@@ -134,6 +134,12 @@
         id
         ))))
 
+(defn transact-role-details
+  [dbid val]
+  (let [age (date/age-parser (:age val))]
+    (if (not (nil? age))
+      (ds/transact! d/conn [[:db/add dbid :role/age age]]))))
+
 (defn transact-role
   [val field]
   (println "slekt.events:transact-role")
@@ -151,10 +157,15 @@
               (:persona/by-id val))]
     (if (nil? pid)
       nil
-      (newid (ds/transact! d/conn [{:db/id           id
-                                    :role/field      field
-                                    :role/type       role
-                                    :role/persona    pid}])))))
+      (let [dbid
+            (newid (ds/transact! d/conn [{:db/id        id
+                                          :role/field   field
+                                          :role/type    role
+                                          :role/persona pid}]))]
+        (if (nil? dbid)
+          (transact-role-details id val)
+          (transact-role-details dbid val))                 ; stores additional values
+        dbid))))
 
 (defn parse-group-role
   [group-role]

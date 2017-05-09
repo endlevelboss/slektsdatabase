@@ -118,3 +118,10 @@
           :parsed (get date 3)
           :onlyyear (get date 3)
           nil)))
+
+(defn age-parser
+  [agestring]
+  (let [age (int agestring)]
+    (if (= age 0)
+      nil
+      age)))

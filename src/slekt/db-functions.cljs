@@ -146,7 +146,8 @@
             index (ffirst (d/get-value-of p :role/field))
             persona (ffirst (d/get-value-of p :role/persona))
             role (ffirst (d/get-value-of p :role/type))
-            vals {:persona/by-id persona :db/id p :role role}]
+            age (ffirst (d/get-value-of p :role/age))
+            vals {:persona/by-id persona :db/id p :role role :age age}]
         (recur (rest persons) (assoc result index vals)))))
   )
 

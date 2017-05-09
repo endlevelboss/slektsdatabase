@@ -10,7 +10,7 @@
 
 (defn age-calc
   [fact-id]
-  (let [age (ffirst (d/get-fact-detail fact-id :fact/age))
+  (let [age (ffirst (d/get-fact-detail fact-id :role/age))
         facts (flatten (into [] (d/get-fact-from-role fact-id)))
         parsed (sort (comp comp/compare-dates) (remove nil? (map el/parse-fact facts)))]
     (if (nil? age)
