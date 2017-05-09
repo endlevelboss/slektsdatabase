@@ -252,6 +252,7 @@
       (swap! d/state assoc-in [:window/edit :event/by-id] nil)
       (swap! d/state assoc-in [:window/edit :values] {}))
     (let [template (th/get-template key)] ;; creates edit-window
+      (set-event-edit nil)                                  ;; makes sure we have clean start
       (set-roles-recur (:roles template))
       (set-events-recur (:events template))
       (swap! d/state assoc-in [:window/edit :values :source :refs] [{:index 0 :id nil :value ""}])
