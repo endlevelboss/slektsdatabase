@@ -439,24 +439,15 @@
             span (ls/birth-death-string birthyear deathyear)]
         (ds/transact! d/conn [[:db/add id :persona/lifespan span]])))))
 
-(defn recur-update-lifespan
-  [fields data]
-  ;(println "slekt.events:recur-update-lifespan")
-  ;(println fields)
-  ;(println data)
-  (if (empty? fields)
-    nil
-    (let [field (first fields)
-          field-id (get field 0)
-          value (get-in data [:values :roles field-id])]
-      (update-lifespan-persona value)
-      (recur (rest fields) data))))
-
 (defn update-lifespan
-  []
-  (let [data (get-in @d/state [:window/edit])
-        fields (th/get-roles (:type data))]
-    (println "slekt.events:update-lifespan")
-    (println data)
-    (println fields)
-    (recur-update-lifespan fields data)))
+  ([]
+    (let [roles (get-in @d/state [:window/edit :values :roles])]
+      (println "slekt.events:update-lifespan")
+      (println roles)
+      (update-lifespan roles)))
+  ([roles]
+   (if (empty? roles)
+     nil
+     (let [role (first roles)]
+       (update-lifespan-persona (get role 1))
+       (recur (rest roles))))))
