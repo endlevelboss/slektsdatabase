@@ -147,15 +147,18 @@
 
 (defn find-children
   [id]
-  (let [mysex (ffirst (find-sex-of-person id))
-        myrole (if (= :m mysex)
-                 :father
-                 :mother)
-        children (into #{} (flatten (into [] (get-relation :child myrole id))))]
+  (let [
+        children1 (into #{} (flatten (into [] (get-relation :child :father id))))
+        children2 (into children1 (flatten (into [] (get-relation :child :mother id))))
+        children3 (into children2 (flatten (into [] (get-relation :son :husband id))))
+        children4 (into children3 (flatten (into [] (get-relation :son :wife id))))
+        children5 (into children4 (flatten (into [] (get-relation :daughter :husband id))))
+        children6 (into children5 (flatten (into [] (get-relation :daughter :wife id))))
+        ]
     ;(println id)
     ;(println myrole)
     ;(println children)
-    children))
+    children6))
 
 (defn find-spouses
   "Finds all persons that are registered as married, OR has children together"
@@ -169,8 +172,13 @@
 (defn find-parent-id
   [oid myid]
   (let [par1 (into #{} (flatten (into [] (get-relation :father :child myid))))
-        par2 (into par1 (flatten (into [] (get-relation :mother :child myid))))]
-    (disj par2 oid)))
+        par2 (into par1 (flatten (into [] (get-relation :mother :child myid))))
+        par3 (into par2 (flatten (into [] (get-relation :husband :son myid))))
+        par4 (into par3 (flatten (into [] (get-relation :husband :daughter myid))))
+        par5 (into par4 (flatten (into [] (get-relation :wife :son myid))))
+        par6 (into par5 (flatten (into [] (get-relation :wife :daughter myid))))
+        ]
+    (disj par6 oid)))
 
 (defn recur-arrange
   [spousemap myid pids]
@@ -355,15 +363,15 @@
           [?rid :role/field ?f]]
         @conn eventid field))
 
-(defn get-persona-from-field
-  [eventid field]
-  (ds/q '[:find ?pid
-          :in $ ?eid ?f
-          :where
-          [?eid :event/roles ?rid]
-          [?rid :role/field ?f]
-          [?rid :role/persona ?pid]]
-        @conn eventid field))
+;(defn get-persona-from-field
+;  [eventid field]
+;  (ds/q '[:find ?pid
+;          :in $ ?eid ?f
+;          :where
+;          [?eid :event/roles ?rid]
+;          [?rid :role/field ?f]
+;          [?rid :role/persona ?pid]]
+;        @conn eventid field))
 
 (defn get-field-id
   [eventid field fieldtype]

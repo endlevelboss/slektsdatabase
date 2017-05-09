@@ -134,20 +134,20 @@
   [index]
   (swap! d/state assoc-in [:window/edit :values :roles index] {:persona/by-id nil :role nil}))
 
-(defn multi-component
-  [field]
-  (println "slekt.gui.edit:multi-component")
-  (println field)
-  (let [field-id (get field 0)
-        list (get-in @d/state [:window/edit :values :roles field-id])
-        count (count list)]
-    (println list)
-    [:div (d/l :persons-household)
-     (for [l list]
-       ^{:key (get l 0)} [person-list-component l field-id])
-     [:input {:type "button"
-              :value "+"
-              :on-click #(button-add-person-list-component  count)}]]))
+;(defn multi-component
+;  [field]
+;  (println "slekt.gui.edit:multi-component")
+;  (println field)
+;  (let [field-id (get field 0)
+;        list (get-in @d/state [:window/edit :values :roles field-id])
+;        count (count list)]
+;    (println list)
+;    [:div (d/l :persons-household)
+;     (for [l list]
+;       ^{:key (get l 0)} [person-list-component l field-id])
+;     [:input {:type "button"
+;              :value "+"
+;              :on-click #(button-add-person-list-component  count)}]]))
 
 (defn person-generator
   [persons]
